@@ -119,9 +119,8 @@ local function ShowKeyValidationOverlay(cfg)
     function controller:GetGui() return gui end
     return controller
 end
-
 local controller=ShowKeyValidationOverlay({
-    duration=8,
+    duration=12,
     fadeIn=0.25,
     fadeOut=0.25,
     title="Connecting to NoxHub",
