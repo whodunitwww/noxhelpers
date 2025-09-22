@@ -1,5 +1,5 @@
 return function(a)
-    -- Dependency injection
+    -- Dependency injection ll
     local Services, References, Tabs, Library = a.Services, a.References, a.Tabs, a.Library
     local Players, Workspace, RunService, UserInputService = Services.Players, Services.Workspace, Services.RunService, Services.UserInputService
 
@@ -31,6 +31,22 @@ return function(a)
     cfg.ShowAimLine        = (cfg.ShowAimLine ~= nil) and cfg.ShowAimLine or false
     cfg.ProjectileSpeed    = cfg.ProjectileSpeed or 0        -- 0 = hitscan / no ballistic math
     cfg.DeadzonePixels     = cfg.DeadzonePixels or 6
+
+    -- 🔧 TargetTypes normalization + helper (fixes multi-select map vs array)
+    local function normalizeTargetTypes(t)
+        if type(t) ~= "table" then return {"Players"} end
+        if #t > 0 then return t end
+        local out = {}
+        for k,v in pairs(t) do if v then out[#out+1] = k end end
+        if #out == 0 then out = {"Players"} end
+        return out
+    end
+    local function hasType(t, name)
+        if type(t) ~= "table" then return false end
+        if #t > 0 then return table.find(t, name) ~= nil end
+        return t[name] == true
+    end
+    cfg.TargetTypes = normalizeTargetTypes(cfg.TargetTypes)
 
     -- Drawing support (some executors don't support Drawing)
     local hasDrawing, Drawing = pcall(function() return Drawing end)
@@ -145,8 +161,8 @@ return function(a)
 
     local function collectCandidates()
         local out = {}
-        local wantPlayers = table.find(cfg.TargetTypes, "Players") ~= nil
-        local wantNPCs = table.find(cfg.TargetTypes, "NPCs") ~= nil
+        local wantPlayers = hasType(cfg.TargetTypes, "Players")
+        local wantNPCs    = hasType(cfg.TargetTypes, "NPCs")
         if wantPlayers then
             for _,pl in ipairs(Players:GetPlayers()) do
                 if pl ~= References.player and pl.Character then out[#out+1] = pl.Character end
@@ -353,7 +369,7 @@ return function(a)
     group:AddToggle("AB_AimbotEnabled", {Text = "Enable Aimbot", Default = cfg.Enabled, Callback = function(v) cfg.Enabled = v end})
     group:AddToggle("AB_MobileAutoAim", {Text = "Mobile Auto Aim", Default = cfg.MobileAutoAim, Callback = function(v) cfg.MobileAutoAim = v end})
     group:AddToggle("AB_ShowAimLine", {Text = "Show Aim Line", Default = cfg.ShowAimLine, Callback = function(v) cfg.ShowAimLine = v if hasDrawing and aimLine then aimLine.Visible = false end end})
-    group:AddDropdown("AB_TargetTypes", { Text = "Target Types", Values = {"Players","NPCs"}, Default = cfg.TargetTypes, Multi = true, Callback = function(v) cfg.TargetTypes = v end })
+    group:AddDropdown("AB_TargetTypes", { Text = "Target Types", Values = {"Players","NPCs"}, Default = cfg.TargetTypes, Multi = true, Callback = function(v) cfg.TargetTypes = normalizeTargetTypes(v) end })
     group:AddDropdown("AB_TargetParts", { Text = "Target Part", Values = {"Head","HumanoidRootPart","UpperTorso","LowerTorso","Torso"}, Default = cfg.TargetParts[1], Callback = function(v) cfg.TargetParts = {v} end })
     group:AddToggle("AB_TeamCheck", {Text = "Team Check", Default = cfg.TeamCheck, Callback = function(v) cfg.TeamCheck = v end})
     group:AddToggle("AB_WallCheck", {Text = "Wall Check", Default = cfg.WallCheck, Callback = function(v) cfg.WallCheck = v end})
@@ -373,7 +389,6 @@ return function(a)
             if typeof(val) == "EnumItem" then
                 cfg.AimKey = val
             elseif type(val) == "string" then
-                -- try to resolve to Enum.KeyCode if possible
                 cfg.AimKey = (Enum.KeyCode[val] and Enum.KeyCode[val]) or val
             else
                 cfg.AimKey = val
