@@ -328,7 +328,7 @@ return function(a)
     group:AddSlider("AB_Prediction", {Text = "Prediction", Default = cfg.Prediction, Min = 0, Max = 0.5, Rounding = 2, Callback = function(v) cfg.Prediction = v end})
     group:AddSlider("AB_DropCompensation", {Text = "Drop Compensation", Default = cfg.DropCompensation, Min = 0, Max = 5, Rounding = 2, Callback = function(v) cfg.DropCompensation = v end})
     group:AddSlider("AB_ProjectileSpeed", {Text = "Projectile Speed (0=hitscan)", Default = cfg.ProjectileSpeed, Min = 0, Max = 2000, Rounding = 0, Callback = function(v) cfg.ProjectileSpeed = v end})
-    group:AddLabel("Aim Key"):AddKeyPicker("AB_AimKey", {
+    group:AddLabel("Secondary Aim Key"):AddKeyPicker("AB_AimKey", {
         Default = (typeof(cfg.AimKey) == "EnumItem" and cfg.AimKey.Name) or tostring(cfg.AimKey) or "Q",
         NoUI = false,
         Text = "Hold/Press to Aim",
