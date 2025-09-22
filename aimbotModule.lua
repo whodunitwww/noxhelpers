@@ -319,15 +319,15 @@ return function(a)
     end
 
     -- Update FOV circle position & visuals
-    const updateFOV = function()
+    local function updateFOV()
         if not hasDrawing or not fovCircle then return end
         local cam = camera()
         if not cam then return end
         local vs = cam.ViewportSize
-        fovCircle.Position = Vector2.new(vs.X*0.5, vs.Y*0.5)
-        fovCircle.Radius = cfg.FOV
-        fovCircle.Color = cfg.FOVColor
-        fovCircle.Visible = cfg.ShowFOV
+        fovCircle.Position = Vector2.new(vs.X * 0.5, vs.Y * 0.5)
+        fovCircle.Radius   = cfg.FOV
+        fovCircle.Color    = cfg.FOVColor
+        fovCircle.Visible  = cfg.ShowFOV
     end
 
     -- Main render loop connections
