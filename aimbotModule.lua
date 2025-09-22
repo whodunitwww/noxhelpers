@@ -1,16 +1,20 @@
 return function(a)
+    -- Dependency injection
     local Services, References, Tabs, Library = a.Services, a.References, a.Tabs, a.Library
     local Players, Workspace, RunService, UserInputService = Services.Players, Services.Workspace, Services.RunService, Services.UserInputService
 
+    -- Namespaced config in getgenv to avoid collisions
     local root = getgenv()
     root.CERB = root.CERB or {}
     root.CERB.Aimbot = root.CERB.Aimbot or {}
     local cfg = root.CERB.Aimbot
 
+    -- camera accessor
     local function camera()
         return References.camera or Workspace.CurrentCamera
     end
 
+    -- defaults (only set if not present)
     cfg.Enabled            = (cfg.Enabled ~= nil) and cfg.Enabled or false
     cfg.AimKey             = cfg.AimKey or Enum.KeyCode.Q
     cfg.FOV                = cfg.FOV or 80
@@ -28,30 +32,41 @@ return function(a)
     cfg.ProjectileSpeed    = cfg.ProjectileSpeed or 0
     cfg.DeadzonePixels     = cfg.DeadzonePixels or 6
 
-    local hasDrawing, Drawing = pcall(function() return Drawing end)
-    hasDrawing = hasDrawing and type(Drawing) == "table"
+    -- --- Robust Drawing detection & creation (no dependency on previous scripts)
+    local hasDrawing, DrawingObj = pcall(function() return Drawing end)
     local fovCircle, aimLine
-    if hasDrawing then
-        local ok, circle = pcall(function() return Drawing.new("Circle") end)
-        local ok2, line = pcall(function() return Drawing.new("Line") end)
-        if ok and ok2 and circle and line then
-            fovCircle = circle
-            fovCircle.Thickness, fovCircle.Filled = 1, false
-            fovCircle.Color = cfg.FOVColor
-            fovCircle.Visible = cfg.ShowFOV
+    do
+        local canCreate = false
+        if hasDrawing and DrawingObj then
+            -- Executors differ: sometimes Drawing is a table, function, or userdata; test-construction to be sure.
+            local ok, test = pcall(function() return (DrawingObj.new and DrawingObj.new("Line")) end)
+            canCreate = ok and test ~= nil
+        end
+        if canCreate then
+            local okC, circle = pcall(function() return DrawingObj.new("Circle") end)
+            local okL, line   = pcall(function() return DrawingObj.new("Line") end)
+            if okC and okL and circle and line then
+                fovCircle = circle
+                fovCircle.Thickness, fovCircle.Filled = 1, false
+                fovCircle.Color = cfg.FOVColor
+                fovCircle.Visible = cfg.ShowFOV
 
-            aimLine = line
-            aimLine.Color = Color3.fromRGB(255,0,0)
-            aimLine.Thickness = 1
-            aimLine.Visible = false
-        else
-            hasDrawing = false
-            fovCircle, aimLine = nil, nil
+                aimLine = line
+                aimLine.Color = Color3.fromRGB(255,0,0)
+                aimLine.Thickness = 1
+                aimLine.Visible = false
+            end
         end
     end
 
-    local highlight = cfg.Highlight or Instance.new("Highlight")
-    highlight.Name = "AimbotTargetHighlight"
+    -- --- Stable Highlight (reuse if exists; else create)
+    local coreParent = (gethui and gethui()) or game:GetService("CoreGui")
+    local highlight = (coreParent and coreParent:FindFirstChild("AimbotTargetHighlight")) or cfg.Highlight
+    if not (highlight and highlight.Parent) then
+        highlight = Instance.new("Highlight")
+        highlight.Name = "AimbotTargetHighlight"
+        highlight.Parent = coreParent
+    end
     highlight.FillColor = Color3.new(1,0,0)
     highlight.OutlineColor = Color3.new(0,0,0)
     highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
@@ -59,32 +74,33 @@ return function(a)
     highlight.OutlineTransparency = 0
     highlight.Adornee = nil
     highlight.Enabled = false
-    local coreParent = (gethui and gethui()) or game:GetService("CoreGui")
-    if highlight.Parent ~= coreParent then highlight.Parent = coreParent end
     cfg.Highlight = highlight
 
+    -- --- Raycast params (always exclude local character)
     local rcParams = RaycastParams.new()
     rcParams.FilterType = Enum.RaycastFilterType.Exclude
     rcParams.FilterDescendantsInstances = {}
 
-    local function setRaycastFilter(excludeInstances)
+    local function setRaycastFilter(extra)
         local t = {}
         if References.character then t[#t+1] = References.character end
-        if excludeInstances then
-            if type(excludeInstances) == "table" then
-                for _,v in ipairs(excludeInstances) do t[#t+1] = v end
-            else
-                t[#t+1] = excludeInstances
-            end
+        if type(extra) == "table" then
+            for _,v in ipairs(extra) do t[#t+1] = v end
+        elseif extra then
+            t[#t+1] = extra
         end
         rcParams.FilterDescendantsInstances = t
     end
 
+    -- --- NPC discovery (simple, safe)
     local npcFolders = {}
     local function discoverNpcFolders()
         npcFolders = {}
-        local f1 = Workspace:FindFirstChild("NPCs") or Workspace:FindFirstChild("NPCS")
-        if f1 then npcFolders[#npcFolders+1] = f1 end
+        local names = { "NPCs","NPCS","Enemies","Mobs" }
+        for _,n in ipairs(names) do
+            local f = Workspace:FindFirstChild(n)
+            if f then npcFolders[#npcFolders+1] = f end
+        end
     end
     discoverNpcFolders()
     local npcAddConns = {}
@@ -112,11 +128,12 @@ return function(a)
     local function isFriendly(model)
         if not cfg.TeamCheck then return false end
         local pl = Players:GetPlayerFromCharacter(model)
-        if not pl or not References.player then return false end
-        if References.player.Team and pl.Team then
-            return References.player.Team == pl.Team
+        local me = References.player
+        if not (pl and me) then return false end
+        if me.Team and pl.Team then
+            return me.Team == pl.Team
         end
-        return References.player.TeamColor == pl.TeamColor
+        return me.TeamColor == pl.TeamColor
     end
 
     local function wallFree(part)
@@ -135,15 +152,14 @@ return function(a)
     local function collectCandidates()
         local out = {}
         local wantPlayers = table.find(cfg.TargetTypes, "Players") ~= nil
-        local wantNPCs = table.find(cfg.TargetTypes, "NPCs") ~= nil
+        local wantNPCs    = table.find(cfg.TargetTypes, "NPCs")    ~= nil
         if wantPlayers then
             for _,pl in ipairs(Players:GetPlayers()) do
                 if pl ~= References.player and pl.Character then out[#out+1] = pl.Character end
             end
         end
         if wantNPCs then
-            local list = npcModels()
-            for _,m in ipairs(list) do out[#out+1] = m end
+            for _,m in ipairs(npcModels()) do out[#out+1] = m end
         end
         return out
     end
@@ -155,7 +171,8 @@ return function(a)
     local function acquireTarget(force)
         local now = tick()
         if not force and currentTarget then
-            if currentTarget.Parent and currentTarget:FindFirstChildOfClass("Humanoid") and currentTarget:FindFirstChildOfClass("Humanoid").Health > 0 then
+            local hum = currentTarget:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health > 0 and currentTarget.Parent then
                 return currentTarget
             else
                 currentTarget = nil
@@ -204,14 +221,14 @@ return function(a)
 
     local gravityVec = Vector3.new(0, -Workspace.Gravity, 0)
     local function leadPoint(origin, targetPos, targetVel)
+        local toTarget = targetPos - origin
+        local distance = toTarget.Magnitude
         if cfg.ProjectileSpeed and cfg.ProjectileSpeed > 0 then
-            local toTarget = targetPos - origin
-            local distance = toTarget.Magnitude
             local t = distance / cfg.ProjectileSpeed
-            local pred = targetPos + targetVel * t + 0.5 * gravityVec * (t*t)
-            return pred
+            return targetPos + targetVel * t + 0.5 * gravityVec * (t*t)
         else
-            return targetPos + targetVel * cfg.Prediction + Vector3.new(0, (distance and (distance/100)*cfg.DropCompensation or 0), 0)
+            local drop = (distance/100) * (cfg.DropCompensation or 0)
+            return targetPos + targetVel * (cfg.Prediction or 0) + Vector3.new(0, drop, 0)
         end
     end
 
@@ -239,7 +256,14 @@ return function(a)
         if not (cam and model) then return end
         local part = model:FindFirstChild(cfg.TargetParts[1]) or model:FindFirstChild("HumanoidRootPart")
         if not part then return end
-        local vel = part.AssemblyLinearVelocity or part:FindFirstChildWhichIsA("BasePart") and part.Velocity or Vector3.zero
+
+        local vel = part.AssemblyLinearVelocity
+        if not vel then
+            -- fallbacks for older parts/executors
+            local ok, v = pcall(function() return part.Velocity end)
+            vel = (ok and v) or Vector3.zero
+        end
+
         local origin = cam.CFrame.Position
         local targetLead = leadPoint(origin, part.Position, vel)
         local toDir = (targetLead - origin)
@@ -254,19 +278,20 @@ return function(a)
         local alpha = expSmooth(smoothFactor, dt)
         local newCF = CFrame.new(origin, targetLead)
         cam.CFrame = cam.CFrame:Lerp(newCF, alpha)
-        if cfg.ShowAimLine and hasDrawing and aimLine then
+
+        if cfg.ShowAimLine and aimLine then
             local vs = cam.ViewportSize
             aimLine.From = Vector2.new(vs.X*0.5, vs.Y)
             local sc = cam:WorldToViewportPoint(targetLead)
             aimLine.To = Vector2.new(sc.X, sc.Y)
             aimLine.Visible = true
-        elseif hasDrawing and aimLine then
+        elseif aimLine then
             aimLine.Visible = false
         end
     end
 
     local function updateFOV()
-        if not hasDrawing or not fovCircle then return end
+        if not fovCircle then return end
         local cam = camera()
         if not cam then return end
         local vs = cam.ViewportSize
@@ -285,23 +310,24 @@ return function(a)
 
         if not cfg.Enabled then
             if highlight and highlight.Enabled then highlight.Enabled = false; highlight.Adornee = nil end
-            if hasDrawing and aimLine then aimLine.Visible = false end
+            if aimLine then aimLine.Visible = false end
             return
         end
 
         local target = acquireTarget()
         if target then
-            highlight.Adornee = target
-            highlight.Enabled = true
-
+            if highlight then
+                highlight.Adornee = target
+                highlight.Enabled = true
+            end
             if shouldAim() then
                 aimAt(target, dt)
             else
-                if hasDrawing and aimLine then aimLine.Visible = false end
+                if aimLine then aimLine.Visible = false end
             end
         else
             if highlight and highlight.Enabled then highlight.Enabled = false; highlight.Adornee = nil end
-            if hasDrawing and aimLine then aimLine.Visible = false end
+            if aimLine then aimLine.Visible = false end
         end
     end)
 
@@ -310,14 +336,14 @@ return function(a)
     local group = Tabs.Combat:AddLeftGroupbox("Aimbot", "crosshair")
     group:AddToggle("AB_AimbotEnabled", {Text = "Enable Aimbot", Default = cfg.Enabled, Callback = function(v) cfg.Enabled = v end})
     group:AddToggle("AB_MobileAutoAim", {Text = "Mobile Auto Aim", Default = cfg.MobileAutoAim, Callback = function(v) cfg.MobileAutoAim = v end})
-    group:AddToggle("AB_ShowAimLine", {Text = "Show Aim Line", Default = cfg.ShowAimLine, Callback = function(v) cfg.ShowAimLine = v if hasDrawing and aimLine then aimLine.Visible = false end end})
+    group:AddToggle("AB_ShowAimLine", {Text = "Show Aim Line", Default = cfg.ShowAimLine, Callback = function(v) cfg.ShowAimLine = v if aimLine then aimLine.Visible = false end end})
     group:AddDropdown("AB_TargetTypes", { Text = "Target Types", Values = {"Players","NPCs"}, Default = cfg.TargetTypes, Multi = true, Callback = function(v) cfg.TargetTypes = v end })
     group:AddDropdown("AB_TargetParts", { Text = "Target Part", Values = {"Head","HumanoidRootPart","UpperTorso","LowerTorso","Torso"}, Default = cfg.TargetParts[1], Callback = function(v) cfg.TargetParts = {v} end })
     group:AddToggle("AB_TeamCheck", {Text = "Team Check", Default = cfg.TeamCheck, Callback = function(v) cfg.TeamCheck = v end})
     group:AddToggle("AB_WallCheck", {Text = "Wall Check", Default = cfg.WallCheck, Callback = function(v) cfg.WallCheck = v end})
-    group:AddLabel("FOV Circle Color"):AddColorPicker("FOVColorPicker", {Default = cfg.FOVColor, Title = "FOV Circle Color", Callback = function(col) cfg.FOVColor = col if hasDrawing and fovCircle then fovCircle.Color = col end end})
-    group:AddToggle("AB_ShowFOVCircle", {Text = "Show FOV Circle", Default = cfg.ShowFOV, Callback = function(v) cfg.ShowFOV = v if hasDrawing and fovCircle then fovCircle.Visible = v end end})
-    group:AddSlider("AB_FOVRadius", {Text = "FOV Radius", Default = cfg.FOV, Min = 20, Max = 300, Rounding = 0, Callback = function(v) cfg.FOV = v if hasDrawing and fovCircle then fovCircle.Radius = v end end})
+    group:AddLabel("FOV Circle Color"):AddColorPicker("FOVColorPicker", {Default = cfg.FOVColor, Title = "FOV Circle Color", Callback = function(col) cfg.FOVColor = col if fovCircle then fovCircle.Color = col end end})
+    group:AddToggle("AB_ShowFOVCircle", {Text = "Show FOV Circle", Default = cfg.ShowFOV, Callback = function(v) cfg.ShowFOV = v if fovCircle then fovCircle.Visible = v end end})
+    group:AddSlider("AB_FOVRadius", {Text = "FOV Radius", Default = cfg.FOV, Min = 20, Max = 300, Rounding = 0, Callback = function(v) cfg.FOV = v if fovCircle then fovCircle.Radius = v end end})
     group:AddSlider("AB_Smoothness", {Text = "Smoothness", Default = cfg.Smoothness, Min = 0.01, Max = 1, Rounding = 2, Callback = function(v) cfg.Smoothness = v end})
     group:AddSlider("AB_Prediction", {Text = "Prediction", Default = cfg.Prediction, Min = 0, Max = 0.5, Rounding = 2, Callback = function(v) cfg.Prediction = v end})
     group:AddSlider("AB_DropCompensation", {Text = "Drop Compensation", Default = cfg.DropCompensation, Min = 0, Max = 5, Rounding = 2, Callback = function(v) cfg.DropCompensation = v end})
@@ -341,12 +367,10 @@ return function(a)
         if aimConn then aimConn:Disconnect(); aimConn = nil end
         if fovConn then fovConn:Disconnect(); fovConn = nil end
         if camConn then camConn:Disconnect(); camConn = nil end
-        if hasDrawing then
-            pcall(function() if fovCircle and fovCircle.Remove then fovCircle:Remove() end end)
-            pcall(function() if aimLine and aimLine.Remove then aimLine:Remove() end end)
-        end
+        if fovCircle then pcall(function() if fovCircle.Remove then fovCircle:Remove() end end) end
+        if aimLine   then pcall(function() if aimLine.Remove   then aimLine:Remove()   end end) end
         if fovCircle then fovCircle.Visible = false end
-        if aimLine then aimLine.Visible = false end
+        if aimLine   then aimLine.Visible   = false end
         if highlight then highlight.Enabled = false; highlight.Adornee = nil end
         for _,c in ipairs(npcAddConns) do pcall(function() c:Disconnect() end) end
         npcAddConns = {}
