@@ -1,5 +1,5 @@
 return function(a)
-    -- Dependency injection
+    -- Dependency injection fr
     local Services, References, Tabs, Library = a.Services, a.References, a.Tabs, a.Library
     local Players, Workspace, RunService, UserInputService = Services.Players, Services.Workspace, Services.RunService, Services.UserInputService
 
@@ -31,6 +31,35 @@ return function(a)
     cfg.ShowAimLine        = (cfg.ShowAimLine ~= nil) and cfg.ShowAimLine or false
     cfg.ProjectileSpeed    = cfg.ProjectileSpeed or 0        -- 0 = hitscan / no ballistic math
     cfg.DeadzonePixels     = cfg.DeadzonePixels or 6
+
+    -- === Multi-select helpers (fix) ===
+    local function hasChoice(sel, value)
+        if type(sel) ~= "table" then
+            return sel == value
+        end
+        if sel[1] ~= nil then
+            -- array form: {"Players","NPCs"}
+            return table.find(sel, value) ~= nil
+        else
+            -- map form: { Players=true, NPCs=true }
+            return sel[value] == true
+        end
+    end
+    local function toArray(sel)
+        if type(sel) ~= "table" then
+            return { sel }
+        end
+        if sel[1] ~= nil then
+            return sel
+        end
+        local arr = {}
+        for k,v in pairs(sel) do
+            if v then arr[#arr+1] = k end
+        end
+        table.sort(arr)
+        return arr
+    end
+    -- ===================================
 
     -- Drawing support (some executors don't support Drawing)
     local hasDrawing, Drawing = pcall(function() return Drawing end)
@@ -99,7 +128,7 @@ return function(a)
     local npcAddConns = {}
     local function watchNpcFolder(folder)
         if not folder then return end
-        local con = folder.ChildAdded:Connect(function() end) -- placeholder: existence ensures folder watched, actual scan done by npcModels()
+        local con = folder.ChildAdded:Connect(function() end) -- placeholder: existence ensures folder watched
         npcAddConns[#npcAddConns+1] = con
     end
     for _,f in ipairs(npcFolders) do watchNpcFolder(f) end
@@ -145,8 +174,9 @@ return function(a)
 
     local function collectCandidates()
         local out = {}
-        local wantPlayers = table.find(cfg.TargetTypes, "Players") ~= nil
-        local wantNPCs = table.find(cfg.TargetTypes, "NPCs") ~= nil
+        local wantPlayers = hasChoice(cfg.TargetTypes, "Players")
+        local wantNPCs    = hasChoice(cfg.TargetTypes, "NPCs")
+
         if wantPlayers then
             for _,pl in ipairs(Players:GetPlayers()) do
                 if pl ~= References.player and pl.Character then out[#out+1] = pl.Character end
@@ -168,7 +198,8 @@ return function(a)
         local now = tick()
         if not force and currentTarget then
             -- validate current
-            if currentTarget.Parent and currentTarget:FindFirstChildOfClass("Humanoid") and currentTarget:FindFirstChildOfClass("Humanoid").Health > 0 then
+            local hum = currentTarget:FindFirstChildOfClass("Humanoid")
+            if currentTarget.Parent and hum and hum.Health > 0 then
                 return currentTarget
             else
                 currentTarget = nil
@@ -230,7 +261,8 @@ return function(a)
             return pred
         else
             -- hitscan-ish: simple linear prediction + optional drop compensation
-            return targetPos + targetVel * cfg.Prediction + Vector3.new(0, (distance and (distance/100)*cfg.DropCompensation or 0), 0)
+            local distance = (targetPos - origin).Magnitude
+            return targetPos + targetVel * cfg.Prediction + Vector3.new(0, (distance/100)*cfg.DropCompensation, 0)
         end
     end
 
@@ -264,7 +296,7 @@ return function(a)
         local part = model:FindFirstChild(cfg.TargetParts[1]) or model:FindFirstChild("HumanoidRootPart")
         if not part then return end
 
-        local vel = part.AssemblyLinearVelocity or part:FindFirstChildWhichIsA("BasePart") and part.Velocity or Vector3.zero
+        local vel = part.AssemblyLinearVelocity or (part:IsA("BasePart") and part.Velocity) or Vector3.zero
         local origin = cam.CFrame.Position
 
         -- compute lead & drop compensation
@@ -279,7 +311,7 @@ return function(a)
 
         -- responsiveness: bigger error -> faster response
         local baseResp = 8  -- per-second base
-        local resp = baseResp + (22 * (angleErr / math.rad(cfg.FOV))) -- in range [8,30] roughly
+        local resp = baseResp + (22 * (angleErr / math.rad(cfg.FOV))) -- ~[8,30]
         -- scale by Smoothness (lower Smoothness = faster response, invert to keep semantics)
         local smoothFactor = math.clamp(1 - cfg.Smoothness, 0.01, 1) * resp
         local alpha = expSmooth(smoothFactor, dt)
@@ -317,7 +349,7 @@ return function(a)
     fovConn = RunService.RenderStepped:Connect(updateFOV)
 
     aimConn = RunService.RenderStepped:Connect(function(dt)
-        -- dt here is seconds passed since last render step; some executors pass dt directly, others not — safeguard:
+        -- dt here is seconds passed since last render step; fallback if not provided
         dt = tonumber(dt) or math.max(1/60, tick() - lastTick)
         lastTick = tick()
 
@@ -353,7 +385,13 @@ return function(a)
     group:AddToggle("AB_AimbotEnabled", {Text = "Enable Aimbot", Default = cfg.Enabled, Callback = function(v) cfg.Enabled = v end})
     group:AddToggle("AB_MobileAutoAim", {Text = "Mobile Auto Aim", Default = cfg.MobileAutoAim, Callback = function(v) cfg.MobileAutoAim = v end})
     group:AddToggle("AB_ShowAimLine", {Text = "Show Aim Line", Default = cfg.ShowAimLine, Callback = function(v) cfg.ShowAimLine = v if hasDrawing and aimLine then aimLine.Visible = false end end})
-    group:AddDropdown("AB_TargetTypes", { Text = "Target Types", Values = {"Players","NPCs"}, Default = cfg.TargetTypes, Multi = true, Callback = function(v) cfg.TargetTypes = v end })
+    group:AddDropdown("AB_TargetTypes", {
+        Text = "Target Types",
+        Values = {"Players","NPCs"},
+        Default = toArray(cfg.TargetTypes),   -- << use array form for UI default
+        Multi = true,
+        Callback = function(v) cfg.TargetTypes = v end
+    })
     group:AddDropdown("AB_TargetParts", { Text = "Target Part", Values = {"Head","HumanoidRootPart","UpperTorso","LowerTorso","Torso"}, Default = cfg.TargetParts[1], Callback = function(v) cfg.TargetParts = {v} end })
     group:AddToggle("AB_TeamCheck", {Text = "Team Check", Default = cfg.TeamCheck, Callback = function(v) cfg.TeamCheck = v end})
     group:AddToggle("AB_WallCheck", {Text = "Wall Check", Default = cfg.WallCheck, Callback = function(v) cfg.WallCheck = v end})
@@ -364,7 +402,7 @@ return function(a)
     group:AddSlider("AB_Prediction", {Text = "Prediction", Default = cfg.Prediction, Min = 0, Max = 0.5, Rounding = 2, Callback = function(v) cfg.Prediction = v end})
     group:AddSlider("AB_DropCompensation", {Text = "Drop Compensation", Default = cfg.DropCompensation, Min = 0, Max = 5, Rounding = 2, Callback = function(v) cfg.DropCompensation = v end})
     group:AddSlider("AB_ProjectileSpeed", {Text = "Projectile Speed (0=hitscan)", Default = cfg.ProjectileSpeed, Min = 0, Max = 2000, Rounding = 0, Callback = function(v) cfg.ProjectileSpeed = v end})
-    group:AddLabel("Aim Key"):AddKeyPicker("AB_AimKey", {
+    group:AddLabel("Secondary Aim Key"):AddKeyPicker("AB_AimKey", {
         Default = (typeof(cfg.AimKey) == "EnumItem" and cfg.AimKey.Name) or tostring(cfg.AimKey) or "Q",
         NoUI = false,
         Text = "Hold/Press to Aim",
@@ -373,7 +411,6 @@ return function(a)
             if typeof(val) == "EnumItem" then
                 cfg.AimKey = val
             elseif type(val) == "string" then
-                -- try to resolve to Enum.KeyCode if possible
                 cfg.AimKey = (Enum.KeyCode[val] and Enum.KeyCode[val]) or val
             else
                 cfg.AimKey = val
