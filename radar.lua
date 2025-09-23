@@ -1,6 +1,5 @@
--- radar.lua  (module-like self-contained)
+-- radar.lua
 return function(Tabs, Services, References)
-    -- == PLAYER RADAR == --
     local RadarGroup = Tabs.ESP:AddRightGroupbox("Player Radar", "map")
 
     local radar = {
@@ -8,17 +7,19 @@ return function(Tabs, Services, References)
         range = 500, scale = 1,
         mode = "Camera",
         rings = {},
+        _holder = nil, _centerIcon = nil,
+        buildRings = nil, updateRings = nil,
     }
 
     local function destroyRadar()
         if radar.conn then radar.conn:Disconnect(); radar.conn = nil end
         if radar.gui then radar.gui:Destroy(); radar.gui = nil end
         radar.rings = {}
+        radar._holder, radar._centerIcon = nil, nil
     end
 
     local function createRadar()
         destroyRadar()
-
         local parent = (gethui and gethui()) or Services.CoreGui
         local sg = Instance.new("ScreenGui")
         sg.Name = "CerberusRadar"
@@ -146,8 +147,7 @@ return function(Tabs, Services, References)
                                 rx = rel:Dot(camRight)
                                 rz = -rel:Dot(camForward)
                             else
-                                rx = rel.X
-                                rz = rel.Z
+                                rx = rel.X; rz = rel.Z
                             end
 
                             local pos = Vector2.new(rx, rz) / radar.range * radius
@@ -216,4 +216,11 @@ return function(Tabs, Services, References)
         Default = "Camera",
         Callback = function(v) radar.mode = v end
     })
+
+    -- Expose API to the caller so it can unload
+    return {
+        destroy = destroyRadar,
+        create  = createRadar,
+        isActive = function() return radar.gui ~= nil end
+    }
 end
