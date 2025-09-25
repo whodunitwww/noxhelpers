@@ -172,7 +172,7 @@ math.randomseed(os.clock()*1e6)
 
 showNotification{
     title = "Welcome to Cerberus",
-    message = "Thanks for installing! Enjoy fast, safe features and a clean UI. Join our Discord for updates, support, and giveaways.",
+    message = "Thanks for choosing Cerberus! Enjoy fast, safe features and a clean UI. Join our Discord for updates and support.",
     duration = 5,
     copyText = DISCORD,
     buttonText = "Copy Discord Link"
