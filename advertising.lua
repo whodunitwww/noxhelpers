@@ -1,10 +1,12 @@
 local ICON_ASSET_ID = "rbxassetid://136497541793809"
 local GREEN = Color3.fromRGB(0, 220, 120)
 local BLACK = Color3.fromRGB(10, 10, 10)
+
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local Camera = workspace.CurrentCamera
 local playerGui = Players.LocalPlayer:FindFirstChildOfClass("PlayerGui") or Players.LocalPlayer:WaitForChild("PlayerGui")
+
 local function softenURLs(s)
     s = s:gsub("https?://[%w%p]+", function(url)
         url = url:gsub("/", "/\226\128\139")
@@ -13,6 +15,7 @@ local function softenURLs(s)
     end)
     return s
 end
+
 local function copyToClipboard(text)
     local ok = false
     pcall(function()
@@ -24,6 +27,7 @@ local function copyToClipboard(text)
     end)
     return ok
 end
+
 local function showNotification(opts)
     opts = opts or {}
     local titleText = tostring(opts.title or "Notification")
@@ -32,14 +36,17 @@ local function showNotification(opts)
     local duration = tonumber(opts.duration or 5)
     local copyText = (type(opts.copyText) == "string" and #opts.copyText > 0) and opts.copyText or nil
     local buttonLabel = tostring(opts.buttonText or "Copy")
+
     local viewportX = Camera and Camera.ViewportSize.X or 1280
     local targetWidth = math.clamp(math.floor(viewportX * 0.8), 640, 1360)
+
     local gui = Instance.new("ScreenGui")
     gui.Name = "CerberusTopToast"
     gui.ResetOnSpawn = false
     gui.IgnoreGuiInset = true
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = playerGui
+
     local frame = Instance.new("Frame")
     frame.Name = "Toast"
     frame.Size = UDim2.fromOffset(targetWidth, 20)
@@ -51,8 +58,10 @@ local function showNotification(opts)
     frame.BackgroundTransparency = 0.05
     frame.ClipsDescendants = true
     frame.Parent = gui
+
     local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0, 24); corner.Parent = frame
     local stroke = Instance.new("UIStroke"); stroke.Thickness = 4; stroke.Color = GREEN; stroke.Transparency = 0.2; stroke.Parent = frame
+
     local grad = Instance.new("UIGradient")
     grad.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0.0, Color3.fromRGB(18,18,18)),
@@ -60,17 +69,20 @@ local function showNotification(opts)
     }
     grad.Rotation = 90
     grad.Parent = frame
+
     local padding = Instance.new("UIPadding")
     padding.PaddingTop = UDim.new(0, 20)
     padding.PaddingBottom = UDim.new(0, 20)
     padding.PaddingLeft = UDim.new(0, 24)
     padding.PaddingRight = UDim.new(0, 24)
     padding.Parent = frame
+
     local list = Instance.new("UIListLayout")
     list.FillDirection = Enum.FillDirection.Horizontal
     list.VerticalAlignment = Enum.VerticalAlignment.Center
     list.Padding = UDim.new(0, 20)
     list.Parent = frame
+
     local icon = Instance.new("ImageLabel")
     icon.Name = "Icon"
     icon.Size = UDim2.fromOffset(80, 80)
@@ -79,20 +91,25 @@ local function showNotification(opts)
     icon.ScaleType = Enum.ScaleType.Fit
     icon.Parent = frame
     local iconCorner = Instance.new("UICorner"); iconCorner.CornerRadius = UDim.new(0, 16); iconCorner.Parent = icon
+
     local reservedLeft = 80 + 20 + 24
     local reservedRight = (copyText and (340 + 20) or 0) + 24
     local textPixelWidth = targetWidth - reservedLeft - reservedRight
+
     local textHolder = Instance.new("Frame")
     textHolder.Name = "TextHolder"
     textHolder.BackgroundTransparency = 1
     textHolder.Size = UDim2.fromOffset(math.max(240, textPixelWidth), 0)
     textHolder.AutomaticSize = Enum.AutomaticSize.Y
     textHolder.Parent = frame
+
     local textLayout = Instance.new("UIListLayout")
     textLayout.FillDirection = Enum.FillDirection.Vertical
-    textLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    textLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+    textLayout.SortOrder = Enum.SortOrder.LayoutOrder
     textLayout.Padding = UDim.new(0, 4)
     textLayout.Parent = textHolder
+
     local title = Instance.new("TextLabel")
     title.Name = "Title"
     title.BackgroundTransparency = 1
@@ -105,7 +122,9 @@ local function showNotification(opts)
     title.TextWrapped = true
     title.Text = titleText
     title.TextColor3 = GREEN
+    title.LayoutOrder = 1
     title.Parent = textHolder
+
     local body = Instance.new("TextLabel")
     body.Name = "Body"
     body.BackgroundTransparency = 1
@@ -119,7 +138,9 @@ local function showNotification(opts)
     body.TextTruncate = Enum.TextTruncate.None
     body.TextColor3 = Color3.fromRGB(225,225,225)
     body.Text = bodyText
+    body.LayoutOrder = 2
     body.Parent = textHolder
+
     local btn
     if copyText then
         btn = Instance.new("TextButton")
@@ -132,14 +153,17 @@ local function showNotification(opts)
         btn.TextColor3 = Color3.fromRGB(255,255,255)
         btn.Text = buttonLabel
         btn.Parent = frame
+
         local btnCorner = Instance.new("UICorner"); btnCorner.CornerRadius = UDim.new(0, 20); btnCorner.Parent = btn
         local btnStroke = Instance.new("UIStroke"); btnStroke.Thickness = 4; btnStroke.Color = GREEN; btnStroke.Transparency = 0.25; btnStroke.Parent = btn
+
         btn.MouseEnter:Connect(function()
             TweenService:Create(btn, TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(28,28,28)}):Play()
         end)
         btn.MouseLeave:Connect(function()
             TweenService:Create(btn, TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(20,20,20)}):Play()
         end)
+
         local copying = false
         btn.Activated:Connect(function()
             if copying then return end
@@ -151,13 +175,16 @@ local function showNotification(opts)
             task.delay(1, function() btn.Text = original; copying = false end)
         end)
     end
+
     TweenService:Create(frame, TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.5, 0.03), BackgroundTransparency = 0.05}):Play()
+
     task.delay(duration, function()
         local out = TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.fromScale(0.5, -0.12), BackgroundTransparency = 0.3})
         out:Play()
         out.Completed:Wait()
         gui:Destroy()
     end)
+
     if copyText then
         body.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -168,7 +195,7 @@ local function showNotification(opts)
 end
 
 local DISCORD = "https://getcerberus.com/discord"
-math.randomseed(os.clock()*1e6)
+math.randomseed(os.clock() * 1e6)
 
 showNotification{
     title = "Welcome to Cerberus",
@@ -195,9 +222,13 @@ local pool = {
     }
 }
 
+local function nextDelaySeconds()
+    return math.random(120, 240)
+end
+
 task.spawn(function()
     while true do
-        task.wait(120)
+        task.wait(nextDelaySeconds())
         local cfg = pool[math.random(1, #pool)]
         showNotification(cfg)
     end
