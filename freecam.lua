@@ -8,12 +8,10 @@ return function(Services, Tabs, References, Toggles, Options, Library)
     local Cam = Services.Workspace.CurrentCamera
 
     -- == UI ==
-    local Group = (Tabs.Misc or Tabs.Main or Tabs["UI Settings"]):AddRightGroupbox("Freecam", "video")
-
-    Group:AddToggle("Freecam_Enabled", { Text = "Enable Freecam", Default = false })
+    VisualsGroup:AddToggle("Freecam_Enabled", { Text = "Enable Freecam", Default = false })
         :AddKeyPicker("Freecam_Key", { Default = "P", SyncToggleState = true, Mode = "Toggle", Text = "Freecam Key" })
 
-    Group:AddSlider("Freecam_Sens", {
+    VisualsGroup:AddSlider("Freecam_Sens", {
         Text = "Sensitivity",
         Default = 1.0, Min = 0.2, Max = 3.0, Rounding = 2,
         Tooltip = "Scales movement, look and zoom speeds"
