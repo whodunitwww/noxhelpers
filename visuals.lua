@@ -104,9 +104,8 @@ return function(Services, Tabs, References, Toggles, Options, Library)
     Options.CameraFOV:OnChanged(applyFOV); applyFOV()
 
     ------------------------------------------------------------
-    -- FREECAM (toggle + keybind + sensitivity; blocks jumping)
+    -- FREECAM (toggle + keybind + sensitivity; no RMB needed)
     ------------------------------------------------------------
-    -- UI
     VisualsGroup:AddToggle("FreecamEnabled", { Text = "Freecam", Default = false })
         :AddKeyPicker("FreecamKey", { Default = "P", SyncToggleState = true, Mode = "Toggle", Text = "Freecam Key" })
     VisualsGroup:AddSlider("FreecamSensitivity", {
@@ -115,7 +114,6 @@ return function(Services, Tabs, References, Toggles, Options, Library)
         Tooltip = "Scales look + movement speed"
     })
 
-    -- State
     local Camera = Workspace.CurrentCamera
     Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function() Camera = Workspace.CurrentCamera end)
 
@@ -123,11 +121,8 @@ return function(Services, Tabs, References, Toggles, Options, Library)
         math.pi, math.exp, math.rad, math.sqrt, math.tan, math.abs, math.clamp, math.sign
 
     local PITCH_LIMIT = rad(90)
-    local Spring = {}
-    Spring.__index = Spring
-    function Spring.new(freq, pos)
-        return setmetatable({ f=freq, p=pos, v=pos*0 }, Spring)
-    end
+    local Spring = {}; Spring.__index = Spring
+    function Spring.new(freq, pos) return setmetatable({ f=freq, p=pos, v=pos*0 }, Spring) end
     function Spring:Update(dt, goal)
         local f = self.f*2*pi
         local p0, v0 = self.p, self.v
@@ -280,7 +275,9 @@ return function(Services, Tabs, References, Toggles, Options, Library)
         return gp + mw
     end
 
-    local stepConn
+    -- Use a simple boolean instead of a (nil) renderstep "connection"
+    local freecamOn = false
+
     local function StepFreecam(dt)
         local sens = Options.FreecamSensitivity.Value or 1
         local vel = velSpring:Update(dt, velInput(dt, sens))
@@ -301,7 +298,8 @@ return function(Services, Tabs, References, Toggles, Options, Library)
     end
 
     local function StartFreecam()
-        if stepConn then return end
+        if freecamOn then return end
+
         -- seed camera
         local cf = Camera.CFrame
         cameraRot = Vector2.new(cf:toEulerAnglesYXZ()); cameraPos = cf.Position; cameraFov = Camera.FieldOfView
@@ -311,21 +309,32 @@ return function(Services, Tabs, References, Toggles, Options, Library)
         pushGuiState()
         disableJump()
         Camera.CameraType = Enum.CameraType.Scriptable
+
+        -- lock cursor so mouse move always pans (no RMB needed)
         UIS.MouseIconEnabled = false
-        UIS.MouseBehavior = Enum.MouseBehavior.Default
+        UIS.MouseBehavior = Enum.MouseBehavior.LockCenter
 
         StartCapture()
-        stepConn = RunService:BindToRenderStep("CerbFreecam", Enum.RenderPriority.Camera.Value, StepFreecam)
+        RunService:BindToRenderStep("CerbFreecam", Enum.RenderPriority.Camera.Value, StepFreecam)
+        freecamOn = true
     end
 
     local function StopFreecam()
-        if not stepConn then return end
-        RunService:UnbindFromRenderStep("CerbFreecam"); stepConn = nil
+        if not freecamOn then return end
+        RunService:UnbindFromRenderStep("CerbFreecam")
+
         StopCapture()
         enableJump()
+
         Camera.CameraType = Enum.CameraType.Custom
+        UIS.MouseBehavior = Enum.MouseBehavior.Default
         UIS.MouseIconEnabled = true
+
+        -- clear residual mouse delta
+        mouse.Delta = Vector2.new(); mouse.MouseWheel = 0
+
         popGuiState()
+        freecamOn = false
     end
 
     -- Toggle wiring (UI)
@@ -341,5 +350,6 @@ return function(Services, Tabs, References, Toggles, Options, Library)
         if Toggles.Fullbright and Toggles.Fullbright.Value then Toggles.Fullbright:SetValue(false) end
         if Toggles.FreecamEnabled and Toggles.FreecamEnabled.Value then Toggles.FreecamEnabled:SetValue(false) end
         fbOff(); nfOff(); setXRay(false)
+        if freecamOn then StopFreecam() end
     end)
 end
