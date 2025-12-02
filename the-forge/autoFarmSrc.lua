@@ -274,7 +274,7 @@ return function(ctx)
     local FARM_MODE_ORES    = "Ores"
     local FARM_MODE_ENEMIES = "Enemies"
 
-    local MaxTargetHeight   = 50
+    local MaxTargetHeight   = 100
 
     local ModeDefs = {
         [FARM_MODE_ORES] = {
@@ -1216,7 +1216,7 @@ return function(ctx)
     FarmGroup:AddSlider("AF_MaxTargetHeight", {
         Text     = "Max Target Height",
         Min      = 0,
-        Max      = 100,
+        Max      = 120,
         Default  = MaxTargetHeight,
         Rounding = 0,
         Suffix   = " studs",
