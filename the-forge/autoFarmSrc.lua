@@ -1,14 +1,25 @@
+-- autoFarmSrc.lua
+-- Simple unified auto farm (ores + enemies) using AttachPanel
+-- Outsourced module version.
+
 return function(ctx)
-    local Services   = ctx.Services
-    local Tabs       = ctx.Tabs
-    local References = ctx.References
-    local Library    = ctx.Library
-    local Options    = ctx.Options
-    local Toggles    = ctx.Toggles
-    local META       = ctx.META or {}
+    ----------------------------------------------------------------
+    -- CONTEXT BINDINGS
+    ----------------------------------------------------------------
+    local Services     = ctx.Services
+    local Tabs         = ctx.Tabs
+    local References   = ctx.References
+    local Library      = ctx.Library
+    local Options      = ctx.Options
+    local Toggles      = ctx.Toggles
+    local META         = ctx.META or {}
 
     local AttachPanel = ctx.AttachPanel
     local MoveToPos   = ctx.MoveToPos
+
+    ----------------------------------------------------------------
+    -- INTERNAL HELPERS
+    ----------------------------------------------------------------
 
     local function getLocalHRP()
         return References.humanoidRootPart
@@ -20,6 +31,7 @@ return function(ctx)
         end
     end
 
+    -- Shared ToolService remote
     local ToolActivatedRF = Services.ReplicatedStorage
         :WaitForChild("Shared")
         :WaitForChild("Packages")
@@ -37,6 +49,10 @@ return function(ctx)
             warn("[AutoFarm] ToolActivated error:", err)
         end
     end
+
+    -- ====================================================================
+    --  PRIORITY TABLES
+    -- ====================================================================
 
     local OrePriority = {
         ["Volcanic Rock"] = 1,
@@ -64,6 +80,10 @@ return function(ctx)
         end
         return 999
     end
+
+    -- ====================================================================
+    --  ORE HELPERS
+    -- ====================================================================
 
     local function rockHealth(model)
         if not model or not model.Parent then
@@ -109,6 +129,7 @@ return function(ctx)
         return root and root.Position or nil
     end
 
+    -- Cache for the goblin cave folder
     local GoblinCaveFolder = nil
 
     local function getGoblinCaveFolder()
@@ -145,9 +166,12 @@ return function(ctx)
 
         for _, inst in ipairs(rocksFolder:GetDescendants()) do
             if inst:IsA("Model") then
+                -- HARD IGNORE: anything inside workspace.Rocks.Island2GoblinCave
                 if caveFolder and inst:IsDescendantOf(caveFolder) then
+                    -- skip
                 else
                     local parent = inst.Parent
+                    -- Skip nested models like Rock["20"]
                     if not (parent and parent ~= rocksFolder and parent:IsA("Model")) then
                         if rockHealth(inst) then
                             local name = inst.Name
@@ -166,6 +190,26 @@ return function(ctx)
         return nameMap, uniqueNames
     end
 
+    -- Helper: Get authoritative list of Ore Types from ReplicatedStorage
+    local function getGameOreTypes()
+        local assets = Services.ReplicatedStorage:FindFirstChild("Assets")
+        local oresFolder = assets and assets:FindFirstChild("Ores")
+        
+        local list = {}
+        if oresFolder then
+            for _, v in ipairs(oresFolder:GetChildren()) do
+                table.insert(list, v.Name)
+            end
+        end
+        
+        table.sort(list)
+        return list
+    end
+
+    -- ====================================================================
+    --  MOB HELPERS
+    -- ====================================================================
+
     local function getLivingFolder()
         local living = Services.Workspace:FindFirstChild("Living")
         if living and living:IsA("Folder") then
@@ -176,8 +220,8 @@ return function(ctx)
 
     local function normalizeMobName(name)
         local base = tostring(name or "")
-        base = base:gsub("%d+$", "")
-        base = base:gsub("%s+$", "")
+        base = base:gsub("%d+$", "")   -- remove trailing digits
+        base = base:gsub("%s+$", "")   -- trim trailing spaces
         if base == "" then
             base = tostring(name or "Mob")
         end
@@ -256,6 +300,10 @@ return function(ctx)
         return nameMap, names
     end
 
+    -- ====================================================================
+    --  ATTACH CONFIG
+    -- ====================================================================
+
     local ORE_ATTACH_MODE   = "Aligned"
     local ORE_ATTACH_Y_BASE = -8
     local ORE_ATTACH_HORIZ  = 0
@@ -268,13 +316,14 @@ return function(ctx)
     local MOB_HIT_INTERVAL  = 0.25
     local MOB_HIT_DIST      = 12
 
-    local ExtraYOffset      = 0
-    local FarmSpeed         = 80
+    local ExtraYOffset      = 0      -- global Y offset
+    local FarmSpeed         = 80     -- movement speed
 
     local FARM_MODE_ORES    = "Ores"
     local FARM_MODE_ENEMIES = "Enemies"
 
-    local MaxTargetHeight   = 100
+    -- Max target height (any target above this Y is ignored)
+    local MaxTargetHeight   = 50
 
     local ModeDefs = {
         [FARM_MODE_ORES] = {
@@ -336,6 +385,7 @@ return function(ctx)
         end
     end
 
+    -- Save/restore attach state so we don’t mess user’s settings permanently
     local SavedAttach = nil
 
     local function saveAttachSettings()
@@ -378,16 +428,25 @@ return function(ctx)
         SavedAttach = nil
     end
 
+    -- ====================================================================
+    --  SIMPLE FARM STATE + FLAGS
+    -- ====================================================================
+
     local AvoidLava         = false
     local AvoidPlayers      = false
     local PlayerAvoidRadius = 40
+    
+    -- New flags for Ore filtering
+    local OreWhitelistEnabled = false
+    local WhitelistedOres     = {} -- [OreAttributeString] = true
 
-    local TargetBlacklist   = {}
+    -- Target blacklist (per-instance) for player detection / bad targets
+    local TargetBlacklist   = {}  -- [Instance] = expiryTime (os.clock())
 
     local FarmState = {
         enabled       = false,
         mode          = FARM_MODE_ORES,
-        selectedNames = {},
+        selectedNames = {},   -- ore names (e.g. Basalt Rock) or mob base names
         nameMap       = {},
 
         currentTarget = nil,
@@ -397,6 +456,11 @@ return function(ctx)
         attached      = false,
         lastHit       = 0,
         detourActive  = false,
+
+        -- Stuck detection
+        lastTargetRef    = nil,
+        lastTargetHealth = 0,
+        stuckStartTime   = 0,
     }
 
     local function stopMoving()
@@ -405,6 +469,10 @@ return function(ctx)
             FarmState.moveCleanup = nil
         end
     end
+
+    -- ====================================================================
+    --  BLACKLIST HELPERS
+    -- ====================================================================
 
     local function isTargetBlacklisted(model)
         if not model then return false end
@@ -424,6 +492,10 @@ return function(ctx)
         TargetBlacklist[model] = os.clock() + (duration or 60)
     end
 
+    -- ====================================================================
+    --  SAFE OFFSET WRAPPER (PROTECTS AGAINST ATTACHPANEL ERRORS)
+    -- ====================================================================
+
     local function safeComputeOffset(rootCFrame, def)
         if not AttachPanel or not AttachPanel.ComputeOffset then
             return Vector3.new(0, def.attachBaseY + ExtraYOffset, 0)
@@ -441,8 +513,13 @@ return function(ctx)
             return result
         end
 
+        -- Fallback: straight down offset
         return Vector3.new(0, def.attachBaseY + ExtraYOffset, 0)
     end
+
+    -- ====================================================================
+    --  LAVA AVOIDANCE
+    -- ====================================================================
 
     local LavaParts = {}
 
@@ -452,7 +529,6 @@ return function(ctx)
         local ws = Services.Workspace
         if not ws then return end
 
-        -- 1) Existing cave lava (same logic, but without early returns)
         local assets = ws:FindFirstChild("Assets")
         if assets then
             local cave = assets:FindFirstChild("Cave Area [2]")
@@ -477,6 +553,7 @@ return function(ctx)
         end
     end
 
+
     local function pointInsidePart(point, part)
         if not part or not part.Parent then return false end
         local relative = part.CFrame:PointToObjectSpace(point)
@@ -486,8 +563,11 @@ return function(ctx)
            and math.abs(relative.Z) <= half.Z
     end
 
+    -- IMPORTANT: This function is hard-gated by AvoidLava.
+    -- If AvoidLava == false, it **always** returns false and does no lava logic.
     local function isPointInLava(point)
         if not AvoidLava then
+            -- Lava avoidance disabled: never treat any point as lava.
             return false
         end
 
@@ -500,6 +580,30 @@ return function(ctx)
             end
         end
         return false
+    end
+
+    -- ====================================================================
+    --  PLAYER AVOIDANCE HELPERS
+    -- ====================================================================
+
+    local function isAnyPlayerNearHRP(radius)
+        local hrp = getLocalHRP()
+        if not hrp then return false, nil end
+
+        local myPlayer = References.player
+        for _, plr in ipairs(Services.Players:GetPlayers()) do
+            if plr ~= myPlayer then
+                local char = plr.Character
+                local phrp = char and char:FindFirstChild("HumanoidRootPart")
+                if phrp then
+                    local dist = (phrp.Position - hrp.Position).Magnitude
+                    if dist <= radius then
+                        return true, plr
+                    end
+                end
+            end
+        end
+        return false, nil
     end
 
     local function isAnyPlayerNearPosition(position, radius)
@@ -522,6 +626,7 @@ return function(ctx)
         return false, nil
     end
 
+    -- Idle horizontal move away from players
     local function moveAwayFromNearbyPlayers()
         if not AvoidPlayers then return end
 
@@ -549,10 +654,12 @@ return function(ctx)
         end
 
         if closestPos then
+            -- Horizontal direction away from player
             local away = hrpPos - closestPos
             away = Vector3.new(away.X, 0, away.Z)
             local mag = away.Magnitude
             if mag < 1 then
+                -- If basically on top, pick arbitrary sideways
                 away = Vector3.new(1, 0, 0)
             else
                 away = away / mag
@@ -566,6 +673,7 @@ return function(ctx)
         end
     end
 
+    -- Build a simple 1- or 2-point path around players between startPos and endPos
     local function buildPathAroundPlayers(startPos, endPos)
         if not AvoidPlayers then
             return { endPos }
@@ -588,6 +696,7 @@ return function(ctx)
                 if phrp then
                     local p = phrp.Position
 
+                    -- Distance from player to line segment startPos-endPos
                     local ap = p - startPos
                     local t = 0
                     local abDot = ab:Dot(ab)
@@ -609,6 +718,7 @@ return function(ctx)
             return { endPos }
         end
 
+        -- Compute a sideways offset around that player, horizontal only
         local sideDir = ab:Cross(Vector3.yAxis)
         if sideDir.Magnitude < 1e-3 then
             sideDir = Vector3.new(1, 0, 0)
@@ -618,10 +728,15 @@ return function(ctx)
 
         local offsetDist = PlayerAvoidRadius + 8
         local mid = hitPlayerPos + sideDir * offsetDist
+        -- Keep roughly horizontal movement for the detour point
         mid = Vector3.new(mid.X, startPos.Y, mid.Z)
 
         return { mid, endPos }
     end
+
+    -- ====================================================================
+    --  SIMPLE TARGET SELECTION (PRIORITY + NEAREST + LAVA + PLAYER AVOID)
+    -- ====================================================================
 
     local function chooseNearestTarget()
         local hrp = getLocalHRP()
@@ -633,6 +748,7 @@ return function(ctx)
         local nameMap, _ = def.scan()
         FarmState.nameMap = nameMap or {}
 
+        -- Quick lookup table for selected names
         local selectedLookup = {}
         for _, name in ipairs(FarmState.selectedNames) do
             selectedLookup[name] = true
@@ -644,6 +760,7 @@ return function(ctx)
 
         for name, models in pairs(nameMap) do
             if selectedLookup[name] and models then
+                -- Use shared helper so priority logic is always consistent
                 local priority = getTargetPriorityForMode(FarmState.mode, name)
 
                 for _, model in ipairs(models) do
@@ -653,10 +770,13 @@ return function(ctx)
                         if pos then
                             local skip = false
 
+                            -- Max height filter
                             if pos.Y > MaxTargetHeight then
                                 skip = true
                             end
 
+                            -- LAVA AVOIDANCE (ORES + ENEMIES)
+                            -- NOTE: guarded by AvoidLava, so when toggle is OFF, this whole block is skipped.
                             if not skip and AvoidLava then
                                 local root = def.getRoot(model)
                                 if root then
@@ -668,9 +788,11 @@ return function(ctx)
                                 end
                             end
 
+                            -- PLAYER AVOIDANCE DURING PICK
                             if not skip and AvoidPlayers then
                                 local nearTarget, _ = isAnyPlayerNearPosition(pos, PlayerAvoidRadius)
                                 if nearTarget then
+                                    -- skip (no blacklist here; we only blacklist if it's *our* active target)
                                     skip = true
                                 end
                             end
@@ -692,6 +814,10 @@ return function(ctx)
 
         return bestTarget
     end
+
+    -- ====================================================================
+    --  ATTACH + MOVEMENT
+    -- ====================================================================
 
     local function realignAttach(target)
         if not target then return end
@@ -733,6 +859,8 @@ return function(ctx)
         realignAttach(target)
     end
 
+    -- === DETOUR PATH WHEN X < -120 ======================================
+
     local DETOUR_THRESHOLD_X = -120
     local DETOUR_POINTS = {
         Vector3.new(-259.431091, 21.436172, -129.926697),
@@ -772,14 +900,17 @@ return function(ctx)
         local useDetour = (startPos.X < DETOUR_THRESHOLD_X)
 
         if not useDetour then
+            -- Normal path: optionally build a detour around players
             local waypoints = { finalPos }
             if AvoidPlayers then
                 waypoints = buildPathAroundPlayers(startPos, finalPos)
             end
 
             if #waypoints == 1 then
+                -- Single leg, allow dynamic target updates
                 FarmState.moveCleanup = MoveToPos(finalPos, FarmSpeed, getFinalPos)
             else
+                -- Multi-leg (side-step around player, then target)
                 local active = true
                 local currentCleanup = nil
 
@@ -822,6 +953,7 @@ return function(ctx)
                     end
 
                     if active then
+                        -- Done with path
                         FarmState.moveCleanup = nil
                     end
                 end)
@@ -830,6 +962,7 @@ return function(ctx)
             return
         end
 
+        -- Detour path: go through each DETOUR_POINTS in order, then final dynamic leg
         local active = true
         local currentCleanup = nil
 
@@ -879,19 +1012,26 @@ return function(ctx)
                 return
             end
 
+            -- Final dynamic leg (no extra around-player logic here; caves already detoured)
             local function dynFinalPos()
                 return getFinalPos()
             end
 
             currentCleanup = MoveToPos(fp, FarmSpeed, dynFinalPos)
+            -- Cleanup of this final leg is via globalCleanup / stopMoving()
         end)
     end
+
+    -- ====================================================================
+    --  MAIN FARM LOOP (RETARGET ON PLAYER NEAR TARGET)
+    -- ====================================================================
 
     local function farmLoop()
         while FarmState.enabled do
             local hrp = getLocalHRP()
             local hum = References.humanoid
 
+            -- death / no char handling (safe)
             if not hrp or not hum then
                 stopMoving()
                 FarmState.currentTarget = nil
@@ -911,6 +1051,7 @@ return function(ctx)
                 humState  = stateOrErr
                 humHealth = hum.Health
             else
+                -- Humanoid probably invalid / destroyed
                 stopMoving()
                 FarmState.currentTarget = nil
                 FarmState.attached      = false
@@ -938,6 +1079,7 @@ return function(ctx)
             local pos    = target and def.getPos(target) or nil
             local alive  = target and def.isAlive(target)
 
+            -- Pick new target if current is invalid or blacklisted
             if (not target)
                 or (not target.Parent)
                 or (not pos)
@@ -947,12 +1089,19 @@ return function(ctx)
                 FarmState.currentTarget = chooseNearestTarget()
                 FarmState.attached      = false
                 FarmState.detourActive  = false
+                
+                -- Reset stuck logic for new target
+                FarmState.lastTargetRef    = FarmState.currentTarget
+                FarmState.lastTargetHealth = 0
+                FarmState.stuckStartTime   = os.clock()
+
                 target = FarmState.currentTarget
 
                 if target then
                     startMovingToTarget(target)
                     pos = def.getPos(target)
                 else
+                    -- No targets: idle in place but keep scanning & step away from players
                     stopMoving()
                     if AvoidPlayers then
                         moveAwayFromNearbyPlayers()
@@ -962,21 +1111,29 @@ return function(ctx)
                 end
             end
 
+            -- Double-check target position validity and height (retarget instead of stopping)
             if pos and pos.Y > MaxTargetHeight then
-                blacklistTarget(target, 60)
+                notify("Target too high! Ditching.", 2)
+                blacklistTarget(target, 60) -- too high, don't keep retargeting it
 
                 stopMoving()
                 FarmState.currentTarget = nil
                 FarmState.attached      = false
                 FarmState.detourActive  = false
 
+                -- Immediately retarget to the next one
                 local newTarget = chooseNearestTarget()
                 if newTarget then
                     FarmState.currentTarget = newTarget
                     FarmState.attached      = false
                     FarmState.detourActive  = false
+                    
+                    FarmState.lastTargetRef    = newTarget
+                    FarmState.lastTargetHealth = 0
+                    FarmState.stuckStartTime   = os.clock()
 
                     startMovingToTarget(newTarget)
+                    -- next loop will handle hit logic
                 else
                     if AvoidPlayers then
                         moveAwayFromNearbyPlayers()
@@ -987,9 +1144,11 @@ return function(ctx)
                 continue
             end
 
+            -- If we have a target and a player approaches THAT target, ditch + blacklist + RETARGET
             if AvoidPlayers and target and pos then
                 local nearTarget, _ = isAnyPlayerNearPosition(pos, PlayerAvoidRadius)
                 if nearTarget then
+                    notify("Player nearby! Ditching.", 2)
                     blacklistTarget(target, 60)
 
                     stopMoving()
@@ -997,13 +1156,19 @@ return function(ctx)
                     FarmState.attached      = false
                     FarmState.detourActive  = false
 
+                    -- Immediately retarget instead of going idle
                     local newTarget = chooseNearestTarget()
                     if newTarget then
                         FarmState.currentTarget = newTarget
                         FarmState.attached      = false
                         FarmState.detourActive  = false
+                        
+                        FarmState.lastTargetRef    = newTarget
+                        FarmState.lastTargetHealth = 0
+                        FarmState.stuckStartTime   = os.clock()
 
                         startMovingToTarget(newTarget)
+                        -- let next iteration handle hit
                     else
                         if AvoidPlayers then
                             moveAwayFromNearbyPlayers()
@@ -1014,18 +1179,58 @@ return function(ctx)
                     continue
                 end
             end
+            
+            -- >>> WHITELIST CHECK FOR ORES <<<
+            if FarmState.mode == FARM_MODE_ORES and OreWhitelistEnabled and target then
+                -- Check if "Ore" children exist
+                local oreChildren = {}
+                for _, c in ipairs(target:GetChildren()) do
+                    if c.Name == "Ore" then
+                        table.insert(oreChildren, c)
+                    end
+                end
+                
+                if #oreChildren > 0 then
+                    -- Ores are visible, check against whitelist
+                    local matchFound = false
+                    for _, orePart in ipairs(oreChildren) do
+                        local oreType = orePart:GetAttribute("Ore")
+                        if oreType and WhitelistedOres[oreType] then
+                            matchFound = true
+                            break
+                        end
+                    end
+                    
+                    if not matchFound then
+                        -- Target has ores, but NONE match our whitelist -> DITCH
+                        notify("No whitelisted ore found! Ditching.", 2)
+                        blacklistTarget(target, 60)
+                        stopMoving()
+                        FarmState.currentTarget = nil
+                        FarmState.attached      = false
+                        FarmState.detourActive  = false
+                        task.wait(0.1)
+                        continue
+                    end
+                end
+            end
+
+            -- If we have a target and we somehow end up with X < -120 while NOT attached,
+            -- force a detour-based path once per "under-threshold" period.
             if target and not FarmState.attached then
                 local hrpPos = hrp.Position
                 if hrpPos.X < DETOUR_THRESHOLD_X then
                     if not FarmState.detourActive then
                         FarmState.detourActive = true
                         stopMoving()
-                        startMovingToTarget(target)
+                        startMovingToTarget(target) -- will use detour because X < threshold
                     end
                 else
+                    -- once we're back above the threshold, allow detour to be triggered again later
                     FarmState.detourActive = false
                 end
             else
+                -- if no target or attached, we don't consider detour
                 FarmState.detourActive = false
             end
 
@@ -1038,6 +1243,44 @@ return function(ctx)
                     if not FarmState.attached then
                         attachToTarget(target)
                         FarmState.attached = true
+                        -- Reset stuck timer on first attach
+                        FarmState.stuckStartTime = os.clock()
+                        local h = def.getHealth(target)
+                        FarmState.lastTargetHealth = h or 0
+                    else
+                        -- === ALWAYS FACE TARGET UPDATE ===
+                        -- We call realignAttach again here so the LookAt CFrame is updated
+                        -- every loop tick (0.05s). This ensures strict facing.
+                        realignAttach(target)
+
+                        -- >>> STUCK CHECK <<<
+                        -- Only run stuck check if we have been attached to this target
+                        if FarmState.lastTargetRef == target then
+                            local currentH = def.getHealth(target) or 0
+                            -- If health changed (damaged), reset timer
+                            if currentH < FarmState.lastTargetHealth then
+                                FarmState.lastTargetHealth = currentH
+                                FarmState.stuckStartTime = os.clock()
+                            else
+                                -- Health didn't change
+                                if (os.clock() - FarmState.stuckStartTime) > 30 then
+                                    -- STUCK FOR 30 SECONDS
+                                    notify("Stuck (30s)! Ditching.", 2)
+                                    blacklistTarget(target, 60)
+                                    stopMoving()
+                                    FarmState.currentTarget = nil
+                                    FarmState.attached      = false
+                                    FarmState.detourActive  = false
+                                    task.wait(0.1)
+                                    continue
+                                end
+                            end
+                        else
+                            -- Target ref mismatch (shouldn't happen often), reset
+                            FarmState.lastTargetRef = target
+                            FarmState.lastTargetHealth = def.getHealth(target) or 0
+                            FarmState.stuckStartTime = os.clock()
+                        end
                     end
 
                     local now = os.clock()
@@ -1046,10 +1289,13 @@ return function(ctx)
                         FarmState.lastHit = now
                     end
                 else
+                    -- Out of range, make sure we are moving
                     if not FarmState.moveCleanup then
                         startMovingToTarget(target)
                     end
                     FarmState.attached = false
+                    -- Reset stuck timer while moving
+                    FarmState.stuckStartTime = os.clock()
                 end
             end
 
@@ -1061,6 +1307,10 @@ return function(ctx)
         FarmState.attached      = false
         FarmState.detourActive  = false
     end
+
+    -- ====================================================================
+    --  START / STOP
+    -- ====================================================================
 
     local function startFarm()
         if FarmState.enabled then return end
@@ -1097,10 +1347,18 @@ return function(ctx)
             end
             return
         end
+        
+        -- Warning if whitelist enabled but no ores selected
+        local whitelistedCount = 0
+        for _ in pairs(WhitelistedOres) do whitelistedCount = whitelistedCount + 1 end
+        if FarmState.mode == FARM_MODE_ORES and OreWhitelistEnabled and whitelistedCount == 0 then
+            notify("Warning: Ore Whitelist ON but no ores selected!", 5)
+        end
 
         saveAttachSettings()
         configureAttachForMode(FarmState.mode)
 
+        -- hard reset state so death / previous run can't poison us
         stopMoving()
         FarmState.currentTarget = nil
         FarmState.attached      = false
@@ -1125,11 +1383,16 @@ return function(ctx)
         restoreAttachSettings()
     end
 
+    -- ====================================================================
+    --  UI: MODE + TARGETS + OFFSET + SPEED + AVOID + AUTO TOOL
+    -- ====================================================================
+
     local AutoTab   = Tabs["Auto"] or Tabs.Main
     local FarmGroup = AutoTab:AddLeftGroupbox("Auto Farm", "pickaxe")
 
     local ModeDropdown
     local TargetDropdown
+    local OreTypeDropdown -- New Dropdown
 
     local function refreshTargetDropdown()
         if not TargetDropdown then return end
@@ -1140,6 +1403,12 @@ return function(ctx)
         end
         local _, names = def.scan()
         TargetDropdown:SetValues(names)
+    end
+    
+    local function refreshOreTypesDropdown()
+        if not OreTypeDropdown then return end
+        local types = getGameOreTypes()
+        OreTypeDropdown:SetValues(types)
     end
 
     ModeDropdown = FarmGroup:AddDropdown("AF_Mode", {
@@ -1153,7 +1422,8 @@ return function(ctx)
             FarmState.mode = value
             FarmState.selectedNames = {}
             refreshTargetDropdown()
-
+            -- Hide/Show Ore specific elements? (Library might not support visibility toggle easily, keeping simple)
+            
             if FarmState.enabled then
                 stopFarm()
                 startFarm()
@@ -1180,7 +1450,39 @@ return function(ctx)
         Text = "Refresh Targets",
         Func = function()
             refreshTargetDropdown()
-            refreshLavaParts()
+            refreshLavaParts() -- in case map reloaded; harmless if AvoidLava is off
+        end,
+    })
+    
+    -- ORE WHITELIST UI
+    FarmGroup:AddToggle("AF_OreWhitelist", {
+        Text    = "Ore Whitelist",
+        Default = false,
+        Tooltip = "If enabled, farm checks inner 'Ore' parts. If none match selected list, it ditches the rock.",
+        Callback = function(state)
+            OreWhitelistEnabled = state
+        end,
+    })
+    
+    OreTypeDropdown = FarmGroup:AddDropdown("AF_OreTypes", {
+        Text   = "Whitelisted Ores",
+        Values = {},
+        Multi  = true,
+        Tooltip = "Select which ores (Iron, Gold, etc) are allowed.",
+        Callback = function(selectedTable)
+            WhitelistedOres = {}
+            for name, selected in pairs(selectedTable) do
+                if selected then
+                    WhitelistedOres[name] = true
+                end
+            end
+        end,
+    })
+    
+    FarmGroup:AddButton({
+        Text = "Refresh Ore Types",
+        Func = function()
+            refreshOreTypesDropdown()
         end,
     })
 
@@ -1216,7 +1518,7 @@ return function(ctx)
     FarmGroup:AddSlider("AF_MaxTargetHeight", {
         Text     = "Max Target Height",
         Min      = 0,
-        Max      = 120,
+        Max      = 100,
         Default  = MaxTargetHeight,
         Rounding = 0,
         Suffix   = " studs",
@@ -1271,8 +1573,14 @@ return function(ctx)
         end,
     })
 
+    -- Initial target list + lava parts + Ore types
     refreshTargetDropdown()
     refreshLavaParts()
+    refreshOreTypesDropdown()
+
+    ----------------------------------------------------------------
+    -- MODULE HANDLE
+    ----------------------------------------------------------------
 
     local H = {}
 
@@ -1285,17 +1593,20 @@ return function(ctx)
     end
 
     function H.Unload()
+        -- stop farm
         FarmState.enabled = false
         stopMoving()
         FarmState.currentTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
 
+        -- disable toggle in UI
         if Toggles.AF_Enabled then
             pcall(function()
                 Toggles.AF_Enabled:SetValue(false)
             end)
         end
+        -- destroy attach + restore user settings
         if AttachPanel.DestroyAttach then
             pcall(AttachPanel.DestroyAttach)
         end
