@@ -452,18 +452,27 @@ return function(ctx)
         local ws = Services.Workspace
         if not ws then return end
 
+        -- 1) Existing cave lava (same logic, but without early returns)
         local assets = ws:FindFirstChild("Assets")
-        if not assets then return end
+        if assets then
+            local cave = assets:FindFirstChild("Cave Area [2]")
+            if cave then
+                local folder = cave:FindFirstChild("Folder")
+                if folder then
+                    for _, inst in ipairs(folder:GetDescendants()) do
+                        if inst:IsA("BasePart") and inst.Name == "Lava" then
+                            table.insert(LavaParts, inst)
+                        end
+                    end
+                end
+            end
+        end
 
-        local cave = assets:FindFirstChild("Cave Area [2]")
-        if not cave then return end
-
-        local folder = cave:FindFirstChild("Folder")
-        if not folder then return end
-
-        for _, inst in ipairs(folder:GetDescendants()) do
-            if inst:IsA("BasePart") and inst.Name == "Lava" then
-                table.insert(LavaParts, inst)
+        local debris = ws:FindFirstChild("Debris")
+        if debris then
+            local lavaZone = debris:FindFirstChild("LavaDamageZone")
+            if lavaZone and lavaZone:IsA("BasePart") then
+                table.insert(LavaParts, lavaZone)
             end
         end
     end
