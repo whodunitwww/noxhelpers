@@ -142,7 +142,7 @@ return function(ctx)
     -- ====================================================================
 
     local ConfigFolder         = "Cerberus/The Forge"
-    local ConfigFile           = ConfigFolder .. "/HudConfig.json"
+    local ConfigFile           = ConfigFolder .. "/_HudConfig.json"
 
     local function saveHudConfig(position, size)
         if not isfolder("Cerberus") then makefolder("Cerberus") end
@@ -2048,7 +2048,7 @@ return function(ctx)
     FarmGroup:AddSlider("AF_OffsetAdjust", {
         Text     = "Extra Offset",
         Min      = -5,
-        Max      = 5,
+        Max      = 15,
         Default  = 0,
         Rounding = 1,
         Suffix   = " studs",
