@@ -2225,26 +2225,9 @@ return function(ctx)
     -- PROXIMITY TRACKER (SEPARATE HUD SYSTEM)
     ----------------------------------------------------------------
     
-    local TrackerState = {
-        Enabled      = false,
-        Gui          = nil,
-        Container    = nil,
-        TargetName   = nil,
-        HealthBar    = nil,
-        HealthText   = nil,
-        DropList     = nil,
-        
-        CachedMaxHp  = 100,
-        CurrentDrops = {}, 
-        
-        ActiveTarget    = nil,
-        LastCheckHealth = {}, 
-    }
-    
     TrackingGroupbox:AddToggle("AF_ProximityTracker", {
-        Text    = "Proximity Tracker",
+        Text    = "Progress Tracker",
         Default = false,
-        Tooltip = "Shows a HUD for the most recent rock damaged within 15 studs.",
         Callback = function(state)
             TrackerState.Enabled = state
             if state then
