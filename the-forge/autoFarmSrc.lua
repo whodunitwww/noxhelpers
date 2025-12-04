@@ -2104,7 +2104,7 @@ return function(ctx)
     WhitelistGroup:AddToggle("AF_TargetFullHealth", {
         Text    = "Target Full Health Only",
         Default = false,
-        Tooltip = "Only targets fresh rocks to avoid kill-stealing.",
+        Tooltip = "Only targets fresh rocks.",
         Callback = function(state)
             TargetFullHealth = state
         end,
