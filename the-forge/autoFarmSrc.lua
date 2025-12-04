@@ -98,10 +98,10 @@ return function(ctx)
     end
 
     -- ====================================================================
-    --  PRIORITY TABLES
+    --  PRIORITY TABLES & CONFIG LOADING
     -- ====================================================================
 
-    local OrePriority = {
+    local DefaultOrePriority = {
         ["Crimson Crystal"] = 1,
         ["Cyan Crystal"]    = 1,
         ["Earth Crystal"]   = 1,
@@ -131,6 +131,43 @@ return function(ctx)
         ["Bomber"]                  = 8,
     }
 
+    -- Live Priority Table (will be overwritten by config load)
+    local OrePriority = {} 
+    for k,v in pairs(DefaultOrePriority) do OrePriority[k] = v end
+
+    local PriorityConfigFile = "Cerberus/The Forge/PriorityConfig.json"
+
+    local function loadPriorityConfig()
+        -- Ensure folders exist
+        if not isfolder("Cerberus") then makefolder("Cerberus") end
+        if not isfolder("Cerberus/The Forge") then makefolder("Cerberus/The Forge") end
+        
+        if isfile(PriorityConfigFile) then
+            local success, result = pcall(function()
+                return HttpService:JSONDecode(readfile(PriorityConfigFile))
+            end)
+            
+            if success and type(result) == "table" then
+                OrePriority = result
+            else
+                notify("Failed to load priority config. Using defaults.", 5)
+                -- Fallback remains default
+            end
+        else
+            -- Save default if not exists
+            local success, err = pcall(function()
+                writefile(PriorityConfigFile, HttpService:JSONEncode(DefaultOrePriority))
+            end)
+            if success then
+            else
+                warn("Failed to save default priority config:", err)
+            end
+        end
+    end
+    
+    -- Load immediately
+    loadPriorityConfig()
+
     local function getTargetPriorityForMode(modeName, baseName)
         if modeName == "Ores" then
             return OrePriority[baseName] or 999
@@ -147,7 +184,7 @@ return function(ctx)
     local AvoidLava          = false
     local AvoidPlayers       = false
     local DamageDitchEnabled = false
-    local TargetFullHealth   = false -- New Flag
+    local TargetFullHealth   = false 
     local PlayerAvoidRadius  = 40
     
     -- Whitelists
