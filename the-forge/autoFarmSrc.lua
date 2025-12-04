@@ -101,6 +101,7 @@ return function(ctx)
     --  PRIORITY TABLES & CONFIG LOADING
     -- ====================================================================
 
+    -- Default priorities for ORES
     local DefaultOrePriority = {
         ["Crimson Crystal"] = 1,
         ["Cyan Crystal"]    = 1,
@@ -112,15 +113,17 @@ return function(ctx)
         ["Basalt Rock"]     = 5,
     }
 
+    -- Some ores don’t always appear in scan but should always be selectable
     local PermOreList = {
         "Crimson Crystal",
         "Cyan Crystal",
         "Earth Crystal",
         "Light Crystal",
-        "Volcanic Rock"
+        "Volcanic Rock",
     }
 
-    local EnemyPriority = {
+    -- Default priorities for MOBS (this used to be your static EnemyPriority)
+    local DefaultEnemyPriority = {
         ["Blazing Slime"]           = 1,
         ["Elite Deathaxe Skeleton"] = 2,
         ["Reaper"]                  = 3,
@@ -131,48 +134,108 @@ return function(ctx)
         ["Bomber"]                  = 8,
     }
 
-    -- Live Priority Table (will be overwritten by config load)
-    local OrePriority = {} 
-    for k,v in pairs(DefaultOrePriority) do OrePriority[k] = v end
+    -- Live (mutable) priority tables (can be overridden by config)
+    local OrePriority   = {}
+    local EnemyPriority = {}
+
+    for k, v in pairs(DefaultOrePriority) do
+        OrePriority[k] = v
+    end
+
+    for k, v in pairs(DefaultEnemyPriority) do
+        EnemyPriority[k] = v
+    end
 
     local PriorityConfigFile = "Cerberus/The Forge/PriorityConfig.json"
+
+    -- Optional helper if you ever want to save current priorities back to disk
+    local function savePriorityConfig()
+        local payload = {
+            Ores    = OrePriority,
+            Enemies = EnemyPriority,
+        }
+
+        local ok, err = pcall(function()
+            writefile(PriorityConfigFile, HttpService:JSONEncode(payload))
+        end)
+
+        if not ok then
+            warn("[AutoFarm] Failed to save priority config:", err)
+        end
+    end
 
     local function loadPriorityConfig()
         -- Ensure folders exist
         if not isfolder("Cerberus") then makefolder("Cerberus") end
         if not isfolder("Cerberus/The Forge") then makefolder("Cerberus/The Forge") end
-        
+
         if isfile(PriorityConfigFile) then
             local success, result = pcall(function()
                 return HttpService:JSONDecode(readfile(PriorityConfigFile))
             end)
-            
+
             if success and type(result) == "table" then
-                OrePriority = result
+                -- NEW FORMAT:
+                -- {
+                --     "Ores":    { ... },
+                --     "Enemies": { ... }
+                -- }
+                if result.Ores or result.Enemies then
+                    if type(result.Ores) == "table" then
+                        OrePriority = {}
+                        for k, v in pairs(result.Ores) do
+                            OrePriority[k] = tonumber(v) or 999
+                        end
+                    end
+
+                    if type(result.Enemies) == "table" then
+                        EnemyPriority = {}
+                        for k, v in pairs(result.Enemies) do
+                            EnemyPriority[k] = tonumber(v) or 999
+                        end
+                    end
+
+                else
+                    -- BACKWARDS COMPAT:
+                    -- Old format was just a plain ore map: { ["Volcanic Rock"] = 2, ... }
+                    OrePriority = {}
+                    for k, v in pairs(result) do
+                        OrePriority[k] = tonumber(v) or 999
+                    end
+                end
             else
                 notify("Failed to load priority config. Using defaults.", 5)
-                -- Fallback remains default
             end
         else
-            -- Save default if not exists
-            local success, err = pcall(function()
-                writefile(PriorityConfigFile, HttpService:JSONEncode(DefaultOrePriority))
+            -- No file yet: create a proper default with BOTH Ores + Enemies
+            local defaultPayload = {
+                Ores    = DefaultOrePriority,
+                Enemies = DefaultEnemyPriority,
+            }
+
+            local ok, err = pcall(function()
+                writefile(PriorityConfigFile, HttpService:JSONEncode(defaultPayload))
             end)
-            if success then
-            else
-                warn("Failed to save default priority config:", err)
+
+            if not ok then
+                warn("[AutoFarm] Failed to save default priority config:", err)
             end
         end
     end
-    
-    -- Load immediately
+
+    -- Load immediately on script start
     loadPriorityConfig()
 
     local function getTargetPriorityForMode(modeName, baseName)
+        -- We prefer the LIVE tables (from config), and fall back to defaults
         if modeName == "Ores" then
-            return OrePriority[baseName] or 999
+            return (OrePriority[baseName])
+                or (DefaultOrePriority[baseName])
+                or 999
         elseif modeName == "Enemies" then
-            return EnemyPriority[baseName] or 999
+            return (EnemyPriority[baseName])
+                or (DefaultEnemyPriority[baseName])
+                or 999
         end
         return 999
     end
