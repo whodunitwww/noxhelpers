@@ -6,13 +6,13 @@ return function(ctx)
     ----------------------------------------------------------------
     -- CONTEXT BINDINGS
     ----------------------------------------------------------------
-    local Services         = ctx.Services
-    local Tabs             = ctx.Tabs
-    local References       = ctx.References
-    local Library          = ctx.Library
-    local Options          = ctx.Options
-    local Toggles          = ctx.Toggles
-    local META             = ctx.META or {}
+    local Services     = ctx.Services
+    local Tabs         = ctx.Tabs
+    local References   = ctx.References
+    local Library      = ctx.Library
+    local Options      = ctx.Options
+    local Toggles      = ctx.Toggles
+    local META         = ctx.META or {}
 
     local AttachPanel      = ctx.AttachPanel
     local MoveToPos        = ctx.MoveToPos
@@ -21,7 +21,7 @@ return function(ctx)
     local HttpService      = Services.HttpService
 
     ----------------------------------------------------------------
-    -- INTERNAL HELPERS
+    -- INTERNAL HELPERS (Global Scope)
     ----------------------------------------------------------------
 
     local function getLocalHRP()
@@ -32,6 +32,50 @@ return function(ctx)
         if Library and Library.Notify then
             Library:Notify(msg, time or 3)
         end
+    end
+    
+    local function getRocksFolder()
+        return Services.Workspace:FindFirstChild("Rocks")
+    end
+
+    local function rockHealth(model)
+        if not model or not model.Parent then
+            return nil
+        end
+        local ok, value = pcall(function()
+            return model:GetAttribute("Health")
+        end)
+        if not ok or value == nil then
+            return nil
+        end
+        return tonumber(value)
+    end
+
+    local function isRockAlive(model)
+        local h = rockHealth(model)
+        return h and h > 0
+    end
+
+    local function rockRoot(model)
+        if not model or not model.Parent then return nil end
+        if model:IsA("BasePart") then
+            return model
+        end
+
+        local part = AttachPanel.HrpOf and AttachPanel.HrpOf(model) or nil
+        if part then return part end
+
+        for _, inst in ipairs(model:GetDescendants()) do
+            if inst:IsA("BasePart") then
+                return inst
+            end
+        end
+        return nil
+    end
+
+    local function rockPosition(model)
+        local root = rockRoot(model)
+        return root and root.Position or nil
     end
 
     -- Shared ToolService remote
@@ -100,54 +144,55 @@ return function(ctx)
     --  FARM STATE + FLAGS
     -- ====================================================================
 
-    local AvoidLava            = false
-    local AvoidPlayers         = false
-    local DamageDitchEnabled   = false
-    local PlayerAvoidRadius    = 40
-
+    local AvoidLava          = false
+    local AvoidPlayers       = false
+    local DamageDitchEnabled = false
+    local TargetFullHealth   = false -- New Flag
+    local PlayerAvoidRadius  = 40
+    
     -- Whitelists
-    local OreWhitelistEnabled  = false
-    local WhitelistedOres      = {} -- The Drops (Iron, Gold)
-    local WhitelistAppliesTo   = {} -- The Rocks (Basalt Rock, etc)
+    local OreWhitelistEnabled = false
+    local WhitelistedOres     = {} 
+    local WhitelistAppliesTo  = {} 
 
     local ZoneWhitelistEnabled = false
-    local WhitelistedZones     = {}
+    local WhitelistedZones     = {} 
 
-    local TargetBlacklist      = {}
+    local TargetBlacklist   = {} 
 
-    local FarmState            = {
-        enabled          = false,
-        mode             = "Ores",
-        selectedNames    = {},
-        nameMap          = {},
+    local FarmState = {
+        enabled       = false,
+        mode          = "Ores", 
+        selectedNames = {},   
+        nameMap       = {},
 
-        currentTarget    = nil,
-        moveCleanup      = nil,
-        farmThread       = nil,
-        noclipConn       = nil,
+        currentTarget = nil,
+        moveCleanup   = nil,
+        farmThread    = nil,
+        noclipConn    = nil, 
 
-        attached         = false,
-        lastHit          = 0,
-        detourActive     = false,
+        attached      = false,
+        lastHit       = 0,
+        detourActive  = false,
 
         lastTargetRef    = nil,
         lastTargetHealth = 0,
         stuckStartTime   = 0,
-
-        LastLocalHealth  = 100,
+        
+        LastLocalHealth  = 100, 
     }
 
     -- ====================================================================
     --  CONFIG SYSTEM (HUD)
     -- ====================================================================
-
-    local ConfigFolder         = "Cerberus/The Forge"
-    local ConfigFile           = ConfigFolder .. "/_HudConfig.json"
+    
+    local ConfigFolder = "Cerberus/The Forge"
+    local ConfigFile   = ConfigFolder .. "/HudConfig.json"
 
     local function saveHudConfig(position, size)
         if not isfolder("Cerberus") then makefolder("Cerberus") end
         if not isfolder("Cerberus/The Forge") then makefolder("Cerberus/The Forge") end
-
+        
         local data = {
             X = position.X.Offset,
             Y = position.Y.Offset,
@@ -193,68 +238,24 @@ return function(ctx)
     end
 
     -- ====================================================================
-    --  ORE HELPERS
+    --  ORE HELPERS (Cont)
     -- ====================================================================
-
-    local function getRocksFolder()
-        return Services.Workspace:FindFirstChild("Rocks")
-    end
 
     local function getZoneFromDescendant(model)
         local rocksFolder = getRocksFolder()
         if not rocksFolder then return nil end
-
+        
         local current = model.Parent
         while current and current ~= game do
             if current.Parent == rocksFolder then
-                return current.Name
+                return current.Name 
             end
             if current == rocksFolder then
-                return nil
+                return nil 
             end
             current = current.Parent
         end
         return nil
-    end
-
-    local function rockHealth(model)
-        if not model or not model.Parent then
-            return nil
-        end
-        local ok, value = pcall(function()
-            return model:GetAttribute("Health")
-        end)
-        if not ok or value == nil then
-            return nil
-        end
-        return tonumber(value)
-    end
-
-    local function isRockAlive(model)
-        local h = rockHealth(model)
-        return h and h > 0
-    end
-
-    local function rockRoot(model)
-        if not model or not model.Parent then return nil end
-        if model:IsA("BasePart") then
-            return model
-        end
-
-        local part = AttachPanel.HrpOf and AttachPanel.HrpOf(model) or nil
-        if part then return part end
-
-        for _, inst in ipairs(model:GetDescendants()) do
-            if inst:IsA("BasePart") then
-                return inst
-            end
-        end
-        return nil
-    end
-
-    local function rockPosition(model)
-        local root = rockRoot(model)
-        return root and root.Position or nil
     end
 
     local GoblinCaveFolder = nil
@@ -298,6 +299,7 @@ return function(ctx)
                 else
                     local parent = inst.Parent
                     if not (parent and parent ~= rocksFolder and parent:IsA("Model")) then
+                        
                         -- ZONE CHECK
                         local passedZone = true
                         if ZoneWhitelistEnabled then
@@ -327,14 +329,14 @@ return function(ctx)
     local function getGameOreTypes()
         local assets = Services.ReplicatedStorage:FindFirstChild("Assets")
         local oresFolder = assets and assets:FindFirstChild("Ores")
-
+        
         local list = {}
         if oresFolder then
             for _, v in ipairs(oresFolder:GetChildren()) do
                 table.insert(list, v.Name)
             end
         end
-
+        
         table.sort(list)
         return list
     end
@@ -367,8 +369,8 @@ return function(ctx)
 
     local function normalizeMobName(name)
         local base = tostring(name or "")
-        base = base:gsub("%d+$", "") -- remove trailing digits
-        base = base:gsub("%s+$", "") -- trim trailing spaces
+        base = base:gsub("%d+$", "")   -- remove trailing digits
+        base = base:gsub("%s+$", "")   -- trim trailing spaces
         if base == "" then
             base = tostring(name or "Mob")
         end
@@ -422,7 +424,7 @@ return function(ctx)
         local nameMap = {}
         local names   = {}
 
-        local living  = getLivingFolder()
+        local living = getLivingFolder()
         if not living then
             return nameMap, names
         end
@@ -463,15 +465,15 @@ return function(ctx)
     local MOB_HIT_INTERVAL  = 0.25
     local MOB_HIT_DIST      = 12
 
-    local ExtraYOffset      = 0  -- global Y offset
-    local FarmSpeed         = 80 -- movement speed
+    local ExtraYOffset      = 0      -- global Y offset
+    local FarmSpeed         = 80     -- movement speed
 
     local FARM_MODE_ORES    = "Ores"
     local FARM_MODE_ENEMIES = "Enemies"
 
     local MaxTargetHeight   = 100
 
-    local ModeDefs          = {
+    local ModeDefs = {
         [FARM_MODE_ORES] = {
             name          = FARM_MODE_ORES,
             scan          = scanRocks,
@@ -668,8 +670,8 @@ return function(ctx)
         local relative = part.CFrame:PointToObjectSpace(point)
         local half = part.Size / 2
         return math.abs(relative.X) <= half.X
-            and math.abs(relative.Y) <= half.Y
-            and math.abs(relative.Z) <= half.Z
+           and math.abs(relative.Y) <= half.Y
+           and math.abs(relative.Z) <= half.Z
     end
 
     local function isPointInLava(point)
@@ -739,8 +741,8 @@ return function(ctx)
         local hrp = getLocalHRP()
         if not hrp then return end
 
-        local myPlayer    = References.player
-        local hrpPos      = hrp.Position
+        local myPlayer = References.player
+        local hrpPos   = hrp.Position
 
         local closestDist = math.huge
         local closestPos  = nil
@@ -899,6 +901,19 @@ return function(ctx)
                                 local nearTarget, _ = isAnyPlayerNearPosition(pos, PlayerAvoidRadius)
                                 if nearTarget then
                                     -- skip (no blacklist here; we only blacklist if it's *our* active target)
+                                    skip = true
+                                end
+                            end
+                            
+                            -- FULL HEALTH CHECK
+                            -- If enabled, and this is NOT our current active target,
+                            -- ensure it has full health before we pick it.
+                            if not skip and TargetFullHealth and def.name == FARM_MODE_ORES then
+                                -- Only apply to Ores usually, or if enemies too? 
+                                -- You specified "mining rocks".
+                                local h = def.getHealth(model)
+                                local m = model:GetAttribute("MaxHealth")
+                                if h and m and h < m then
                                     skip = true
                                 end
                             end
@@ -1131,42 +1146,42 @@ return function(ctx)
     -- ====================================================================
     --  PROXIMITY TRACKER (SEPARATE HUD SYSTEM)
     -- ====================================================================
-
+    
     local TrackerState = {
-        Enabled         = false,
-        Gui             = nil,
-        Container       = nil,
-        TargetName      = nil,
-        HealthBar       = nil,
-        HealthText      = nil,
-        DropList        = nil,
-
-        CachedMaxHp     = 100,
-        CurrentDrops    = {},
-
+        Enabled      = false,
+        Gui          = nil,
+        Container    = nil,
+        TargetName   = nil,
+        HealthBar    = nil,
+        HealthText   = nil,
+        DropList     = nil,
+        
+        CachedMaxHp  = 100,
+        CurrentDrops = {}, 
+        
         ActiveTarget    = nil,
-        LastCheckHealth = {},
+        LastCheckHealth = {}, 
     }
 
     local function createTrackerGui()
         if TrackerState.Gui then return end
-
+        
         local sg = Instance.new("ScreenGui")
         sg.Name = "ProximityTrackerHUD"
         sg.ResetOnSpawn = false
         pcall(function()
             sg.Parent = Services.Players.LocalPlayer:WaitForChild("PlayerGui")
         end)
-
+        
         local savedConfig = loadHudConfig()
         local initialPos = UDim2.new(0.5, 0, 0.2, 0)
         local initialSize = UDim2.new(0, 320, 0, 180)
-
+        
         if savedConfig then
             initialPos = UDim2.new(0, savedConfig.X, 0, savedConfig.Y)
             initialSize = UDim2.new(0, savedConfig.SX, 0, savedConfig.SY)
         end
-
+        
         local mainFrame = Instance.new("Frame")
         mainFrame.Name = "MainFrame"
         mainFrame.Size = initialSize
@@ -1174,7 +1189,7 @@ return function(ctx)
         mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
         mainFrame.BorderSizePixel = 0
         mainFrame.Parent = sg
-
+        
         -- Drag Logic
         local dragging, dragInput, dragStart, startPos
         mainFrame.InputBegan:Connect(function(input)
@@ -1182,7 +1197,7 @@ return function(ctx)
                 dragging = true
                 dragStart = input.Position
                 startPos = mainFrame.Position
-
+                
                 input.Changed:Connect(function()
                     if input.UserInputState == Enum.UserInputState.End then
                         dragging = false
@@ -1191,52 +1206,47 @@ return function(ctx)
                 end)
             end
         end)
-
+        
         mainFrame.InputChanged:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseMovement then
                 dragInput = input
             end
         end)
-
+        
         UserInputService.InputChanged:Connect(function(input)
             if input == dragInput and dragging then
                 local delta = input.Position - dragStart
-                mainFrame.Position = UDim2.new(
-                    startPos.X.Scale,
-                    startPos.X.Offset + delta.X,
-                    startPos.Y.Scale,
-                    startPos.Y.Offset + delta.Y
-                )
+                mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
             end
         end)
-
+        
         local uiCorner = Instance.new("UICorner")
         uiCorner.CornerRadius = UDim.new(0, 8)
         uiCorner.Parent = mainFrame
-
+        
         local uiStroke = Instance.new("UIStroke")
         uiStroke.Color = Color3.fromRGB(60, 60, 70)
         uiStroke.Thickness = 2
         uiStroke.Transparency = 0.2
         uiStroke.Parent = mainFrame
-
+        
         -- Resize Handle
         local resizeHandle = Instance.new("ImageButton")
         resizeHandle.Name = "ResizeHandle"
         resizeHandle.Size = UDim2.new(0, 20, 0, 20)
         resizeHandle.Position = UDim2.new(1, -20, 1, -20)
         resizeHandle.BackgroundTransparency = 1
-        resizeHandle.Image = "rbxassetid://3570695787"
+        resizeHandle.Image = "rbxassetid://3570695787" -- Standard resize icon
         resizeHandle.ImageColor3 = Color3.fromRGB(150, 150, 150)
         resizeHandle.Parent = mainFrame
-
+        
         local resizing, resizeStart, startSize
         resizeHandle.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
                 resizing = true
                 resizeStart = input.Position
                 startSize = mainFrame.AbsoluteSize
-
+                
                 input.Changed:Connect(function()
                     if input.UserInputState == Enum.UserInputState.End then
                         resizing = false
@@ -1245,7 +1255,7 @@ return function(ctx)
                 end)
             end
         end)
-
+        
         UserInputService.InputChanged:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseMovement and resizing then
                 local delta = input.Position - resizeStart
@@ -1253,158 +1263,162 @@ return function(ctx)
             end
         end)
 
-        local tName                    = Instance.new("TextLabel")
-        tName.Name                     = "TargetName"
-        tName.Size                     = UDim2.new(1, -20, 0, 26)
-        tName.Position                 = UDim2.new(0, 10, 0, 10)
-        tName.BackgroundTransparency   = 1
-        tName.TextColor3               = Color3.fromRGB(255, 255, 255)
-        tName.Font                     = Enum.Font.GothamBold
-        tName.TextSize                 = 18
-        tName.Text                     = "🎯 Searching..."
-        tName.TextXAlignment           = Enum.TextXAlignment.Left
-        tName.TextTruncate             = Enum.TextTruncate.AtEnd
-        tName.Parent                   = mainFrame
-
-        local barBg                    = Instance.new("Frame")
-        barBg.Name                     = "BarBG"
-        barBg.Size                     = UDim2.new(1, -20, 0, 18)
-        barBg.Position                 = UDim2.new(0, 10, 0, 40)
-        barBg.BackgroundColor3         = Color3.fromRGB(45, 45, 50)
-        barBg.BorderSizePixel          = 0
-        barBg.Parent                   = mainFrame
-
-        local barCorner                = Instance.new("UICorner")
-        barCorner.CornerRadius         = UDim.new(0, 5)
-        barCorner.Parent               = barBg
-
-        local barFill                  = Instance.new("Frame")
-        barFill.Name                   = "Fill"
-        barFill.Size                   = UDim2.new(1, 0, 1, 0)
-        barFill.BackgroundColor3       = Color3.fromRGB(255, 255, 255)
-        barFill.BorderSizePixel        = 0
-        barFill.Parent                 = barBg
-
-        local fillCorner               = Instance.new("UICorner")
-        fillCorner.CornerRadius        = UDim.new(0, 5)
-        fillCorner.Parent              = barFill
-
-        local gradient                 = Instance.new("UIGradient")
-        gradient.Color                 = ColorSequence.new {
+        local tName = Instance.new("TextLabel")
+        tName.Name = "TargetName"
+        tName.Size = UDim2.new(1, -20, 0, 26)
+        tName.Position = UDim2.new(0, 10, 0, 10)
+        tName.BackgroundTransparency = 1
+        tName.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tName.Font = Enum.Font.GothamBold
+        tName.TextSize = 18 
+        tName.Text = "🎯 Searching..."
+        tName.TextXAlignment = Enum.TextXAlignment.Left
+        tName.TextTruncate = Enum.TextTruncate.AtEnd
+        tName.Parent = mainFrame
+        
+        local barBg = Instance.new("Frame")
+        barBg.Name = "BarBG"
+        barBg.Size = UDim2.new(1, -20, 0, 18) 
+        barBg.Position = UDim2.new(0, 10, 0, 40)
+        barBg.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+        barBg.BorderSizePixel = 0
+        barBg.Parent = mainFrame
+        
+        local barCorner = Instance.new("UICorner")
+        barCorner.CornerRadius = UDim.new(0, 5)
+        barCorner.Parent = barBg
+        
+        local barFill = Instance.new("Frame")
+        barFill.Name = "Fill"
+        barFill.Size = UDim2.new(1, 0, 1, 0)
+        barFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        barFill.BorderSizePixel = 0
+        barFill.Parent = barBg
+        
+        local fillCorner = Instance.new("UICorner")
+        fillCorner.CornerRadius = UDim.new(0, 5)
+        fillCorner.Parent = barFill
+        
+        local gradient = Instance.new("UIGradient")
+        gradient.Color = ColorSequence.new{
             ColorSequenceKeypoint.new(0, Color3.fromRGB(85, 255, 120)),
             ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 170, 120))
         }
-        gradient.Parent                = barFill
-
-        local hpText                   = Instance.new("TextLabel")
-        hpText.Size                    = UDim2.new(1, 0, 1, 0)
-        hpText.BackgroundTransparency  = 1
-        hpText.TextColor3              = Color3.fromRGB(255, 255, 255)
-        hpText.Font                    = Enum.Font.GothamBold
-        hpText.TextSize                = 12
-        hpText.TextStrokeTransparency  = 0.5
-        hpText.Text                    = "100 / 100"
-        hpText.ZIndex                  = 2
-        hpText.Parent                  = barBg
-
-        local dLabel                   = Instance.new("TextLabel")
-        dLabel.Name                    = "DropsLabel"
-        dLabel.Size                    = UDim2.new(1, -20, 0, 20)
-        dLabel.Position                = UDim2.new(0, 10, 0, 68)
-        dLabel.BackgroundTransparency  = 1
-        dLabel.TextColor3              = Color3.fromRGB(200, 200, 200)
-        dLabel.Font                    = Enum.Font.Gotham
-        dLabel.TextSize                = 14
-        dLabel.Text                    = "💎 Drops Detected:"
-        dLabel.TextXAlignment          = Enum.TextXAlignment.Left
-        dLabel.Parent                  = mainFrame
-
-        local dropContainer            = Instance.new("Frame")
-        dropContainer.Name             = "DropContainer"
-        dropContainer.Size             = UDim2.new(1, 0, 1, -95)
-        dropContainer.Position         = UDim2.new(0, 0, 0, 95)
+        gradient.Parent = barFill
+        
+        local hpText = Instance.new("TextLabel")
+        hpText.Size = UDim2.new(1, 0, 1, 0)
+        hpText.BackgroundTransparency = 1
+        hpText.TextColor3 = Color3.fromRGB(255, 255, 255)
+        hpText.Font = Enum.Font.GothamBold
+        hpText.TextSize = 12
+        hpText.TextStrokeTransparency = 0.5
+        hpText.Text = "100 / 100"
+        hpText.ZIndex = 2
+        hpText.Parent = barBg
+        
+        local dLabel = Instance.new("TextLabel")
+        dLabel.Name = "DropsLabel"
+        dLabel.Size = UDim2.new(1, -20, 0, 20)
+        dLabel.Position = UDim2.new(0, 10, 0, 68)
+        dLabel.BackgroundTransparency = 1
+        dLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        dLabel.Font = Enum.Font.Gotham
+        dLabel.TextSize = 14
+        dLabel.Text = "💎 Drops Detected:"
+        dLabel.TextXAlignment = Enum.TextXAlignment.Left
+        dLabel.Parent = mainFrame
+        
+        local dropContainer = Instance.new("Frame")
+        dropContainer.Name = "DropContainer"
+        dropContainer.Size = UDim2.new(1, 0, 1, -95) 
+        dropContainer.Position = UDim2.new(0, 0, 0, 95)
         dropContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-        dropContainer.BorderSizePixel  = 0
-        dropContainer.Parent           = mainFrame
-
-        local dropCorner               = Instance.new("UICorner")
-        dropCorner.CornerRadius        = UDim.new(0, 6)
-        dropCorner.Parent              = dropContainer
-
-        local dList                    = Instance.new("ScrollingFrame")
-        dList.Name                     = "DropList"
-        dList.Size                     = UDim2.new(1, -10, 1, -10)
-        dList.Position                 = UDim2.new(0, 5, 0, 5)
-        dList.BackgroundTransparency   = 1
-        dList.BorderSizePixel          = 0
-        dList.ScrollBarThickness       = 4
-        dList.ScrollBarImageColor3     = Color3.fromRGB(80, 80, 80)
-        dList.AutomaticCanvasSize      = Enum.AutomaticSize.Y
-        dList.CanvasSize               = UDim2.new(0, 0, 0, 0)
-        dList.Parent                   = dropContainer
-
-        local layout                   = Instance.new("UIListLayout")
-        layout.Parent                  = dList
-        layout.SortOrder               = Enum.SortOrder.LayoutOrder
-        layout.Padding                 = UDim.new(0, 4)
-
-        TrackerState.Gui               = sg
-        TrackerState.Container         = mainFrame
-        TrackerState.TargetName        = tName
-        TrackerState.HealthBar         = barFill
-        TrackerState.HealthText        = hpText
-        TrackerState.DropList          = dList
-
-        sg.Enabled                     = false
+        dropContainer.BorderSizePixel = 0
+        dropContainer.Parent = mainFrame
+        
+        local dropCorner = Instance.new("UICorner")
+        dropCorner.CornerRadius = UDim.new(0, 6)
+        dropCorner.Parent = dropContainer
+        
+        local dList = Instance.new("ScrollingFrame")
+        dList.Name = "DropList"
+        dList.Size = UDim2.new(1, -10, 1, -10)
+        dList.Position = UDim2.new(0, 5, 0, 5)
+        dList.BackgroundTransparency = 1
+        dList.BorderSizePixel = 0
+        dList.ScrollBarThickness = 4
+        dList.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
+        dList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        dList.CanvasSize = UDim2.new(0, 0, 0, 0)
+        dList.Parent = dropContainer
+        
+        local layout = Instance.new("UIListLayout")
+        layout.Parent = dList
+        layout.SortOrder = Enum.SortOrder.LayoutOrder
+        layout.Padding = UDim.new(0, 4)
+        
+        TrackerState.Gui = sg
+        TrackerState.Container = mainFrame
+        TrackerState.TargetName = tName
+        TrackerState.HealthBar = barFill
+        TrackerState.HealthText = hpText
+        TrackerState.DropList = dList
+        
+        sg.Enabled = false
     end
-
+    
     local function resetTrackerData(newTarget)
         if not TrackerState.Gui then return end
-
+        
+        -- Clear Drops
         for _, c in ipairs(TrackerState.DropList:GetChildren()) do
             if c:IsA("TextLabel") then c:Destroy() end
         end
         table.clear(TrackerState.CurrentDrops)
-
+        
         if newTarget then
             local hp = rockHealth(newTarget) or 100
             local attrMax = newTarget:GetAttribute("MaxHealth")
             TrackerState.CachedMaxHp = attrMax or hp
         end
     end
-
+    
     local function updateTrackerUi()
         if not TrackerState.Enabled or not TrackerState.Gui then
             if TrackerState.Gui then TrackerState.Gui.Enabled = false end
             return
         end
-
+        
+        -- PERSISTENCE: Keep UI open even if no target
         TrackerState.Gui.Enabled = true
-
+        
         local target = TrackerState.ActiveTarget
         if not target or not target.Parent then
+            -- Show "Searching..." state
             TrackerState.TargetName.Text = "🎯 Searching..."
             TrackerState.HealthBar:TweenSize(UDim2.new(0, 0, 1, 0), "Out", "Quad", 0.3, true)
             TrackerState.HealthText.Text = "0 / 0"
             return
         end
-
+        
         TrackerState.TargetName.Text = "🎯 " .. target.Name
-
-        local hp                     = rockHealth(target) or 0
-        local maxHp                  = math.max(TrackerState.CachedMaxHp, 1)
-
-        local pct                    = math.clamp(hp / maxHp, 0, 1)
+        
+        local hp = rockHealth(target) or 0
+        local maxHp = math.max(TrackerState.CachedMaxHp, 1)
+        
+        local pct = math.clamp(hp / maxHp, 0, 1)
         TrackerState.HealthBar:TweenSize(UDim2.new(pct, 0, 1, 0), "Out", "Quad", 0.15, true)
         TrackerState.HealthText.Text = math.floor(hp) .. " / " .. math.floor(maxHp)
-
+        
+        -- Scan Drops
         local children = target:GetChildren()
         for _, c in ipairs(children) do
             if c.Name == "Ore" and not TrackerState.CurrentDrops[c] then
                 local oreType = c:GetAttribute("Ore")
                 if oreType then
                     TrackerState.CurrentDrops[c] = true
-
+                    
                     local lbl = Instance.new("TextLabel")
                     lbl.Size = UDim2.new(1, 0, 0, 20)
                     lbl.BackgroundTransparency = 1
@@ -1414,13 +1428,14 @@ return function(ctx)
                     lbl.Text = "  ✨ " .. tostring(oreType)
                     lbl.TextXAlignment = Enum.TextXAlignment.Left
                     lbl.Parent = TrackerState.DropList
-
+                    
                     TrackerState.DropList.CanvasPosition = Vector2.new(0, 9999)
                 end
             end
         end
     end
 
+    -- Independent Loop for Proximity Tracker
     task.spawn(function()
         while true do
             if not TrackerState.Enabled then
@@ -1428,16 +1443,16 @@ return function(ctx)
                 task.wait(1)
                 continue
             end
-
+            
             local hrp = getLocalHRP()
             if not hrp then
                 task.wait(0.5)
                 continue
             end
-
+            
             local rocks = {}
             local folder = getRocksFolder()
-
+            
             if folder then
                 for _, desc in ipairs(folder:GetDescendants()) do
                     if desc:IsA("Model") and desc:GetAttribute("Health") then
@@ -1447,41 +1462,39 @@ return function(ctx)
                     end
                 end
             end
-
+            
             for _, rock in ipairs(rocks) do
                 local currentHp = rockHealth(rock) or 0
-                local oldHp     = TrackerState.LastCheckHealth[rock]
-
+                local oldHp = TrackerState.LastCheckHealth[rock]
+                
                 if oldHp and currentHp < oldHp then
                     if TrackerState.ActiveTarget ~= rock then
                         TrackerState.ActiveTarget = rock
                         resetTrackerData(rock)
                     end
                 end
-
+                
                 TrackerState.LastCheckHealth[rock] = currentHp
             end
-
+            
             for r, _ in pairs(TrackerState.LastCheckHealth) do
                 if not r.Parent or (r:GetPivot().Position - hrp.Position).Magnitude > 20 then
                     TrackerState.LastCheckHealth[r] = nil
                 end
             end
-
+            
             if TrackerState.ActiveTarget then
                 local t = TrackerState.ActiveTarget
-                if not t.Parent
-                    or (rockHealth(t) or 0) <= 0
-                    or (t:GetPivot().Position - hrp.Position).Magnitude > 20 then
+                if not t.Parent or (rockHealth(t) or 0) <= 0 or (t:GetPivot().Position - hrp.Position).Magnitude > 20 then
                     TrackerState.ActiveTarget = nil
                 end
             end
-
+            
             updateTrackerUi()
             task.wait(0.1)
         end
     end)
-
+    
     -- ====================================================================
     --  MAIN FARM LOOP (RETARGET ON PLAYER NEAR TARGET)
     -- ====================================================================
@@ -1533,17 +1546,17 @@ return function(ctx)
                 task.wait(0.3)
                 continue
             end
-
+            
             -- >>> DAMAGE DITCH LOGIC (Gated by DamageDitchEnabled) <<<
             if DamageDitchEnabled and FarmState.currentTarget and humHealth < FarmState.LastLocalHealth then
                 notify("Took damage! Ditching.", 2)
                 blacklistTarget(FarmState.currentTarget, 60)
                 stopMoving()
-                FarmState.currentTarget   = nil
-                FarmState.attached        = false
-                FarmState.detourActive    = false
-
-                FarmState.LastLocalHealth = humHealth
+                FarmState.currentTarget = nil
+                FarmState.attached      = false
+                FarmState.detourActive  = false
+                
+                FarmState.LastLocalHealth = humHealth 
                 task.wait(0.15)
                 continue
             end
@@ -1566,32 +1579,44 @@ return function(ctx)
                 or (not pos)
                 or (not alive)
                 or isTargetBlacklisted(target) then
-                FarmState.currentTarget    = chooseNearestTarget()
-                FarmState.attached         = false
-                FarmState.detourActive     = false
 
+                FarmState.currentTarget = chooseNearestTarget()
+                FarmState.attached      = false
+                FarmState.detourActive  = false
+                
                 -- Reset stuck logic for new target
                 FarmState.lastTargetRef    = FarmState.currentTarget
                 FarmState.lastTargetHealth = 0
                 FarmState.stuckStartTime   = os.clock()
-
+                
                 -- Reset Damage Ditch baseline
-                FarmState.LastLocalHealth  = humHealth
+                FarmState.LastLocalHealth = humHealth
 
-                target                     = FarmState.currentTarget
+                target = FarmState.currentTarget
 
                 if target then
                     startMovingToTarget(target)
                     pos = def.getPos(target)
                 else
-                    -- No targets: idle in place but keep scanning & step away from players
+                    -- No targets found:
+                    -- We stay idle but anchor to prevent falling through map
                     stopMoving()
+                    
+                    if hrp and hrp.Anchored == false then
+                        hrp.Anchored = true -- prevent fall
+                    end
+                    
                     if AvoidPlayers then
                         moveAwayFromNearbyPlayers()
                     end
                     task.wait(0.15)
                     continue
                 end
+            end
+
+            -- If we have target, ensure unanchored so we can move
+            if hrp.Anchored == true then
+                hrp.Anchored = false
             end
 
             -- Double-check target position validity and height (retarget instead of stopping)
@@ -1605,17 +1630,17 @@ return function(ctx)
                 FarmState.detourActive  = false
 
                 -- Immediately retarget to the next one
-                local newTarget         = chooseNearestTarget()
+                local newTarget = chooseNearestTarget()
                 if newTarget then
-                    FarmState.currentTarget    = newTarget
-                    FarmState.attached         = false
-                    FarmState.detourActive     = false
-
+                    FarmState.currentTarget = newTarget
+                    FarmState.attached      = false
+                    FarmState.detourActive  = false
+                    
                     FarmState.lastTargetRef    = newTarget
                     FarmState.lastTargetHealth = 0
                     FarmState.stuckStartTime   = os.clock()
-
-                    FarmState.LastLocalHealth  = humHealth
+                    
+                    FarmState.LastLocalHealth = humHealth 
 
                     startMovingToTarget(newTarget)
                     -- next loop will handle hit logic
@@ -1642,17 +1667,17 @@ return function(ctx)
                     FarmState.detourActive  = false
 
                     -- Immediately retarget instead of going idle
-                    local newTarget         = chooseNearestTarget()
+                    local newTarget = chooseNearestTarget()
                     if newTarget then
-                        FarmState.currentTarget    = newTarget
-                        FarmState.attached         = false
-                        FarmState.detourActive     = false
-
+                        FarmState.currentTarget = newTarget
+                        FarmState.attached      = false
+                        FarmState.detourActive  = false
+                        
                         FarmState.lastTargetRef    = newTarget
                         FarmState.lastTargetHealth = 0
                         FarmState.stuckStartTime   = os.clock()
-
-                        FarmState.LastLocalHealth  = humHealth
+                        
+                        FarmState.LastLocalHealth = humHealth
 
                         startMovingToTarget(newTarget)
                         -- let next iteration handle hit
@@ -1666,9 +1691,10 @@ return function(ctx)
                     continue
                 end
             end
-
+            
             -- >>> WHITELIST CHECK FOR ORES (Gated by OreWhitelistEnabled) <<<
             if FarmState.mode == FARM_MODE_ORES and OreWhitelistEnabled and target then
+                
                 -- Only apply check if target name matches the "Applies To" list
                 if WhitelistAppliesTo[target.Name] then
                     local oreChildren = {}
@@ -1677,7 +1703,7 @@ return function(ctx)
                             table.insert(oreChildren, c)
                         end
                     end
-
+                    
                     if #oreChildren > 0 then
                         local matchFound = false
                         for _, orePart in ipairs(oreChildren) do
@@ -1687,7 +1713,7 @@ return function(ctx)
                                 break
                             end
                         end
-
+                        
                         if not matchFound then
                             notify("No whitelisted ore found! Ditching.", 2)
                             blacklistTarget(target, 60)
@@ -1791,7 +1817,10 @@ return function(ctx)
         FarmState.currentTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
-
+        
+        local hrp = getLocalHRP()
+        if hrp then hrp.Anchored = false end -- Always unanchor on stop
+        
         disableNoclip()
     end
 
@@ -1839,7 +1868,7 @@ return function(ctx)
             end
             return
         end
-
+        
         -- Warning if whitelist enabled but no ores selected
         local whitelistedCount = 0
         for _ in pairs(WhitelistedOres) do whitelistedCount = whitelistedCount + 1 end
@@ -1849,7 +1878,7 @@ return function(ctx)
 
         saveAttachSettings()
         configureAttachForMode(FarmState.mode)
-
+        
         -- Enable Noclip
         enableNoclip()
 
@@ -1870,6 +1899,9 @@ return function(ctx)
         FarmState.currentTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
+        
+        local hrp = getLocalHRP()
+        if hrp then hrp.Anchored = false end
 
         disableNoclip()
 
@@ -1884,15 +1916,15 @@ return function(ctx)
     --  UI: MODE + TARGETS + OFFSET + SPEED + AVOID + AUTO TOOL
     -- ====================================================================
 
-    local AutoTab          = Tabs["Auto"] or Tabs.Main
-    local WhitelistGroup   = AutoTab:AddLeftGroupbox("Whitelists", "list")
-    local FarmGroup        = AutoTab:AddLeftGroupbox("Auto Farm", "pickaxe")
+    local AutoTab   = Tabs["Auto"] or Tabs.Main
+    local WhitelistGroup = AutoTab:AddLeftGroupbox("Whitelists", "list")
+    local FarmGroup = AutoTab:AddLeftGroupbox("Auto Farm", "pickaxe")
     local TrackingGroupbox = Tabs.Auto:AddRightGroupbox("Tracking", "compass")
 
     local ModeDropdown
     local TargetDropdown
     local OreTypeDropdown
-    local ZoneDropdown
+    local ZoneDropdown 
     local AppliesToDropdown
 
     local function refreshTargetDropdown()
@@ -1902,9 +1934,9 @@ return function(ctx)
             TargetDropdown:SetValues({})
             return
         end
-
+        
         local nameMap, uniqueNames = def.scan()
-
+        
         -- Merge PermOreList if in Ore Mode
         if FarmState.mode == FARM_MODE_ORES then
             local set = {}
@@ -1917,13 +1949,13 @@ return function(ctx)
             end
             table.sort(uniqueNames)
         end
-
+        
         TargetDropdown:SetValues(uniqueNames)
         if AppliesToDropdown then
             AppliesToDropdown:SetValues(uniqueNames)
         end
     end
-
+    
     local function refreshOreTypesDropdown()
         if not OreTypeDropdown then return end
         local types = getGameOreTypes()
@@ -1937,11 +1969,11 @@ return function(ctx)
     end
 
     -- >>> WHITELISTS GROUP <<<
-
+    
     ModeDropdown = WhitelistGroup:AddDropdown("AF_Mode", {
-        Text     = "Farm Mode",
-        Values   = { FARM_MODE_ORES, FARM_MODE_ENEMIES },
-        Default  = FarmState.mode,
+        Text    = "Farm Mode",
+        Values  = { FARM_MODE_ORES, FARM_MODE_ENEMIES },
+        Default = FarmState.mode,
         Callback = function(value)
             if FarmState.mode == value then return end
             FarmState.mode = value
@@ -1955,9 +1987,9 @@ return function(ctx)
     })
 
     TargetDropdown = WhitelistGroup:AddDropdown("AF_Targets", {
-        Text     = "Target Whitelist",
-        Values   = {},
-        Multi    = true,
+        Text   = "Target Whitelist",
+        Values = {},
+        Multi  = true,
         Callback = function(selectedTable)
             local list = {}
             for name, selected in pairs(selectedTable) do
@@ -1968,20 +2000,29 @@ return function(ctx)
             FarmState.selectedNames = list
         end,
     })
-
+    
+    WhitelistGroup:AddToggle("AF_TargetFullHealth", {
+        Text    = "Target Full Health Only",
+        Default = false,
+        Tooltip = "Only targets fresh rocks to avoid kill-stealing.",
+        Callback = function(state)
+            TargetFullHealth = state
+        end,
+    })
+    
     WhitelistGroup:AddToggle("AF_ZoneWhitelist", {
-        Text     = "Zone Whitelist",
-        Default  = false,
-        Tooltip  = "Only target rocks inside specific Zones.",
+        Text    = "Zone Whitelist",
+        Default = false,
+        Tooltip = "Only target rocks inside specific Zone folders.",
         Callback = function(state)
             ZoneWhitelistEnabled = state
         end,
     })
 
     ZoneDropdown = WhitelistGroup:AddDropdown("AF_Zones", {
-        Text     = "Whitelisted Zones",
-        Values   = {},
-        Multi    = true,
+        Text   = "Whitelisted Zones",
+        Values = {},
+        Multi  = true,
         Callback = function(selectedTable)
             WhitelistedZones = {}
             for name, selected in pairs(selectedTable) do
@@ -1991,23 +2032,23 @@ return function(ctx)
             end
         end,
     })
-
+    
     WhitelistGroup:AddDivider()
 
     WhitelistGroup:AddToggle("AF_OreWhitelist", {
-        Text     = "Ore Drop Whitelist",
-        Default  = false,
-        Tooltip  = "If enabled, ditches rocks without any whitelisted ores",
+        Text    = "Ore Drop Whitelist",
+        Default = false,
+        Tooltip = "If enabled, checks inside the rock for specific ore drops.",
         Callback = function(state)
             OreWhitelistEnabled = state
         end,
     })
-
+    
     AppliesToDropdown = WhitelistGroup:AddDropdown("AF_AppliesTo", {
-        Text     = "Whitelist Applies To",
-        Values   = {},
-        Multi    = true,
-        Tooltip  = "Only applies ore whitelist to these rocks",
+        Text   = "Whitelist Applies To",
+        Values = {},
+        Multi  = true,
+        Tooltip = "Select which rocks require drop checking. Unselected rocks are mined freely.",
         Callback = function(selectedTable)
             WhitelistAppliesTo = {}
             for name, selected in pairs(selectedTable) do
@@ -2017,12 +2058,12 @@ return function(ctx)
             end
         end,
     })
-
+    
     OreTypeDropdown = WhitelistGroup:AddDropdown("AF_OreTypes", {
-        Text     = "Whitelisted Ores",
-        Values   = {},
-        Multi    = true,
-        Tooltip  = "Select which ores to check for inside rocks",
+        Text   = "Whitelisted Ores",
+        Values = {},
+        Multi  = true,
+        Tooltip = "Select which drops (Iron, Gold, etc) allow mining.",
         Callback = function(selectedTable)
             WhitelistedOres = {}
             for name, selected in pairs(selectedTable) do
@@ -2032,17 +2073,17 @@ return function(ctx)
             end
         end,
     })
-
+    
     WhitelistGroup:AddButton({
         Text = "Refresh All Whitelists",
         Func = function()
             refreshTargetDropdown()
-            refreshLavaParts()
+            refreshLavaParts() 
             refreshZoneDropdown()
             refreshOreTypesDropdown()
         end,
     })
-
+    
     -- >>> AUTO FARM GROUP <<<
 
     FarmGroup:AddSlider("AF_OffsetAdjust", {
@@ -2087,8 +2128,8 @@ return function(ctx)
     })
 
     FarmGroup:AddToggle("AF_AvoidLava", {
-        Text     = "Avoid Lava",
-        Default  = false,
+        Text    = "Avoid Lava",
+        Default = false,
         Callback = function(state)
             AvoidLava = state and true or false
             if AvoidLava then
@@ -2098,8 +2139,8 @@ return function(ctx)
     })
 
     FarmGroup:AddToggle("AF_AvoidPlayers", {
-        Text     = "Avoid Players",
-        Default  = false,
+        Text    = "Avoid Players",
+        Default = false,
         Callback = function(state)
             AvoidPlayers = state
         end,
@@ -2116,19 +2157,18 @@ return function(ctx)
             PlayerAvoidRadius = tonumber(value) or PlayerAvoidRadius
         end,
     })
-
+    
     FarmGroup:AddToggle("AF_DamageDitch", {
-        Text     = "Damage Ditch",
-        Default  = false,
-        Tooltip = "Ditch the rock we are mining if damage is taken",
+        Text    = "Damage Ditch",
+        Default = false,
         Callback = function(state)
             DamageDitchEnabled = state
         end,
     })
 
     FarmGroup:AddToggle("AF_Enabled", {
-        Text     = "Auto Farm",
-        Default  = false,
+        Text    = "Auto Farm",
+        Default = false,
         Callback = function(state)
             if state then
                 startFarm()
@@ -2143,16 +2183,35 @@ return function(ctx)
     refreshLavaParts()
     refreshOreTypesDropdown()
     refreshZoneDropdown()
-
+    
+    ----------------------------------------------------------------
+    -- PROXIMITY TRACKER (SEPARATE HUD SYSTEM)
+    ----------------------------------------------------------------
+    
+    local TrackerState = {
+        Enabled      = false,
+        Gui          = nil,
+        Container    = nil,
+        TargetName   = nil,
+        HealthBar    = nil,
+        HealthText   = nil,
+        DropList     = nil,
+        
+        CachedMaxHp  = 100,
+        CurrentDrops = {}, 
+        
+        ActiveTarget    = nil,
+        LastCheckHealth = {}, 
+    }
+    
     TrackingGroupbox:AddToggle("AF_ProximityTracker", {
-        Text     = "Progress Tracker",
-        Default  = false,
+        Text    = "Proximity Tracker",
+        Default = false,
+        Tooltip = "Shows a HUD for the most recent rock damaged within 15 studs.",
         Callback = function(state)
             TrackerState.Enabled = state
             if state then
                 createTrackerGui()
-            elseif TrackerState.Gui then
-                TrackerState.Gui.Enabled = false
             end
         end,
     })
@@ -2178,9 +2237,9 @@ return function(ctx)
         FarmState.currentTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
-
+        
         disableNoclip()
-
+        
         if TrackerState.Gui then
             TrackerState.Gui:Destroy()
             TrackerState.Gui = nil
