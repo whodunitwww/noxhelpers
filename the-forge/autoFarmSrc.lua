@@ -210,29 +210,31 @@ return function(ctx)
     local TargetBlacklist      = {}
 
     local FarmState            = {
-        enabled          = false,
-        mode             = "Ores",
-        nameMap          = {},
+        enabled             = false,
+        mode                = "Ores",
+        nameMap             = {},
 
-        currentTarget    = nil,
-        moveCleanup      = nil,
-        farmThread       = nil,
-        noclipConn       = nil,
+        currentTarget       = nil,
+        moveCleanup         = nil,
+        farmThread          = nil,
+        noclipConn          = nil,
 
-        attached         = false,
-        lastHit          = 0,
-        detourActive     = false,
+        attached            = false,
+        lastHit             = 0,
+        detourActive        = false,
 
-        lastTargetRef    = nil,
-        lastTargetHealth = 0,
-        stuckStartTime   = 0,
+        lastTargetRef       = nil,
+        lastTargetHealth    = 0,
+        stuckStartTime      = 0,
 
-        lastMovePos      = Vector3.zero,
-        lastMoveTime     = 0,
+        lastMovePos         = Vector3.zero,
+        lastMoveTime        = 0,
 
-        LastLocalHealth  = 100,
-        tempMobTarget    = nil,
-        avoidingPlayer   = false,
+        LastLocalHealth     = 100,
+        tempMobTarget       = nil,
+        avoidingPlayer      = false,
+        lastAvoidMoveTime   = 0,
+        lastAvoidNoticeTime = 0,
     }
 
     -- ====================================================================
@@ -741,8 +743,15 @@ return function(ctx)
 
     local function moveAwayFromNearbyPlayers()
         if not AvoidPlayers then return end
+
         local hrp = getLocalHRP()
         if not hrp then return end
+
+        local now = os.clock()
+        -- THROTTLE: don't recompute / reissue movement more than ~0.75s
+        if FarmState.avoidingPlayer and (now - (FarmState.lastAvoidMoveTime or 0)) < 0.75 then
+            return
+        end
 
         local myPlayer    = References.player
         local hrpPos      = hrp.Position
@@ -778,12 +787,12 @@ return function(ctx)
             targetPos = Vector3.new(targetPos.X, hrpPos.Y, targetPos.Z)
 
             stopMoving()
-            FarmState.moveCleanup = MoveToPos(targetPos, FarmSpeed)
+            FarmState.moveCleanup       = MoveToPos(targetPos, FarmSpeed)
 
-            -- NEW: mark that we are currently avoiding a player
-            FarmState.avoidingPlayer = true
-            FarmState.lastMovePos = hrpPos
-            FarmState.lastMoveTime = os.clock()
+            FarmState.avoidingPlayer    = true
+            FarmState.lastMovePos       = hrpPos
+            FarmState.lastMoveTime      = now
+            FarmState.lastAvoidMoveTime = now
         end
     end
 
@@ -1632,32 +1641,55 @@ return function(ctx)
                     return
                 end
 
-                -- >>> DYNAMIC PLAYER AVOIDANCE (FIXED) <<<
-                -- NOTE: Disabled while in detour stage so we don't fight ourselves on the lava route.
+                -- >>> DYNAMIC PLAYER AVOIDANCE (SMOOTHED) <<<
                 if AvoidPlayers and not FarmState.detourActive then
-                    -- Check if any player is dangerously close to ME
-                    local nearMe, _ = isAnyPlayerNearHRP(PlayerAvoidRadius)
-                    if nearMe then
-                        notify("Player too close! Moving.", 2)
+                    -- Hysteresis radii
+                    local innerRadius = PlayerAvoidRadius                  -- when to start avoiding
+                    local outerRadius = math.max(PlayerAvoidRadius * 1.2, -- when it's "safe" again
+                                                  PlayerAvoidRadius + 5)
 
-                        -- If attached, detach to run away
-                        if FarmState.attached then
-                            FarmState.attached = false
-                            if AttachPanel.DestroyAttach then AttachPanel.DestroyAttach() end
+                    local now = os.clock()
+
+                    -- Check if any player is too close to *me*
+                    local nearMe, _ = isAnyPlayerNearHRP(innerRadius)
+                    if nearMe then
+                        -- Only show the warning occasionally
+                        if (now - (FarmState.lastAvoidNoticeTime or 0)) > 2 then
+                            notify("Player too close! Moving.", 2)
+                            FarmState.lastAvoidNoticeTime = now
                         end
 
-                        -- Explicitly move away so we don't just freeze in place
-                        moveAwayFromNearbyPlayers()
+                        -- If attached, detach so we can run away
+                        if FarmState.attached then
+                            FarmState.attached = false
+                            if AttachPanel.DestroyAttach then
+                                AttachPanel.DestroyAttach()
+                            end
+                        end
 
+                        -- Actually move away (throttled inside)
+                        moveAwayFromNearbyPlayers()
+                        -- We've chosen to avoid, don't also try to farm on this tick.
                         task.wait(0.2)
                         return
                     else
-                        -- NEW: we were avoiding players but now it's clear:
-                        -- immediately re-engage movement to our current target.
-                        if FarmState.avoidingPlayer and activeTarget then
-                            FarmState.avoidingPlayer = false
-                            stopMoving()
-                            startMovingToTarget(activeTarget, activeDef)
+                        -- We were in avoid-mode: only clear it once we're *well* outside outerRadius
+                        if FarmState.avoidingPlayer then
+                            local stillNear, _ = isAnyPlayerNearHRP(outerRadius)
+                            if not stillNear then
+                                FarmState.avoidingPlayer    = false
+                                FarmState.lastAvoidMoveTime = 0
+
+                                -- Re-engage movement toward current target (if we have one)
+                                if activeTarget then
+                                    stopMoving()
+                                    startMovingToTarget(activeTarget, activeDef)
+                                end
+                            else
+                                -- Still kind of close – stay in avoid mode, don't re-target yet.
+                                task.wait(0.05)
+                                return
+                            end
                         end
                     end
 
@@ -1665,9 +1697,12 @@ return function(ctx)
                     if pos then
                         local distToTarget = (pos - hrp.Position).Magnitude
                         if distToTarget < 100 then
-                            local nearTarget, _ = isAnyPlayerNearPosition(pos, PlayerAvoidRadius)
+                            local nearTarget, _ = isAnyPlayerNearPosition(pos, innerRadius)
                             if nearTarget then
-                                notify("Player at target! Ditching.", 2)
+                                if (now - (FarmState.lastAvoidNoticeTime or 0)) > 2 then
+                                    notify("Player at target! Ditching.", 2)
+                                    FarmState.lastAvoidNoticeTime = now
+                                end
 
                                 if not isDistracted then
                                     blacklistTarget(activeTarget, 60)
@@ -1676,16 +1711,15 @@ return function(ctx)
                                 end
 
                                 stopMoving()
-                                FarmState.currentTarget = nil
-                                FarmState.attached = false
-                                FarmState.avoidingPlayer = false
+                                FarmState.currentTarget   = nil
+                                FarmState.attached        = false
+                                FarmState.avoidingPlayer  = false
                                 task.wait(0.1)
                                 return
                             end
                         end
                     end
                 end
-
 
                 -- Whitelist Checks (Omitted for brevity, logic remains same)
                 if not isDistracted and FarmState.mode == FARM_MODE_ORES and OreWhitelistEnabled and activeTarget then
@@ -1952,7 +1986,7 @@ return function(ctx)
     })
 
     WhitelistGroup:AddLabel(
-    "Mob/Ore selection is now controlled by priorities, use the priority editor below to do this.", true)
+        "Mob/Ore selection is now controlled by priorities, use the priority editor below to do this.", true)
 
     WhitelistGroup:AddToggle("AF_TargetFullHealth", {
         Text     = "Target Full Health Only",
@@ -2015,7 +2049,7 @@ return function(ctx)
         Text = "Launch Priority Editor",
         Func = function()
             loadstring(game:HttpGet(
-            "https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/the-forge/editor.lua"))()
+                "https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/the-forge/editor.lua"))()
         end,
     })
 
