@@ -1,7 +1,7 @@
 -- autoFarmSrc.lua
 -- Simple unified auto farm (ores + enemies) using AttachPanel
 -- Outsourced module version.
--- UPDATED: Removed Target Whitelist (Targets ALL based on Priority)
+-- UPDATED: Added "Ditch Health %" Slider for conditional retreating
 
 return function(ctx)
     ----------------------------------------------------------------
@@ -224,9 +224,14 @@ return function(ctx)
     local AvoidLava          = false
     local AvoidPlayers       = false
     local DamageDitchEnabled = false
+    local DamageDitchThreshold = 100 -- Default 100%
     local TargetFullHealth   = false 
     local PlayerAvoidRadius  = 40
     
+    -- New Flags for Nearby Mob Attack
+    local AttackNearbyMobs   = false
+    local NearbyMobRange     = 40
+
     -- Whitelists (Filters)
     local OreWhitelistEnabled = false
     local WhitelistedOres     = {} 
@@ -255,7 +260,14 @@ return function(ctx)
         lastTargetHealth = 0,
         stuckStartTime   = 0,
         
+        -- Movement stuck watchdog
+        lastMovePos      = Vector3.zero,
+        lastMoveTime     = 0,
+        
         LastLocalHealth  = 100, 
+        
+        -- State to track if we are temporarily distracted by a mob
+        tempMobTarget    = nil, 
     }
 
     -- ====================================================================
@@ -289,7 +301,7 @@ return function(ctx)
     end
 
     -- ====================================================================
-    --  NOCLIP SYSTEM
+    --  NOCLIP SYSTEM (Updated for robustness)
     -- ====================================================================
 
     local function enableNoclip()
@@ -310,6 +322,12 @@ return function(ctx)
         if FarmState.noclipConn then
             FarmState.noclipConn:Disconnect()
             FarmState.noclipConn = nil
+        end
+        -- Restore collision roughly
+        local char = References.character
+        if char then
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if hrp then hrp.CanCollide = true end
         end
     end
 
@@ -523,6 +541,36 @@ return function(ctx)
 
         table.sort(names)
         return nameMap, names
+    end
+    
+    -- New helper for Nearby Mob Attack Logic
+    local function findNearbyEnemy()
+        local hrp = getLocalHRP()
+        if not hrp then return nil end
+        
+        local living = getLivingFolder()
+        if not living then return nil end
+        
+        local myPos = hrp.Position
+        local bestMob = nil
+        local bestDist = NearbyMobRange -- use the slider value
+        
+        for _, m in ipairs(living:GetChildren()) do
+            if m:IsA("Model") and not isPlayerModel(m) and isMobAlive(m) then
+                local root = getMobRoot(m)
+                if root then
+                    local dist = (root.Position - myPos).Magnitude
+                    if dist <= bestDist then
+                        -- Check line of sight or other conditions if needed? 
+                        -- For now, pure distance.
+                        bestDist = dist
+                        bestMob = m
+                    end
+                end
+            end
+        end
+        
+        return bestMob
     end
 
     -- ====================================================================
@@ -1008,10 +1056,10 @@ return function(ctx)
     --  ATTACH + MOVEMENT
     -- ====================================================================
 
-    local function realignAttach(target)
+    local function realignAttach(target, overrideDef)
         if not target then return end
 
-        local def = ModeDefs[FarmState.mode]
+        local def = overrideDef or ModeDefs[FarmState.mode]
         if not def then return end
 
         local state = AttachPanel.State
@@ -1033,10 +1081,18 @@ return function(ctx)
         alignOri.CFrame = CFrame.lookAt(hrp.Position, root.Position, Vector3.yAxis)
     end
 
-    local function attachToTarget(target)
+    local function attachToTarget(target, overrideDef)
         if not target then return end
 
-        configureAttachForMode(FarmState.mode)
+        -- If overriding (e.g. mob attack during ore farm), we don't call standard configure
+        if overrideDef then
+             -- Manual config for override (Enemies)
+             if AttachPanel.SetMode then AttachPanel.SetMode(overrideDef.attachMode) end
+             if AttachPanel.SetYOffset then AttachPanel.SetYOffset(overrideDef.attachBaseY + ExtraYOffset) end
+             if AttachPanel.SetHorizDist then AttachPanel.SetHorizDist(overrideDef.attachHoriz) end
+        else
+            configureAttachForMode(FarmState.mode)
+        end
 
         if AttachPanel.SetTarget then
             AttachPanel.SetTarget(target)
@@ -1045,7 +1101,7 @@ return function(ctx)
             AttachPanel.CreateAttach(target)
         end
 
-        realignAttach(target)
+        realignAttach(target, overrideDef)
     end
 
     -- === DETOUR PATH WHEN X < -120 ======================================
@@ -1062,11 +1118,11 @@ return function(ctx)
         Vector3.new(359.745148, 74.859268, -224.669601),
     }
 
-    local function startMovingToTarget(target)
+    local function startMovingToTarget(target, overrideDef)
         stopMoving()
 
         local hrp = getLocalHRP()
-        local def = ModeDefs[FarmState.mode]
+        local def = overrideDef or ModeDefs[FarmState.mode]
         if not (hrp and def and def.getRoot) then
             return
         end
@@ -1085,6 +1141,10 @@ return function(ctx)
         local startPos = hrp.Position
         local finalPos = getFinalPos()
         if not finalPos then return end
+
+        -- Set initial watchdog data
+        FarmState.lastMovePos = startPos
+        FarmState.lastMoveTime = os.clock()
 
         local useDetour = (startPos.X < DETOUR_THRESHOLD_X)
 
@@ -1574,315 +1634,398 @@ return function(ctx)
         end
 
         while FarmState.enabled do
-            local hrp = getLocalHRP()
-            local hum = References.humanoid
-
-            -- death / no char handling (safe)
-            if not hrp or not hum then
-                stopMoving()
-                FarmState.currentTarget = nil
-                FarmState.attached      = false
-                FarmState.detourActive  = false
-                task.wait(0.3)
-                continue
-            end
-
-            local humHealth
-            local humState
-            local okState, stateOrErr = pcall(function()
-                return hum:GetState()
-            end)
-
-            if okState then
-                humState  = stateOrErr
-                humHealth = hum.Health
-            else
-                -- Humanoid probably invalid / destroyed
-                stopMoving()
-                FarmState.currentTarget = nil
-                FarmState.attached      = false
-                FarmState.detourActive  = false
-                task.wait(0.3)
-                continue
-            end
-
-            if humHealth <= 0 or humState == Enum.HumanoidStateType.Dead then
-                stopMoving()
-                FarmState.currentTarget = nil
-                FarmState.attached      = false
-                FarmState.detourActive  = false
-                task.wait(0.3)
-                continue
-            end
-            
-            -- >>> DAMAGE DITCH LOGIC (Gated by DamageDitchEnabled) <<<
-            if DamageDitchEnabled and FarmState.currentTarget and humHealth < FarmState.LastLocalHealth then
-                notify("Took damage! Ditching.", 2)
-                blacklistTarget(FarmState.currentTarget, 60)
-                stopMoving()
-                FarmState.currentTarget = nil
-                FarmState.attached      = false
-                FarmState.detourActive  = false
+            -- >>> CRASH PROTECTION: Wrap loop body in pcall <<<
+            local loopSuccess, loopError = pcall(function()
                 
-                FarmState.LastLocalHealth = humHealth 
-                task.wait(0.15)
-                continue
-            end
-            -- Update local health tracking for next loop
-            FarmState.LastLocalHealth = humHealth
+                local hrp = getLocalHRP()
+                local hum = References.humanoid
 
-            local def = ModeDefs[FarmState.mode]
-            if not def then
-                task.wait(0.3)
-                continue
-            end
-
-            local target = FarmState.currentTarget
-            local pos    = target and def.getPos(target) or nil
-            local alive  = target and def.isAlive(target)
-
-            -- Pick new target if current is invalid or blacklisted
-            if (not target)
-                or (not target.Parent)
-                or (not pos)
-                or (not alive)
-                or isTargetBlacklisted(target) then
-
-                FarmState.currentTarget = chooseNearestTarget()
-                FarmState.attached      = false
-                FarmState.detourActive  = false
-                
-                -- Reset stuck logic for new target
-                FarmState.lastTargetRef    = FarmState.currentTarget
-                FarmState.lastTargetHealth = 0
-                FarmState.stuckStartTime   = os.clock()
-                
-                -- Reset Damage Ditch baseline
-                FarmState.LastLocalHealth = humHealth
-
-                target = FarmState.currentTarget
-
-                if target then
-                    startMovingToTarget(target)
-                    pos = def.getPos(target)
-                else
-                    -- No targets found:
-                    -- We stay idle but anchor to prevent falling through map
+                -- death / no char handling (safe)
+                if not hrp or not hum then
                     stopMoving()
-                    
-                    if hrp and hrp.Anchored == false then
-                        hrp.Anchored = true -- prevent fall
-                    end
-                    
-                    if AvoidPlayers then
-                        moveAwayFromNearbyPlayers()
-                    end
-                    task.wait(0.15)
-                    continue
+                    FarmState.currentTarget = nil
+                    FarmState.attached      = false
+                    FarmState.detourActive  = false
+                    FarmState.tempMobTarget = nil
+                    task.wait(0.3)
+                    return -- acts as continue inside pcall
                 end
-            end
 
-            -- If we have target, ensure unanchored so we can move
-            if hrp.Anchored == true then
-                hrp.Anchored = false
-            end
+                local humHealth
+                local humState
+                local okState, stateOrErr = pcall(function()
+                    return hum:GetState()
+                end)
 
-            -- Double-check target position validity and height (retarget instead of stopping)
-            if pos and pos.Y > MaxTargetHeight then
-                notify("Target too high! Ditching.", 2)
-                blacklistTarget(target, 60) -- too high, don't keep retargeting it
+                if okState then
+                    humState  = stateOrErr
+                    humHealth = hum.Health
+                else
+                    -- Humanoid probably invalid / destroyed
+                    stopMoving()
+                    FarmState.currentTarget = nil
+                    FarmState.attached      = false
+                    FarmState.detourActive  = false
+                    FarmState.tempMobTarget = nil
+                    task.wait(0.3)
+                    return
+                end
 
-                stopMoving()
-                FarmState.currentTarget = nil
-                FarmState.attached      = false
-                FarmState.detourActive  = false
+                if humHealth <= 0 or humState == Enum.HumanoidStateType.Dead then
+                    stopMoving()
+                    FarmState.currentTarget = nil
+                    FarmState.attached      = false
+                    FarmState.detourActive  = false
+                    FarmState.tempMobTarget = nil
+                    task.wait(0.3)
+                    return
+                end
+                
+                -- >>> DAMAGE DITCH LOGIC (UPDATED: Check Threshold) <<<
+                -- Only ditch if: Enabled AND Health Dropped AND Health < Threshold %
+                local ditchLimit = hum.MaxHealth * (DamageDitchThreshold / 100)
+                
+                if DamageDitchEnabled and FarmState.currentTarget and humHealth < FarmState.LastLocalHealth and humHealth < ditchLimit then
+                    notify("Took damage! Ditching.", 2)
+                    blacklistTarget(FarmState.currentTarget, 60)
+                    stopMoving()
+                    FarmState.currentTarget = nil
+                    FarmState.attached      = false
+                    FarmState.detourActive  = false
+                    FarmState.tempMobTarget = nil
+                    
+                    FarmState.LastLocalHealth = humHealth 
+                    task.wait(0.15)
+                    return
+                end
+                -- Update local health tracking for next loop
+                FarmState.LastLocalHealth = humHealth
+                
+                -- >>> NEARBY MOB CHECK (Ore Mode Only) <<<
+                local activeTarget = nil
+                local activeDef = nil
+                local isDistracted = false
 
-                -- Immediately retarget to the next one
-                local newTarget = chooseNearestTarget()
-                if newTarget then
-                    FarmState.currentTarget = newTarget
+                if FarmState.mode == FARM_MODE_ORES and AttackNearbyMobs then
+                    -- If we already have a focused mob, check if it's still valid
+                    if FarmState.tempMobTarget then
+                        if FarmState.tempMobTarget.Parent and isMobAlive(FarmState.tempMobTarget) then
+                            -- It's still valid, keep attacking
+                            local root = getMobRoot(FarmState.tempMobTarget)
+                            local dist = root and (root.Position - hrp.Position).Magnitude or 9999
+                            if dist <= NearbyMobRange + 10 then -- slight buffer to finish kill
+                                activeTarget = FarmState.tempMobTarget
+                                activeDef = ModeDefs[FARM_MODE_ENEMIES]
+                                isDistracted = true
+                            else
+                                FarmState.tempMobTarget = nil
+                            end
+                        else
+                             FarmState.tempMobTarget = nil
+                        end
+                    end
+                    
+                    -- If no active mob, scan for new one
+                    if not FarmState.tempMobTarget then
+                        local mob = findNearbyEnemy()
+                        if mob then
+                            FarmState.tempMobTarget = mob
+                            activeTarget = mob
+                            activeDef = ModeDefs[FARM_MODE_ENEMIES]
+                            isDistracted = true
+                            notify("Attacking nearby " .. mob.Name, 1)
+                        end
+                    end
+                end
+                
+                -- If not distracted by a mob, use standard logic
+                if not isDistracted then
+                    activeTarget = FarmState.currentTarget
+                    activeDef = ModeDefs[FarmState.mode]
+                end
+
+                if not activeDef then
+                    task.wait(0.3)
+                    return
+                end
+
+                local pos    = activeTarget and activeDef.getPos(activeTarget) or nil
+                local alive  = activeTarget and activeDef.isAlive(activeTarget)
+
+                -- Pick new target if current is invalid or blacklisted (ONLY if not distracted)
+                if (not activeTarget)
+                    or (not activeTarget.Parent)
+                    or (not pos)
+                    or (not alive)
+                    or (not isDistracted and isTargetBlacklisted(activeTarget)) then
+                    
+                    if isDistracted then
+                        -- Mob died or vanished. Clear temp logic and loop will revert to ores next tick.
+                        FarmState.tempMobTarget = nil
+                        FarmState.attached = false
+                        stopMoving()
+                        -- Don't return, let loop continue to pick new ore
+                    end
+
+                    -- Standard Target Selection
+                    FarmState.currentTarget = chooseNearestTarget()
                     FarmState.attached      = false
                     FarmState.detourActive  = false
                     
-                    FarmState.lastTargetRef    = newTarget
+                    -- Reset stuck logic for new target
+                    FarmState.lastTargetRef    = FarmState.currentTarget
                     FarmState.lastTargetHealth = 0
                     FarmState.stuckStartTime   = os.clock()
                     
-                    FarmState.LastLocalHealth = humHealth 
+                    -- Reset Damage Ditch baseline
+                    FarmState.LastLocalHealth = humHealth
 
-                    startMovingToTarget(newTarget)
-                    -- next loop will handle hit logic
-                else
-                    if AvoidPlayers then
-                        moveAwayFromNearbyPlayers()
+                    activeTarget = FarmState.currentTarget
+                    activeDef = ModeDefs[FarmState.mode] -- Revert def
+
+                    if activeTarget then
+                        startMovingToTarget(activeTarget, activeDef)
+                        pos = activeDef.getPos(activeTarget)
+                    else
+                        -- No targets found:
+                        -- We stay idle but anchor to prevent falling through map
+                        stopMoving()
+                        
+                        if hrp and hrp.Anchored == false then
+                            hrp.Anchored = true -- prevent fall
+                        end
+                        
+                        if AvoidPlayers then
+                            moveAwayFromNearbyPlayers()
+                        end
+                        task.wait(0.15)
+                        return
                     end
-                    task.wait(0.15)
                 end
 
-                continue
-            end
+                -- If we have target, ensure unanchored so we can move
+                if hrp.Anchored == true then
+                    hrp.Anchored = false
+                end
 
-            -- If we have a target and a player approaches THAT target, ditch + blacklist + RETARGET
-            if AvoidPlayers and target and pos then
-                local nearTarget, _ = isAnyPlayerNearPosition(pos, PlayerAvoidRadius)
-                if nearTarget then
-                    notify("Player nearby! Ditching.", 2)
-                    blacklistTarget(target, 60)
+                -- Double-check target position validity and height (retarget instead of stopping)
+                if pos and pos.Y > MaxTargetHeight then
+                    notify("Target too high! Ditching.", 2)
+                    blacklistTarget(activeTarget, 60) -- too high, don't keep retargeting it
 
                     stopMoving()
                     FarmState.currentTarget = nil
                     FarmState.attached      = false
                     FarmState.detourActive  = false
 
-                    -- Immediately retarget instead of going idle
-                    local newTarget = chooseNearestTarget()
-                    if newTarget then
-                        FarmState.currentTarget = newTarget
-                        FarmState.attached      = false
-                        FarmState.detourActive  = false
-                        
-                        FarmState.lastTargetRef    = newTarget
-                        FarmState.lastTargetHealth = 0
-                        FarmState.stuckStartTime   = os.clock()
-                        
-                        FarmState.LastLocalHealth = humHealth
-
-                        startMovingToTarget(newTarget)
-                        -- let next iteration handle hit
-                    else
-                        if AvoidPlayers then
-                            moveAwayFromNearbyPlayers()
-                        end
-                        task.wait(0.15)
-                    end
-
-                    continue
-                end
-            end
-            
-            -- >>> WHITELIST CHECK FOR ORES (Gated by OreWhitelistEnabled) <<<
-            if FarmState.mode == FARM_MODE_ORES and OreWhitelistEnabled and target then
-                
-                -- Only apply check if target name matches the "Applies To" list
-                if WhitelistAppliesTo[target.Name] then
-                    local oreChildren = {}
-                    for _, c in ipairs(target:GetChildren()) do
-                        if c.Name == "Ore" then
-                            table.insert(oreChildren, c)
-                        end
-                    end
-                    
-                    if #oreChildren > 0 then
-                        local matchFound = false
-                        for _, orePart in ipairs(oreChildren) do
-                            local oreType = orePart:GetAttribute("Ore")
-                            if oreType and WhitelistedOres[oreType] then
-                                matchFound = true
-                                break
-                            end
-                        end
-                        
-                        if not matchFound then
-                            notify("No whitelisted ore found! Ditching.", 2)
-                            blacklistTarget(target, 60)
-                            stopMoving()
-                            FarmState.currentTarget = nil
+                    -- Immediately retarget to the next one (Only if we aren't distracted by mob)
+                    if not isDistracted then
+                         local newTarget = chooseNearestTarget()
+                        if newTarget then
+                            FarmState.currentTarget = newTarget
                             FarmState.attached      = false
                             FarmState.detourActive  = false
-                            task.wait(0.1)
-                            continue
+                            
+                            FarmState.lastTargetRef    = newTarget
+                            FarmState.lastTargetHealth = 0
+                            FarmState.stuckStartTime   = os.clock()
+                            
+                            FarmState.LastLocalHealth = humHealth 
+
+                            startMovingToTarget(newTarget, activeDef)
+                            -- next loop will handle hit logic
+                        end
+                    else
+                         FarmState.tempMobTarget = nil -- Reset mob target
+                    end
+                    task.wait(0.15)
+                    return
+                end
+
+                -- >>> DYNAMIC PLAYER AVOIDANCE <<<
+                if AvoidPlayers then
+                    -- Check if any player is dangerously close to our current position
+                    local nearMe, _ = isAnyPlayerNearHRP(PlayerAvoidRadius)
+                    if nearMe then
+                        notify("Player too close! Moving.", 2)
+                        -- If attached, detach. If moving, find new path/target.
+                        if activeTarget and not isDistracted then
+                            blacklistTarget(activeTarget, 60)
+                        end
+                        stopMoving()
+                        FarmState.currentTarget = nil
+                        FarmState.tempMobTarget = nil
+                        FarmState.attached = false
+                        FarmState.detourActive = false
+                        task.wait(0.15)
+                        return
+                    end
+                    
+                    -- Check target area
+                    if pos then
+                        local nearTarget, _ = isAnyPlayerNearPosition(pos, PlayerAvoidRadius)
+                        if nearTarget then
+                            notify("Player at target! Ditching.", 2)
+                            if not isDistracted then
+                                blacklistTarget(activeTarget, 60)
+                            else
+                                FarmState.tempMobTarget = nil -- Abandon mob
+                            end
+                            stopMoving()
+                            FarmState.currentTarget = nil
+                            FarmState.attached = false
+                            FarmState.detourActive = false
+                            task.wait(0.15)
+                            return
                         end
                     end
                 end
-            end
-
-            -- If we have a target and we somehow end up with X < -120 while NOT attached,
-            -- force a detour-based path once per "under-threshold" period.
-            if target and not FarmState.attached then
-                local hrpPos = hrp.Position
-                if hrpPos.X < DETOUR_THRESHOLD_X then
-                    if not FarmState.detourActive then
-                        FarmState.detourActive = true
-                        stopMoving()
-                        startMovingToTarget(target) -- will use detour because X < threshold
-                    end
-                else
-                    -- once we're back above the threshold, allow detour to be triggered again later
-                    FarmState.detourActive = false
-                end
-            else
-                -- if no target or attached, we don't consider detour
-                FarmState.detourActive = false
-            end
-
-            if pos then
-                local dist = (pos - hrp.Position).Magnitude
-
-                if dist <= def.hitDistance then
-                    stopMoving()
-
-                    if not FarmState.attached then
-                        attachToTarget(target)
-                        FarmState.attached = true
-                        -- Reset stuck timer on first attach
-                        FarmState.stuckStartTime = os.clock()
-                        local h = def.getHealth(target)
-                        FarmState.lastTargetHealth = h or 0
-                    else
-                        -- === ALWAYS FACE TARGET UPDATE ===
-                        realignAttach(target)
-
-                        -- >>> STUCK CHECK (20s) <<<
-                        -- Only run stuck check if we have been attached to this target
-                        if FarmState.lastTargetRef == target then
-                            local currentH = def.getHealth(target) or 0
-                            -- If health changed (damaged), reset timer
-                            if currentH < FarmState.lastTargetHealth then
-                                FarmState.lastTargetHealth = currentH
-                                FarmState.stuckStartTime = os.clock()
-                            else
-                                -- Health didn't change
-                                if (os.clock() - FarmState.stuckStartTime) > 20 then
-                                    -- STUCK FOR 20 SECONDS
-                                    notify("Stuck (20s)! Ditching.", 2)
-                                    blacklistTarget(target, 60)
-                                    stopMoving()
-                                    FarmState.currentTarget = nil
-                                    FarmState.attached      = false
-                                    FarmState.detourActive  = false
-                                    task.wait(0.1)
-                                    continue
+                
+                -- >>> WHITELIST CHECK FOR ORES (Gated by OreWhitelistEnabled) <<<
+                -- Note: Only run this if we are NOT distracted by a mob
+                if not isDistracted and FarmState.mode == FARM_MODE_ORES and OreWhitelistEnabled and activeTarget then
+                    -- Only apply check if target name matches the "Applies To" list
+                    if WhitelistAppliesTo[activeTarget.Name] then
+                        local oreChildren = {}
+                        for _, c in ipairs(activeTarget:GetChildren()) do
+                            if c.Name == "Ore" then
+                                table.insert(oreChildren, c)
+                            end
+                        end
+                        
+                        if #oreChildren > 0 then
+                            local matchFound = false
+                            for _, orePart in ipairs(oreChildren) do
+                                local oreType = orePart:GetAttribute("Ore")
+                                if oreType and WhitelistedOres[oreType] then
+                                    matchFound = true
+                                    break
                                 end
                             end
-                        else
-                            -- Target ref mismatch (shouldn't happen often), reset
-                            FarmState.lastTargetRef = target
-                            FarmState.lastTargetHealth = def.getHealth(target) or 0
-                            FarmState.stuckStartTime = os.clock()
+                            
+                            if not matchFound then
+                                notify("No whitelisted ore found! Ditching.", 2)
+                                blacklistTarget(activeTarget, 60)
+                                stopMoving()
+                                FarmState.currentTarget = nil
+                                FarmState.attached      = false
+                                FarmState.detourActive  = false
+                                task.wait(0.1)
+                                return
+                            end
                         end
                     end
+                end
 
-                    local now = os.clock()
-                    if now - FarmState.lastHit >= def.hitInterval then
-                        swingTool(def.toolRemoteArg)
-                        FarmState.lastHit = now
+                -- If we have a target and we somehow end up with X < -120 while NOT attached,
+                -- force a detour-based path once per "under-threshold" period.
+                if activeTarget and not FarmState.attached and not isDistracted then
+                    local hrpPos = hrp.Position
+                    if hrpPos.X < DETOUR_THRESHOLD_X then
+                        if not FarmState.detourActive then
+                            FarmState.detourActive = true
+                            stopMoving()
+                            startMovingToTarget(activeTarget, activeDef) -- will use detour because X < threshold
+                        end
+                    else
+                        -- once we're back above the threshold, allow detour to be triggered again later
+                        FarmState.detourActive = false
                     end
                 else
-                    -- Out of range, make sure we are moving
-                    if not FarmState.moveCleanup then
-                        startMovingToTarget(target)
-                    end
-                    FarmState.attached = false
-                    -- Reset stuck timer while moving
-                    FarmState.stuckStartTime = os.clock()
+                    -- if no target or attached, we don't consider detour
+                    FarmState.detourActive = false
                 end
-            end
 
-            task.wait(0.05)
+                if pos then
+                    local dist = (pos - hrp.Position).Magnitude
+
+                    if dist <= activeDef.hitDistance then
+                        stopMoving()
+
+                        if not FarmState.attached then
+                            attachToTarget(activeTarget, activeDef) -- Pass activeDef for mob override
+                            FarmState.attached = true
+                            -- Reset stuck timer on first attach
+                            FarmState.stuckStartTime = os.clock()
+                            local h = activeDef.getHealth(activeTarget)
+                            FarmState.lastTargetHealth = h or 0
+                        else
+                            -- === ALWAYS FACE TARGET UPDATE ===
+                            realignAttach(activeTarget, activeDef)
+
+                            -- >>> STUCK CHECK (20s) <<<
+                            -- Only run stuck check if we have been attached to this target
+                            -- (Skipped for mob attacks to prevent ditching active combat)
+                            if not isDistracted and FarmState.lastTargetRef == activeTarget then
+                                local currentH = activeDef.getHealth(activeTarget) or 0
+                                -- If health changed (damaged), reset timer
+                                if currentH < FarmState.lastTargetHealth then
+                                    FarmState.lastTargetHealth = currentH
+                                    FarmState.stuckStartTime = os.clock()
+                                else
+                                    -- Health didn't change
+                                    if (os.clock() - FarmState.stuckStartTime) > 20 then
+                                        -- STUCK FOR 20 SECONDS
+                                        notify("Stuck (20s)! Ditching.", 2)
+                                        blacklistTarget(activeTarget, 60)
+                                        stopMoving()
+                                        FarmState.currentTarget = nil
+                                        FarmState.attached      = false
+                                        FarmState.detourActive  = false
+                                        task.wait(0.1)
+                                        return
+                                    end
+                                end
+                            else
+                                -- Target ref mismatch (shouldn't happen often), reset
+                                FarmState.lastTargetRef = activeTarget
+                                FarmState.lastTargetHealth = activeDef.getHealth(activeTarget) or 0
+                                FarmState.stuckStartTime = os.clock()
+                            end
+                        end
+
+                        local now = os.clock()
+                        if now - FarmState.lastHit >= activeDef.hitInterval then
+                            swingTool(activeDef.toolRemoteArg) -- Dynamically uses Weapon/Pickaxe
+                            FarmState.lastHit = now
+                        end
+                    else
+                        -- Out of range, make sure we are moving
+                        if not FarmState.moveCleanup then
+                            startMovingToTarget(activeTarget, activeDef)
+                        end
+                        FarmState.attached = false
+                        -- Reset stuck timer while moving
+                        FarmState.stuckStartTime = os.clock()
+                        
+                        -- >>> MOVEMENT WATCHDOG <<<
+                        -- If we are supposed to be moving, but our position hasn't changed by >3 studs in 3 seconds, reset.
+                        if (os.clock() - FarmState.lastMoveTime) > 3 then
+                            if (hrp.Position - FarmState.lastMovePos).Magnitude < 3 then
+                                notify("Movement Stuck! Resetting.", 2)
+                                stopMoving() -- Stop current tween
+                                startMovingToTarget(activeTarget, activeDef) -- Try again
+                            end
+                            FarmState.lastMovePos = hrp.Position
+                            FarmState.lastMoveTime = os.clock()
+                        end
+                    end
+                end
+
+                task.wait(0.05)
+            end) -- end pcall
+
+            if not loopSuccess then
+                warn("[AutoFarm] Crash detected in loop:", loopError)
+                stopMoving()
+                FarmState.attached = false
+                task.wait(1) -- Cool down before restarting loop
+            end
         end
 
         stopMoving()
         FarmState.currentTarget = nil
+        FarmState.tempMobTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
         
@@ -1945,9 +2088,11 @@ return function(ctx)
         -- hard reset state so death / previous run can't poison us
         stopMoving()
         FarmState.currentTarget = nil
+        FarmState.tempMobTarget = nil
         FarmState.attached      = false
         FarmState.lastHit       = 0
         FarmState.detourActive  = false
+        FarmState.lastMoveTime  = os.clock()
 
         FarmState.enabled       = true
         FarmState.farmThread    = task.spawn(farmLoop)
@@ -1957,6 +2102,7 @@ return function(ctx)
         FarmState.enabled = false
         stopMoving()
         FarmState.currentTarget = nil
+        FarmState.tempMobTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
         
@@ -2036,7 +2182,6 @@ return function(ctx)
         Callback = function(value)
             if FarmState.mode == value then return end
             FarmState.mode = value
-            -- FarmState.selectedNames = {} -- Removed
             refreshAvailableTargets()
             if FarmState.enabled then
                 stopFarm()
@@ -2044,6 +2189,8 @@ return function(ctx)
             end
         end,
     })
+
+    WhitelistGroup:AddLabel("Mob/Ore selection is now controlled by priorities, use the priority editor below to do this.", true)
 
     -- TargetDropdown REMOVED here --
     
@@ -2120,6 +2267,23 @@ return function(ctx)
         end,
     })
     
+    WhitelistGroup:AddDivider()
+    
+    WhitelistGroup:AddButton({
+        Text = "Launch Priority Editor",
+        Func = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/the-forge/editor.lua"))()
+        end,
+    })
+    
+    WhitelistGroup:AddButton({
+        Text = "Reload Priorities",
+        Func = function()
+            loadPriorityConfig()
+            notify("Priorities reloaded from config!", 3)
+        end,
+    })
+    
     WhitelistGroup:AddButton({
         Text = "Refresh All Whitelists",
         Func = function()
@@ -2173,6 +2337,8 @@ return function(ctx)
         end,
     })
 
+    FarmGroup:AddDivider()
+
     FarmGroup:AddToggle("AF_AvoidLava", {
         Text    = "Avoid Lava",
         Default = false,
@@ -2183,24 +2349,21 @@ return function(ctx)
             end
         end,
     })
+    
+    FarmGroup:AddToggle("AF_AttackNearbyMobs", {
+        Text    = "Attack Nearby Mobs",
+        Default = false,
+        Callback = function(state)
+            AttackNearbyMobs = state
+        end,
+    })
+    
 
     FarmGroup:AddToggle("AF_AvoidPlayers", {
         Text    = "Avoid Players",
         Default = false,
         Callback = function(state)
             AvoidPlayers = state
-        end,
-    })
-
-    FarmGroup:AddSlider("AF_PlayerAvoidRadius", {
-        Text     = "Player Avoid Range",
-        Min      = 10,
-        Max      = 100,
-        Default  = PlayerAvoidRadius,
-        Rounding = 0,
-        Suffix   = " studs",
-        Callback = function(value)
-            PlayerAvoidRadius = tonumber(value) or PlayerAvoidRadius
         end,
     })
     
@@ -2211,6 +2374,47 @@ return function(ctx)
             DamageDitchEnabled = state
         end,
     })
+
+    FarmGroup:AddSlider("AF_NearbyMobRange", {
+        Text     = "Mob Detect Range",
+        Tooltip  = "Range we attack mobs at when ore farming",
+        Min      = 10,
+        Max      = 100,
+        Default  = NearbyMobRange,
+        Rounding = 0,
+        Suffix   = " studs",
+        Callback = function(value)
+            NearbyMobRange = tonumber(value) or 40
+        end,
+    })
+    
+    FarmGroup:AddSlider("AF_PlayerAvoidRadius", {
+        Text     = "Player Avoid Range",
+        Tooltip  = "Distance we keep from other players",
+        Min      = 10,
+        Max      = 100,
+        Default  = PlayerAvoidRadius,
+        Rounding = 0,
+        Suffix   = " studs",
+        Callback = function(value)
+            PlayerAvoidRadius = tonumber(value) or PlayerAvoidRadius
+        end,
+    })
+
+    FarmGroup:AddSlider("AF_DitchThreshold", {
+        Text     = "Ditch Health %",
+        Tooltip  = "Level of health we start ditching targets when we take damage",
+        Min      = 10,
+        Max      = 100,
+        Default  = 100,
+        Rounding = 0,
+        Suffix   = "%",
+        Callback = function(value)
+            DamageDitchThreshold = tonumber(value) or 100
+        end,
+    })
+
+    FarmGroup:AddDivider()
 
     FarmGroup:AddToggle("AF_Enabled", {
         Text    = "Auto Farm",
@@ -2264,6 +2468,7 @@ return function(ctx)
         FarmState.enabled = false
         stopMoving()
         FarmState.currentTarget = nil
+        FarmState.tempMobTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
         
