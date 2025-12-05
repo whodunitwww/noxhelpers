@@ -1,24 +1,25 @@
 -- autoFarmSrc.lua
 -- Simple unified auto farm (ores + enemies) using AttachPanel
 -- Outsourced module version.
+-- UPDATED: Removed Target Whitelist (Targets ALL based on Priority)
 
 return function(ctx)
     ----------------------------------------------------------------
     -- CONTEXT BINDINGS
     ----------------------------------------------------------------
-    local Services     = ctx.Services
-    local Tabs         = ctx.Tabs
-    local References   = ctx.References
-    local Library      = ctx.Library
-    local Options      = ctx.Options
-    local Toggles      = ctx.Toggles
-    local META         = ctx.META or {}
+    local Services      = ctx.Services
+    local Tabs          = ctx.Tabs
+    local References    = ctx.References
+    local Library       = ctx.Library
+    local Options       = ctx.Options
+    local Toggles       = ctx.Toggles
+    local META          = ctx.META or {}
 
-    local AttachPanel      = ctx.AttachPanel
-    local MoveToPos        = ctx.MoveToPos
-    local RunService       = Services.RunService
-    local UserInputService = Services.UserInputService
-    local HttpService      = Services.HttpService
+    local AttachPanel       = ctx.AttachPanel
+    local MoveToPos         = ctx.MoveToPos
+    local RunService        = Services.RunService
+    local UserInputService  = Services.UserInputService
+    local HttpService       = Services.HttpService
 
     ----------------------------------------------------------------
     -- INTERNAL HELPERS (Global Scope)
@@ -113,7 +114,7 @@ return function(ctx)
         ["Basalt Rock"]     = 5,
     }
 
-    -- Some ores don’t always appear in scan but should always be selectable
+    -- Some ores don’t always appear in scan but should always be selectable for "Applies To"
     local PermOreList = {
         "Crimson Crystal",
         "Cyan Crystal",
@@ -122,7 +123,7 @@ return function(ctx)
         "Volcanic Rock",
     }
 
-    -- Default priorities for MOBS (this used to be your static EnemyPriority)
+    -- Default priorities for MOBS
     local DefaultEnemyPriority = {
         ["Blazing Slime"]           = 1,
         ["Elite Deathaxe Skeleton"] = 2,
@@ -148,22 +149,6 @@ return function(ctx)
 
     local PriorityConfigFile = "Cerberus/The Forge/PriorityConfig.json"
 
-    -- Optional helper if you ever want to save current priorities back to disk
-    local function savePriorityConfig()
-        local payload = {
-            Ores    = OrePriority,
-            Enemies = EnemyPriority,
-        }
-
-        local ok, err = pcall(function()
-            writefile(PriorityConfigFile, HttpService:JSONEncode(payload))
-        end)
-
-        if not ok then
-            warn("[AutoFarm] Failed to save priority config:", err)
-        end
-    end
-
     local function loadPriorityConfig()
         -- Ensure folders exist
         if not isfolder("Cerberus") then makefolder("Cerberus") end
@@ -175,11 +160,6 @@ return function(ctx)
             end)
 
             if success and type(result) == "table" then
-                -- NEW FORMAT:
-                -- {
-                --     "Ores":    { ... },
-                --     "Enemies": { ... }
-                -- }
                 if result.Ores or result.Enemies then
                     if type(result.Ores) == "table" then
                         OrePriority = {}
@@ -194,10 +174,7 @@ return function(ctx)
                             EnemyPriority[k] = tonumber(v) or 999
                         end
                     end
-
                 else
-                    -- BACKWARDS COMPAT:
-                    -- Old format was just a plain ore map: { ["Volcanic Rock"] = 2, ... }
                     OrePriority = {}
                     for k, v in pairs(result) do
                         OrePriority[k] = tonumber(v) or 999
@@ -250,7 +227,7 @@ return function(ctx)
     local TargetFullHealth   = false 
     local PlayerAvoidRadius  = 40
     
-    -- Whitelists
+    -- Whitelists (Filters)
     local OreWhitelistEnabled = false
     local WhitelistedOres     = {} 
     local WhitelistAppliesTo  = {} 
@@ -258,12 +235,11 @@ return function(ctx)
     local ZoneWhitelistEnabled = false
     local WhitelistedZones     = {} 
 
-    local TargetBlacklist   = {} 
+    local TargetBlacklist    = {} 
 
     local FarmState = {
         enabled       = false,
         mode          = "Ores", 
-        selectedNames = {},   
         nameMap       = {},
 
         currentTarget = nil,
@@ -770,8 +746,8 @@ return function(ctx)
         local relative = part.CFrame:PointToObjectSpace(point)
         local half = part.Size / 2
         return math.abs(relative.X) <= half.X
-           and math.abs(relative.Y) <= half.Y
-           and math.abs(relative.Z) <= half.Z
+            and math.abs(relative.Y) <= half.Y
+            and math.abs(relative.Z) <= half.Z
     end
 
     local function isPointInLava(point)
@@ -956,21 +932,16 @@ return function(ctx)
         local nameMap, _ = def.scan()
         FarmState.nameMap = nameMap or {}
 
-        -- Quick lookup table for selected names
-        local selectedLookup = {}
-        for _, name in ipairs(FarmState.selectedNames) do
-            selectedLookup[name] = true
-        end
-
         local bestTarget
         local bestDist
         local bestPriority = math.huge
 
+        -- Updated: No longer uses selectedNames. Iterates EVERYTHING available.
         for name, models in pairs(nameMap) do
-            if selectedLookup[name] and models then
-                -- Use shared helper so priority logic is always consistent
-                local priority = getTargetPriorityForMode(FarmState.mode, name)
+            -- Use shared helper so priority logic is always consistent
+            local priority = getTargetPriorityForMode(FarmState.mode, name)
 
+            if models then
                 for _, model in ipairs(models) do
                     if model and model.Parent and def.isAlive(model) and not isTargetBlacklisted(model) then
                         local pos = def.getPos(model)
@@ -1006,11 +977,7 @@ return function(ctx)
                             end
                             
                             -- FULL HEALTH CHECK
-                            -- If enabled, and this is NOT our current active target,
-                            -- ensure it has full health before we pick it.
                             if not skip and TargetFullHealth and def.name == FARM_MODE_ORES then
-                                -- Only apply to Ores usually, or if enemies too? 
-                                -- You specified "mining rocks".
                                 local h = def.getHealth(model)
                                 local m = model:GetAttribute("MaxHealth")
                                 if h and m and h < m then
@@ -1020,6 +987,7 @@ return function(ctx)
 
                             if not skip then
                                 local dist = (pos - hrp.Position).Magnitude
+                                -- Priority first, then Distance
                                 if (priority < bestPriority)
                                     or (priority == bestPriority and (not bestDist or dist < bestDist)) then
                                     bestPriority = priority
@@ -1960,14 +1928,6 @@ return function(ctx)
             end
             return
         end
-
-        if #FarmState.selectedNames == 0 then
-            notify("Select at least one target type first.", 3)
-            if Toggles.AF_Enabled then
-                Toggles.AF_Enabled:SetValue(false)
-            end
-            return
-        end
         
         -- Warning if whitelist enabled but no ores selected
         local whitelistedCount = 0
@@ -2022,16 +1982,16 @@ return function(ctx)
     local TrackingGroupbox = Tabs.Auto:AddRightGroupbox("Tracking", "compass")
 
     local ModeDropdown
-    local TargetDropdown
+    -- TargetDropdown Removed
     local OreTypeDropdown
     local ZoneDropdown 
     local AppliesToDropdown
 
-    local function refreshTargetDropdown()
-        if not TargetDropdown then return end
+    -- Renamed from refreshTargetDropdown to prevent confusion (it only updates the AppliesTo list now)
+    local function refreshAvailableTargets()
         local def = ModeDefs[FarmState.mode]
         if not def or not def.scan then
-            TargetDropdown:SetValues({})
+            if AppliesToDropdown then AppliesToDropdown:SetValues({}) end
             return
         end
         
@@ -2050,7 +2010,6 @@ return function(ctx)
             table.sort(uniqueNames)
         end
         
-        TargetDropdown:SetValues(uniqueNames)
         if AppliesToDropdown then
             AppliesToDropdown:SetValues(uniqueNames)
         end
@@ -2077,8 +2036,8 @@ return function(ctx)
         Callback = function(value)
             if FarmState.mode == value then return end
             FarmState.mode = value
-            FarmState.selectedNames = {}
-            refreshTargetDropdown()
+            -- FarmState.selectedNames = {} -- Removed
+            refreshAvailableTargets()
             if FarmState.enabled then
                 stopFarm()
                 startFarm()
@@ -2086,20 +2045,7 @@ return function(ctx)
         end,
     })
 
-    TargetDropdown = WhitelistGroup:AddDropdown("AF_Targets", {
-        Text   = "Target Whitelist",
-        Values = {},
-        Multi  = true,
-        Callback = function(selectedTable)
-            local list = {}
-            for name, selected in pairs(selectedTable) do
-                if selected then
-                    list[#list + 1] = name
-                end
-            end
-            FarmState.selectedNames = list
-        end,
-    })
+    -- TargetDropdown REMOVED here --
     
     WhitelistGroup:AddToggle("AF_TargetFullHealth", {
         Text    = "Target Full Health Only",
@@ -2177,7 +2123,7 @@ return function(ctx)
     WhitelistGroup:AddButton({
         Text = "Refresh All Whitelists",
         Func = function()
-            refreshTargetDropdown()
+            refreshAvailableTargets()
             refreshLavaParts() 
             refreshZoneDropdown()
             refreshOreTypesDropdown()
@@ -2279,7 +2225,7 @@ return function(ctx)
     })
 
     -- Initial target list + lava parts + Ore types + Zones
-    refreshTargetDropdown()
+    refreshAvailableTargets()
     refreshLavaParts()
     refreshOreTypesDropdown()
     refreshZoneDropdown()
