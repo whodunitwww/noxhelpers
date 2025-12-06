@@ -12,19 +12,19 @@ Cerberus Forge Priority Editor (Live-sorting, clamped, input-safe)
 ]]
 
 -- // Services
-local Players          = game:GetService("Players")
-local HttpService      = game:GetService("HttpService")
-local UserInputService = game:GetService("UserInputService")
-local LocalPlayer      = Players.LocalPlayer
+local Players              = game:GetService("Players")
+local HttpService          = game:GetService("HttpService")
+local UserInputService     = game:GetService("UserInputService")
+local LocalPlayer          = Players.LocalPlayer
 
 -- // File paths
-local BaseFolder         = "Cerberus"
-local ForgeFolder        = BaseFolder .. "/The Forge"
-local PriorityConfigFile = ForgeFolder .. "/PriorityConfig.json"
+local BaseFolder           = "Cerberus"
+local ForgeFolder          = BaseFolder .. "/The Forge"
+local PriorityConfigFile   = ForgeFolder .. "/PriorityConfig.json"
 
--- // Default priorities (copied from AutoFarm)
-local DefaultOrePriority = {
+local DefaultOrePriority   = {
     ["Crimson Crystal"] = 1,
+    ["Violet Crystal"]  = 1,
     ["Cyan Crystal"]    = 1,
     ["Earth Crystal"]   = 1,
     ["Light Crystal"]   = 1,
@@ -32,6 +32,10 @@ local DefaultOrePriority = {
     ["Basalt Vein"]     = 3,
     ["Basalt Core"]     = 4,
     ["Basalt Rock"]     = 5,
+    ["Boulder"]         = 6,
+    ["Rock"]            = 6,
+    ["Pebble"]          = 6,
+    ["Lucky Block"]     = 6,
 }
 
 local DefaultEnemyPriority = {
@@ -43,6 +47,12 @@ local DefaultEnemyPriority = {
     ["Axe Skeleton"]            = 6,
     ["Skeleton Rogue"]          = 7,
     ["Bomber"]                  = 8,
+    ["Slime"]                   = 9,
+    ["MinerZombie"]             = 9,
+    ["EliteZombie"]             = 9,
+    ["Zombie"]                  = 9,
+    ["Delver Zombie"]           = 9,
+    ["Brute Zombie"]            = 9,
 }
 
 -- // Helpers
@@ -557,15 +567,15 @@ local function createPriorityEditorGui()
     -- Mode switching
     local function setMode(mode)
         if mode == "Ores" then
-            oresScroll.Visible = true
-            enemiesScroll.Visible = false
+            oresScroll.Visible             = true
+            enemiesScroll.Visible          = false
             oresButton.BackgroundColor3    = Color3.fromRGB(60, 60, 120)
             oresButton.TextColor3          = Color3.fromRGB(255, 255, 255)
             enemiesButton.BackgroundColor3 = Color3.fromRGB(30, 40, 50)
             enemiesButton.TextColor3       = Color3.fromRGB(200, 200, 210)
         elseif mode == "Enemies" then
-            oresScroll.Visible = false
-            enemiesScroll.Visible = true
+            oresScroll.Visible             = false
+            enemiesScroll.Visible          = true
             enemiesButton.BackgroundColor3 = Color3.fromRGB(120, 60, 40)
             enemiesButton.TextColor3       = Color3.fromRGB(255, 240, 220)
             oresButton.BackgroundColor3    = Color3.fromRGB(30, 40, 50)
