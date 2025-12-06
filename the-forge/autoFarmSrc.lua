@@ -1644,9 +1644,9 @@ return function(ctx)
                 -- >>> DYNAMIC PLAYER AVOIDANCE (SMOOTHED) <<<
                 if AvoidPlayers and not FarmState.detourActive then
                     -- Hysteresis radii
-                    local innerRadius = PlayerAvoidRadius                  -- when to start avoiding
+                    local innerRadius = PlayerAvoidRadius                 -- when to start avoiding
                     local outerRadius = math.max(PlayerAvoidRadius * 1.2, -- when it's "safe" again
-                                                  PlayerAvoidRadius + 5)
+                        PlayerAvoidRadius + 5)
 
                     local now = os.clock()
 
@@ -1711,9 +1711,9 @@ return function(ctx)
                                 end
 
                                 stopMoving()
-                                FarmState.currentTarget   = nil
-                                FarmState.attached        = false
-                                FarmState.avoidingPlayer  = false
+                                FarmState.currentTarget  = nil
+                                FarmState.attached       = false
+                                FarmState.avoidingPlayer = false
                                 task.wait(0.1)
                                 return
                             end
@@ -2195,7 +2195,57 @@ return function(ctx)
         Default  = false,
         Callback = function(state)
             TrackerState.Enabled = state
-            if state then createTrackerGui() end
+            if state then
+                createTrackerGui()
+            elseif TrackerState.Gui then
+                -- optional: hide when turned off
+                TrackerState.Gui.Enabled = false
+            end
+        end,
+    })
+
+    TrackingGroupbox:AddButton({
+        Text = "Reset Progress Tracker",
+        Tooltip = "Use this if tracker becomes bugged",
+        Func = function()
+            -- Kill current HUD so we can rebuild cleanly
+            if TrackerState.Gui then
+                pcall(function()
+                    TrackerState.Gui:Destroy()
+                end)
+                TrackerState.Gui = nil
+                TrackerState.Container = nil
+                TrackerState.TargetName = nil
+                TrackerState.HealthBar = nil
+                TrackerState.HealthText = nil
+                TrackerState.DropList = nil
+                TrackerState.ActiveTarget = nil
+                TrackerState.CurrentDrops = {}
+                TrackerState.LastCheckHealth = {}
+            end
+
+            local okDelete = false
+
+            if typeof(isfile) == "function"
+                and typeof(delfile) == "function"
+                and typeof(ConfigFile) == "string"
+            then
+                local ok, err = pcall(function()
+                    if isfile(ConfigFile) then
+                        delfile(ConfigFile)
+                    end
+                end)
+                okDelete = ok and true or false
+                if not ok then
+                    warn("[Forge] Failed to delete HUD config:", err)
+                end
+            end
+
+            if okDelete then
+                notify("Tracker HUD layout reset. Toggle Progress Tracker back on to rebuild.", 4)
+            else
+                notify("Could not delete HUD config (executor may not support delfile).", 4)
+            end
         end,
     })
 
