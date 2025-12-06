@@ -99,12 +99,15 @@ return function(ctx)
         end
     end
 
+-- ====================================================================
+    --  PRIORITY TABLES & CONFIG LOADING (Versioned v1.1)
     -- ====================================================================
-    --  PRIORITY TABLES & CONFIG LOADING
-    -- ====================================================================
+
+    local PRIORITY_CONFIG_VERSION = 1.1
 
     local DefaultOrePriority   = {
         ["Crimson Crystal"] = 1,
+        ["Violet Crystal"]  = 1,
         ["Cyan Crystal"]    = 1,
         ["Earth Crystal"]   = 1,
         ["Light Crystal"]   = 1,
@@ -112,6 +115,10 @@ return function(ctx)
         ["Basalt Vein"]     = 3,
         ["Basalt Core"]     = 4,
         ["Basalt Rock"]     = 5,
+        ["Boulder"]         = 6,
+        ["Rock"]            = 6,
+        ["Pebble"]          = 6,
+        ["Lucky Block"]     = 6,
     }
 
     local PermOreList          = {
@@ -120,6 +127,8 @@ return function(ctx)
         "Earth Crystal",
         "Light Crystal",
         "Volcanic Rock",
+        "Basalt Vein",
+        "Basalt Core",
     }
 
     local DefaultEnemyPriority = {
@@ -131,19 +140,50 @@ return function(ctx)
         ["Axe Skeleton"]            = 6,
         ["Skeleton Rogue"]          = 7,
         ["Bomber"]                  = 8,
+        ["Slime"]                   = 9,
+        ["MinerZombie"]             = 9,
+        ["EliteZombie"]             = 9,
+        ["Zombie"]                  = 9,
+        ["Delver Zombie"]           = 9,
+        ["Brute Zombie"]            = 9,
     }
 
-    local OrePriority          = {}
-    local EnemyPriority        = {}
+    local OrePriority   = {}
+    local EnemyPriority = {}
 
+    -- start with defaults in memory
     for k, v in pairs(DefaultOrePriority) do OrePriority[k] = v end
     for k, v in pairs(DefaultEnemyPriority) do EnemyPriority[k] = v end
 
     local PriorityConfigFile = "Cerberus/The Forge/PriorityConfig.json"
 
-    local function loadPriorityConfig()
+    local function writeDefaultPriorityConfig()
+        local payload = {
+            Version = PRIORITY_CONFIG_VERSION,
+            Ores    = DefaultOrePriority,
+            Enemies = DefaultEnemyPriority,
+        }
+
+        pcall(function()
+            writefile(PriorityConfigFile, HttpService:JSONEncode(payload))
+        end)
+    end
+
+    local function applyDefaultPriorities()
+        OrePriority   = {}
+        EnemyPriority = {}
+
+        for k, v in pairs(DefaultOrePriority) do OrePriority[k] = v end
+        for k, v in pairs(DefaultEnemyPriority) do EnemyPriority[k] = v end
+    end
+
+local function loadPriorityConfig()
         if not isfolder("Cerberus") then makefolder("Cerberus") end
         if not isfolder("Cerberus/The Forge") then makefolder("Cerberus/The Forge") end
+
+        if not (isfile and readfile and writefile) then
+            return -- API missing
+        end
 
         if isfile(PriorityConfigFile) then
             local success, result = pcall(function()
@@ -151,27 +191,61 @@ return function(ctx)
             end)
 
             if success and type(result) == "table" then
-                if result.Ores or result.Enemies then
-                    if type(result.Ores) == "table" then
-                        OrePriority = {}
-                        for k, v in pairs(result.Ores) do OrePriority[k] = tonumber(v) or 999 end
+                -- Check for Version
+                local fileVersion = tonumber(result.Version)
+
+                -- Legacy/Editor auto-patch logic
+                if not fileVersion then
+                    if (result.Ores and type(result.Ores) == "table") or (result.Enemies and type(result.Enemies) == "table") then
+                        warn("[Config] Legacy format detected. Auto-patching to v" .. PRIORITY_CONFIG_VERSION)
+                        result.Version = PRIORITY_CONFIG_VERSION
+                        pcall(function()
+                            writefile(PriorityConfigFile, HttpService:JSONEncode(result))
+                        end)
+                        fileVersion = PRIORITY_CONFIG_VERSION
+                    else
+                        fileVersion = 0
                     end
-                    if type(result.Enemies) == "table" then
-                        EnemyPriority = {}
-                        for k, v in pairs(result.Enemies) do EnemyPriority[k] = tonumber(v) or 999 end
+                end
+
+                -- Check if Outdated
+                if fileVersion < PRIORITY_CONFIG_VERSION then
+                    applyDefaultPriorities()
+                    writeDefaultPriorityConfig()
+                    -- FIX: Removed the "<" symbol which caused the RichText error
+                    notify("Priority config outdated (v" .. fileVersion .. " vs v" .. PRIORITY_CONFIG_VERSION .. "). Resetting.", 5)
+                    return
+                end
+
+                -- Load Ores
+                if type(result.Ores) == "table" then
+                    OrePriority = {}
+                    for k, v in pairs(result.Ores) do
+                        OrePriority[k] = tonumber(v) or 999
                     end
                 else
-                    OrePriority = {}
-                    for k, v in pairs(result) do OrePriority[k] = tonumber(v) or 999 end
+                    for k, v in pairs(DefaultOrePriority) do OrePriority[k] = v end
+                end
+
+                -- Load Enemies
+                if type(result.Enemies) == "table" then
+                    EnemyPriority = {}
+                    for k, v in pairs(result.Enemies) do
+                        EnemyPriority[k] = tonumber(v) or 999
+                    end
+                else
+                    for k, v in pairs(DefaultEnemyPriority) do EnemyPriority[k] = v end
                 end
             else
-                notify("Failed to load priority config. Using defaults.", 5)
+                -- Decode failed
+                applyDefaultPriorities()
+                writeDefaultPriorityConfig()
+                notify("Config corrupted. Reset to defaults.", 5)
             end
         else
-            local defaultPayload = { Ores = DefaultOrePriority, Enemies = DefaultEnemyPriority }
-            pcall(function()
-                writefile(PriorityConfigFile, HttpService:JSONEncode(defaultPayload))
-            end)
+            -- No file exists
+            applyDefaultPriorities()
+            writeDefaultPriorityConfig()
         end
     end
 
@@ -1551,7 +1625,6 @@ return function(ctx)
                     end
                 end
 
-                -- If not distracted by a mob, use standard logic
                 if not isDistracted then
                     activeTarget = FarmState.currentTarget
                     activeDef = ModeDefs[FarmState.mode]
