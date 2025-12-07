@@ -1,8 +1,7 @@
 -- autoFarmSrc.lua
 -- Simple unified auto farm (ores + enemies) using AttachPanel
 -- Outsourced module version.
--- FIXED: "Freezing" when Avoid Players is ON (Added timeout to waypoint loop)
--- FIXED: "Swinging at Rock" when attacking mobs (Forced detach before moving)
+-- UPDATED: Integrated Auto Potions & Auto Restock
 
 return function(ctx)
     ----------------------------------------------------------------
@@ -21,6 +20,8 @@ return function(ctx)
     local RunService       = Services.RunService
     local UserInputService = Services.UserInputService
     local HttpService      = Services.HttpService
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    local Players          = Services.Players
 
     ----------------------------------------------------------------
     -- INTERNAL HELPERS (Global Scope)
@@ -89,6 +90,15 @@ return function(ctx)
         :WaitForChild("ToolService")
         :WaitForChild("RF")
         :WaitForChild("ToolActivated")
+    
+    local PurchaseRF = Services.ReplicatedStorage
+        :WaitForChild("Shared")
+        :WaitForChild("Packages")
+        :WaitForChild("Knit")
+        :WaitForChild("Services")
+        :WaitForChild("ProximityService")
+        :WaitForChild("RF")
+        :WaitForChild("Purchase")
 
     local function swingTool(remoteArg)
         local ok, err = pcall(function()
@@ -99,7 +109,144 @@ return function(ctx)
         end
     end
 
--- ====================================================================
+    -- ====================================================================
+    --  POTION CONSTANTS & HELPERS
+    -- ====================================================================
+
+    local RESTOCK_CFRAME = CFrame.new(-94.434898, 20.585484, -34.270695)
+
+    local PotionDisplayToToolId = {
+        ["Damage Potion I"] = "AttackDamagePotion1",
+        ["Speed Potion I"]  = "MovementSpeedPotion1",
+        ["Health Potion I"] = "HealthPotion1",
+        ["Luck Potion I"]   = "LuckPotion1",
+        ["Miner Potion I"]  = "MinerPotion1",
+    }
+
+    -- Helper: read hotbar UI count
+    local function getPotionCount(displayName)
+        local player = Players.LocalPlayer
+        if not player then return 0 end
+        
+        local playerGui    = player:FindFirstChild("PlayerGui")
+        local backpackGui = playerGui and playerGui:FindFirstChild("BackpackGui")
+        local backpack    = backpackGui and backpackGui:FindFirstChild("Backpack")
+        local hotbar      = backpack and backpack:FindFirstChild("Hotbar")
+        
+        if not hotbar then return 0 end
+
+        for _, slot in pairs(hotbar:GetChildren()) do
+            local frame = slot:FindFirstChild("Frame")
+            if frame then
+                local toolName = frame:FindFirstChild("ToolName")
+                if toolName and toolName.Text == displayName then
+                    local stack = frame:FindFirstChild("StackNumber")
+                    if stack and stack.Visible and stack.Text ~= "" then
+                        return tonumber(string.match(stack.Text, "%d+")) or 1
+                    else
+                        return 1
+                    end
+                end
+            end
+        end
+        return 0
+    end
+
+    local function freezeCharacter(char)
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        local hum  = char:FindFirstChildOfClass("Humanoid")
+        if not root or not hum then return end
+    
+        -- Only save once
+        if not root:GetAttribute("CerbStateSaved") then
+            root:SetAttribute("CerbPrevAnchored", root.Anchored)
+            root:SetAttribute("CerbPrevVel", root.AssemblyLinearVelocity)
+            root:SetAttribute("CerbPrevRotVel", root.AssemblyAngularVelocity)
+    
+            root:SetAttribute("CerbPrevState", hum:GetState())
+            root:SetAttribute("CerbPrevWalkSpeed", hum.WalkSpeed)
+            root:SetAttribute("CerbPrevJumpPower", hum.JumpPower)
+            root:SetAttribute("CerbPrevPlatformStand", hum.PlatformStand)
+            root:SetAttribute("CerbPrevAutoRotate", hum.AutoRotate)
+    
+            root:SetAttribute("CerbStateSaved", true)
+        end
+    
+        -- HARD FREEZE
+        root.Anchored = true
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
+    
+        hum.WalkSpeed = 0
+        hum.JumpPower = 0
+        hum.AutoRotate = false
+        hum.PlatformStand = true
+    
+        pcall(function()
+            hum:ChangeState(Enum.HumanoidStateType.Physics)
+        end)
+    end
+    
+    local function unfreezeCharacter(char)
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        local hum  = char:FindFirstChildOfClass("Humanoid")
+        if not root or not hum then return end
+    
+        if not root:GetAttribute("CerbStateSaved") then return end
+    
+        -- Restore values
+        root.Anchored = root:GetAttribute("CerbPrevAnchored")
+        root.AssemblyLinearVelocity = root:GetAttribute("CerbPrevVel")
+        root.AssemblyAngularVelocity = root:GetAttribute("CerbPrevRotVel")
+    
+        hum.WalkSpeed = root:GetAttribute("CerbPrevWalkSpeed")
+        hum.JumpPower = root:GetAttribute("CerbPrevJumpPower")
+        hum.AutoRotate = root:GetAttribute("CerbPrevAutoRotate")
+        hum.PlatformStand = root:GetAttribute("CerbPrevPlatformStand")
+    
+        pcall(function()
+            hum:ChangeState(root:GetAttribute("CerbPrevState"))
+        end)
+    
+        -- Allow new freeze cycles
+        root:SetAttribute("CerbStateSaved", nil)
+    end
+
+    local function equipHotbarItemByName(name)
+        local player = Players.LocalPlayer
+        local pg = player:FindFirstChild("PlayerGui")
+        local hb = pg and pg:FindFirstChild("BackpackGui") and pg.BackpackGui:FindFirstChild("Backpack") and pg.BackpackGui.Backpack:FindFirstChild("Hotbar")
+        if not hb then return false end
+    
+        for _, slot in ipairs(hb:GetChildren()) do
+            local idx = tonumber(slot.Name)
+            if idx then
+                local frame = slot:FindFirstChild("Frame")
+                local tn = frame and frame:FindFirstChild("ToolName")
+                if tn and tn.Text == name then
+                    local fallback = {
+                        Enum.KeyCode.One, Enum.KeyCode.Two, Enum.KeyCode.Three,
+                        Enum.KeyCode.Four, Enum.KeyCode.Five, Enum.KeyCode.Six,
+                        Enum.KeyCode.Seven, Enum.KeyCode.Eight, Enum.KeyCode.Nine,
+                        Enum.KeyCode.Zero,
+                    }
+                    local kc = fallback[idx]
+    
+                    if kc then
+                        VirtualInputManager:SendKeyEvent(true, kc, false, player)
+                        task.wait(0.05)
+                        VirtualInputManager:SendKeyEvent(false, kc, false, player)
+                        return true
+                    end
+                end
+            end
+        end
+        return false
+    end
+
+    -- ====================================================================
     --  PRIORITY TABLES & CONFIG LOADING (Versioned v1.1)
     -- ====================================================================
 
@@ -177,7 +324,7 @@ return function(ctx)
         for k, v in pairs(DefaultEnemyPriority) do EnemyPriority[k] = v end
     end
 
-local function loadPriorityConfig()
+    local function loadPriorityConfig()
         if not isfolder("Cerberus") then makefolder("Cerberus") end
         if not isfolder("Cerberus/The Forge") then makefolder("Cerberus/The Forge") end
 
@@ -212,7 +359,6 @@ local function loadPriorityConfig()
                 if fileVersion < PRIORITY_CONFIG_VERSION then
                     applyDefaultPriorities()
                     writeDefaultPriorityConfig()
-                    -- FIX: Removed the "<" symbol which caused the RichText error
                     notify("Priority config outdated (v" .. fileVersion .. " vs v" .. PRIORITY_CONFIG_VERSION .. "). Resetting.", 5)
                     return
                 end
@@ -288,6 +434,10 @@ local function loadPriorityConfig()
         mode                = "Ores",
         nameMap             = {},
 
+        -- Potion Interop
+        restocking          = false, 
+        potionThread        = nil,
+
         currentTarget       = nil,
         moveCleanup         = nil,
         farmThread          = nil,
@@ -315,8 +465,8 @@ local function loadPriorityConfig()
     --  CONFIG SYSTEM (HUD)
     -- ====================================================================
 
-    local ConfigFolder         = "Cerberus/The Forge"
-    local ConfigFile           = ConfigFolder .. "/HudConfig.json"
+    local ConfigFolder          = "Cerberus/The Forge"
+    local ConfigFile            = ConfigFolder .. "/HudConfig.json"
 
     local function saveHudConfig(position, size)
         if not isfolder("Cerberus") then makefolder("Cerberus") end
@@ -1183,6 +1333,173 @@ local function loadPriorityConfig()
         end)
     end
 
+-- ====================================================================
+    --  RESTOCK LOGIC
+    -- ====================================================================
+
+    local function restockPotions(doFreeze)
+        local selected = Options.AutoPotions_List.Value
+        local didSomething = false
+    
+        -- ensure something is selected
+        local any = false
+        for _, sel in pairs(selected) do if sel then any = true break end end
+        if not any then
+            return
+        end
+    
+        local player = Players.LocalPlayer
+        local char = player.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+    
+        FarmState.restocking = true
+        
+        -- Detach/Stop farm movement
+        stopMoving()
+        if AttachPanel.DestroyAttach then pcall(AttachPanel.DestroyAttach) end
+        FarmState.attached = false
+        FarmState.currentTarget = nil
+    
+        -- Instead of freezing, just kill momentum so we don't slide
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
+        
+        -- Teleport
+        root.CFrame = RESTOCK_CFRAME
+        task.wait(0.15) -- Small wait for replication
+    
+        -- Buy potions
+        for displayName, isOn in pairs(selected) do
+            if isOn then
+                local current = getPotionCount(displayName)
+                local needed = 10 - current
+                local toolId = PotionDisplayToToolId[displayName]
+    
+                if needed > 0 and toolId then
+                    pcall(function()
+                        PurchaseRF:InvokeServer(toolId, needed)
+                    end)
+                    didSomething = true
+                    task.wait(0.05) -- Increased slightly to ensure server registers purchase
+                end
+            end
+        end
+        
+        -- Release control back to farm loop
+        FarmState.restocking = false
+    
+        if didSomething then
+            notify("Potions restocked.", 2)
+        end
+    end
+
+    local function needsRestock(threshold)
+        threshold = threshold or 2
+        local selected = Options.AutoPotions_List and Options.AutoPotions_List.Value
+        if type(selected) ~= "table" then return false end
+    
+        for name, isOn in pairs(selected) do
+            if isOn and getPotionCount(name) < threshold then
+                return true
+            end
+        end
+        return false
+    end
+
+-- ====================================================================
+    --  POTION LOOP (RUNS IN PARALLEL)
+    -- ====================================================================
+
+    local function startPotionLoop()
+        if FarmState.potionThread then return end
+        
+        FarmState.potionThread = task.spawn(function()
+            local lastUse = 0
+            while true do
+                task.wait(1)
+                
+                if not (Toggles.AutoPotions_Enable and Toggles.AutoPotions_Enable.Value) then 
+                    continue 
+                end
+
+                -- >>> CHECK RESTOCK FIRST <<<
+                if Toggles.AutoPotions_AutoRestock.Value and needsRestock(2) then
+                    -- Signal restocking so farm loop pauses
+                    FarmState.restocking = true
+                    
+                    local success, err = pcall(function()
+                        restockPotions(false) 
+                    end)
+                    
+                    if not success then warn("Restock failed:", err) end
+                    
+                    -- Wait a moment to ensure inventory updates
+                    task.wait(1)
+                    
+                    -- Release lock
+                    FarmState.restocking = false
+                end
+
+                -- >>> USE POTIONS <<<
+                local interval = Options.AutoPotions_Interval.Value
+                if os.clock() - lastUse < interval then continue end
+                
+                lastUse = os.clock()
+
+                local selected = Options.AutoPotions_List.Value
+                local player = Players.LocalPlayer
+                
+                if player and player.Character then
+                    local char = player.Character
+                    local hum = char:FindFirstChild("Humanoid")
+                    local backpack = player:FindFirstChild("Backpack")
+
+                    if hum and backpack then
+                        -- 1. Save currently equipped tool (Pickaxe/Weapon)
+                        local previouslyEquipped = char:FindFirstChildOfClass("Tool")
+                        
+                        for displayName, isOn in pairs(selected) do
+                            if isOn then
+                                local toolId = PotionDisplayToToolId[displayName]
+                                
+                                -- Find the potion in Backpack or Character
+                                local tool = backpack:FindFirstChild(displayName) or char:FindFirstChild(displayName)
+                                
+                                -- Fallback: check by internal Tool ID if Display Name failed
+                                if not tool and toolId then
+                                    tool = backpack:FindFirstChild(toolId) or char:FindFirstChild(toolId)
+                                end
+
+                                if tool then
+                                    -- Equip Potion
+                                    hum:EquipTool(tool)
+                                    task.wait(0.3) -- Wait for server to register equip
+                                    
+                                    -- Drink
+                                    if toolId then
+                                        pcall(function()
+                                            ToolActivatedRF:InvokeServer(toolId)
+                                        end)
+                                    else
+                                        tool:Activate() -- Fallback if remote ID missing
+                                    end
+                                    
+                                    task.wait(0.5) -- Small delay between drinks
+                                end
+                            end
+                        end
+
+                        -- 2. Restore previous weapon so farming works
+                        if previouslyEquipped and previouslyEquipped.Parent == backpack then
+                            hum:EquipTool(previouslyEquipped)
+                        end
+                    end
+                end
+            end
+        end)
+    end
+
     -- ====================================================================
     --  PROXIMITY TRACKER
     -- ====================================================================
@@ -1523,6 +1840,12 @@ local function loadPriorityConfig()
         end
 
         while FarmState.enabled do
+            -- >>> RESTOCK CHECK: If restocking, pause the farm logic completely <<<
+            if FarmState.restocking then
+                task.wait(0.5)
+                continue
+            end
+
             -- >>> CRASH PROTECTION: Wrap loop body in pcall <<<
             local loopSuccess, loopError = pcall(function()
                 local hrp = getLocalHRP()
@@ -1570,10 +1893,10 @@ local function loadPriorityConfig()
                     notify("Took damage! Ditching.", 2)
                     blacklistTarget(FarmState.currentTarget, 60)
                     stopMoving()
-                    FarmState.currentTarget   = nil
-                    FarmState.attached        = false
-                    FarmState.detourActive    = false
-                    FarmState.tempMobTarget   = nil
+                    FarmState.currentTarget    = nil
+                    FarmState.attached         = false
+                    FarmState.detourActive     = false
+                    FarmState.tempMobTarget    = nil
 
                     FarmState.LastLocalHealth = humHealth
                     task.wait(0.15)
@@ -1975,10 +2298,12 @@ local function loadPriorityConfig()
         FarmState.attached      = false
         FarmState.lastHit       = 0
         FarmState.detourActive  = false
+        FarmState.restocking    = false -- Reset flag
         FarmState.lastMoveTime  = os.clock()
 
         FarmState.enabled       = true
         FarmState.farmThread    = task.spawn(farmLoop)
+        startPotionLoop()
     end
 
     local function stopFarm()
@@ -1988,6 +2313,7 @@ local function loadPriorityConfig()
         FarmState.tempMobTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
+        FarmState.restocking    = false
 
         local hrp               = getLocalHRP()
         if hrp then hrp.Anchored = false end
@@ -2001,9 +2327,56 @@ local function loadPriorityConfig()
     -- ====================================================================
 
     local AutoTab          = Tabs["Auto"] or Tabs.Main
+    local AutoPotionsGroupbox = AutoTab:AddRightGroupbox("Auto Potions", "flask-round") -- NEW UI BOX
     local WhitelistGroup   = AutoTab:AddLeftGroupbox("Whitelists", "list")
     local FarmGroup        = AutoTab:AddLeftGroupbox("Auto Farm", "pickaxe")
     local TrackingGroupbox = Tabs.Auto:AddRightGroupbox("Tracking", "compass")
+
+    -- >>> AUTO POTIONS UI <<<
+    local potionValues = {
+        "Damage Potion I",
+        "Speed Potion I",
+        "Health Potion I",
+        "Luck Potion I",
+        "Miner Potion I",
+    }
+    
+    AutoPotionsGroupbox:AddDropdown("AutoPotions_List", {
+        Text    = "Potions to Manage",
+        Values  = potionValues,
+        Default = {},
+        Multi   = true,
+    })
+    
+    AutoPotionsGroupbox:AddSlider("AutoPotions_Interval", {
+        Text     = "Auto Use Interval",
+        Default  = 300,
+        Min      = 60,
+        Max      = 600,
+        Rounding = 0,
+        Suffix   = " sec",
+    })
+    
+    AutoPotionsGroupbox:AddToggle("AutoPotions_Enable", {
+        Text    = "Auto Use Potions",
+        Default = false,
+        Callback = function(state)
+            if state then
+                startPotionLoop()
+            end
+        end
+    })
+    
+    AutoPotionsGroupbox:AddToggle("AutoPotions_AutoRestock", {
+        Text    = "Auto Restock",
+        Default = false,
+    })
+
+    AutoPotionsGroupbox:AddButton("Manual Restock", function()
+        restockPotions(false)
+    end)
+    
+    -- >>> AUTO FARM UI <<<
 
     local ModeDropdown
     local OreTypeDropdown
