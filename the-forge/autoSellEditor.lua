@@ -386,7 +386,7 @@ local function createUI()
     infoLabel.TextColor3 = Color3.fromRGB(220, 220, 230)
     infoLabel.ZIndex = 3
     infoLabel.Text =
-        "Threshold' = how many to keep, extra gets auto-sold. " ..
+        "Threshold is how many to keep, extra gets auto-sold. " ..
         "Changes save instantly; hit Reload AutoSell in the main script to apply."
     infoLabel.Parent = mainFrame
 
