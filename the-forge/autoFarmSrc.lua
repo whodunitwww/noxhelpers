@@ -280,6 +280,7 @@ return function(ctx)
 
     local DefaultEnemyPriority = {
         ["Blazing Slime"]           = 1,
+        ["Blight Pyromancer"] = 2,
         ["Elite Deathaxe Skeleton"] = 2,
         ["Reaper"]                  = 3,
         ["Elite Rogue Skeleton"]    = 4,
