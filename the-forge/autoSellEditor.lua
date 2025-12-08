@@ -1,14 +1,14 @@
 -- AutoSellConfigEditor.lua
 -- Standalone config editor for AutoSell thresholds, with pretty UI + live ore icons.
--- UPDATED: mobile-friendly layout (responsive window, dynamic grid columns, scrollable tab bar)
+-- UPDATED: Added Legendary/Mythical Essence and Essence Icons.
 
 -- CONFIG PATH
-local BASE_DIR            = "Cerberus/The Forge"  -- <== make sure this matches References.gameDir in your main script
-local AutoSellConfigFile = BASE_DIR .. "/AutoSellConfig.json"
+local BASE_DIR             = "Cerberus/The Forge"  -- <== make sure this matches References.gameDir in your main script
+local AutoSellConfigFile   = BASE_DIR .. "/AutoSellConfig.json"
 
-local Players       = game:GetService("Players")
-local HttpService   = game:GetService("HttpService")
-local CoreGui       = game:GetService("CoreGui")
+local Players          = game:GetService("Players")
+local HttpService      = game:GetService("HttpService")
+local CoreGui          = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
@@ -24,6 +24,8 @@ local EssenceRarityMap = {
     ["Greater Essence"]   = "Rare",
     ["Superior Essence"]  = "Epic",
     ["Epic Essence"]      = "Epic",
+    ["Legendary Essence"] = "Legendary", -- ADDED
+    ["Mythical Essence"]  = "Mythical",  -- ADDED
 }
 
 local OreRarityMap = {
@@ -85,6 +87,8 @@ local EssenceNamesList = {
     "Greater Essence",
     "Superior Essence",
     "Epic Essence",
+    "Legendary Essence", -- ADDED
+    "Mythical Essence",  -- ADDED
 }
 
 local OreNamesList = {}
@@ -111,8 +115,10 @@ table.sort(OreNamesList, function(a, b)
 end)
 
 local OreRarityList     = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
-local EssenceRarityList = { "Epic", "Rare", "Uncommon", "Common" }
+-- UPDATED: Added Mythical and Legendary to the filter list
+local EssenceRarityList = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
 
+-- Runes + image IDs
 local RuneValues = {
     "Miner Shard",
     "Blast Chip",
@@ -121,7 +127,31 @@ local RuneValues = {
     "Rage Mark",
     "Drain Edge",
     "Ward Patch",
-    "Poison",
+    "Venom Crumb",
+}
+
+local RuneImageIds = {
+    ["Ward Patch"]  = "136618198347198",
+    ["Briar Notch"] = "130375351000261",
+    ["Rage Mark"]   = "74377849245058",
+    ["Miner Shard"] = "110898589664978",
+    ["Flame Spark"] = "73865699740150",
+    ["Blast Chip"]  = "85050444076173",
+    ["Drain Edge"]  = "89173473574831",
+    ["Venom Crumb"] = "77052262266995",
+}
+
+-- ADDED: Essence Image IDs
+local EssenceImageIds = {
+    ["Tiny Essence"]      = "72025528879375",
+    ["Small Essence"]     = "117483889562292",
+    ["Medium Essence"]    = "92874766076839",
+    ["Large Essence"]     = "122449926928886",
+    ["Greater Essence"]   = "75420167695755",
+    ["Superior Essence"]  = "120798786019612",
+    ["Epic Essence"]      = "71038820643974",
+    ["Legendary Essence"] = "126658024565240",
+    ["Mythical Essence"]  = "97191650147139",
 }
 
 ----------------------------------------------------------------
@@ -370,7 +400,7 @@ local function createUI()
     subtitle.TextSize = 12
     subtitle.TextXAlignment = Enum.TextXAlignment.Right
     subtitle.TextColor3 = Color3.fromRGB(185, 185, 210)
-    subtitle.Text = "Threshold = how many to keep. Extra gets auto-sold."
+    subtitle.Text = "WORK IN PROGRESS"
     subtitle.ZIndex = 4
     subtitle.Parent = titleBar
 
@@ -585,7 +615,9 @@ local function createUI()
     end
 
     -- item card (with threshold)
-    local function createItemCard(labelText, initialEnabled, initialThreshold, onChanged, iconTemplate, rarityName)
+    -- iconTemplate: ViewportFrame (ores)
+    -- iconImageId: string assetId (runes)
+    local function createItemCard(labelText, initialEnabled, initialThreshold, onChanged, iconTemplate, rarityName, iconImageId)
         local card = Instance.new("Frame")
         card.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
         card.BorderSizePixel = 0
@@ -661,6 +693,17 @@ local function createUI()
             if cam then
                 icon.CurrentCamera = cam
             end
+        elseif iconImageId then
+            icon = Instance.new("ImageLabel")
+            icon.Size = UDim2.fromScale(1, 1)
+            icon.Position = UDim2.new(0, 0, 0, 0)
+            icon.AnchorPoint = Vector2.new(0, 0)
+            icon.BackgroundTransparency = 1
+            icon.BorderSizePixel = 0
+            icon.Image = "rbxassetid://" .. iconImageId
+            icon.ScaleType = Enum.ScaleType.Fit
+            icon.ZIndex = 4
+            icon.Parent = iconBG
         end
 
         -- name
@@ -679,7 +722,7 @@ local function createUI()
         nameLabel.Parent = card
 
         -- internal state
-        local enabledState = initialEnabled
+        local enabledState    = initialEnabled
         local currentThreshold = initialThreshold or 0
 
         -- toggle button
@@ -824,10 +867,17 @@ local function createUI()
                 local iconTemplate = getOreIconTemplate(oreName)
                 local rarityName = OreRarityMap[oreName]
 
-                local card = createItemCard(oreName, rule.enabled, rule.threshold or 0, function(enabled, threshold)
-                    Config.ores[oreName] = { enabled = enabled, threshold = threshold }
-                    saveConfig()
-                end, iconTemplate, rarityName)
+                local card = createItemCard(
+                    oreName,
+                    rule.enabled,
+                    rule.threshold or 0,
+                    function(enabled, threshold)
+                        Config.ores[oreName] = { enabled = enabled, threshold = threshold }
+                        saveConfig()
+                    end,
+                    iconTemplate,
+                    rarityName
+                )
 
                 card.Parent = scroll
             end
@@ -836,11 +886,16 @@ local function createUI()
             for _, rName in ipairs(OreRarityList) do
                 local rule = Config.oreRarities[rName] or { enabled = false, threshold = 0 }
 
-                local card = createRarityCard(rName, rule.enabled, function(enabled)
-                    -- no quantity: always treat rarity threshold as 0, just enable/disable
-                    Config.oreRarities[rName] = { enabled = enabled, threshold = 0 }
-                    saveConfig()
-                end, rName)
+                local card = createRarityCard(
+                    rName,
+                    rule.enabled,
+                    function(enabled)
+                        -- no quantity: always treat rarity threshold as 0, just enable/disable
+                        Config.oreRarities[rName] = { enabled = enabled, threshold = 0 }
+                        saveConfig()
+                    end,
+                    rName
+                )
 
                 card.Parent = scroll
             end
@@ -849,11 +904,21 @@ local function createUI()
             for _, essName in ipairs(EssenceNamesList) do
                 local rule = Config.essence[essName] or { enabled = false, threshold = 0 }
                 local rarityName = EssenceRarityMap[essName]
+                -- ADDED: Look up image ID
+                local imageId = EssenceImageIds[essName]
 
-                local card = createItemCard(essName, rule.enabled, rule.threshold or 0, function(enabled, threshold)
-                    Config.essence[essName] = { enabled = enabled, threshold = threshold }
-                    saveConfig()
-                end, nil, rarityName)
+                local card = createItemCard(
+                    essName,
+                    rule.enabled,
+                    rule.threshold or 0,
+                    function(enabled, threshold)
+                        Config.essence[essName] = { enabled = enabled, threshold = threshold }
+                        saveConfig()
+                    end,
+                    nil,        -- no viewport
+                    rarityName,
+                    imageId     -- pass image ID
+                )
 
                 card.Parent = scroll
             end
@@ -862,10 +927,15 @@ local function createUI()
             for _, rName in ipairs(EssenceRarityList) do
                 local rule = Config.essenceRarities[rName] or { enabled = false, threshold = 0 }
 
-                local card = createRarityCard(rName, rule.enabled, function(enabled)
-                    Config.essenceRarities[rName] = { enabled = enabled, threshold = 0 }
-                    saveConfig()
-                end, rName)
+                local card = createRarityCard(
+                    rName,
+                    rule.enabled,
+                    function(enabled)
+                        Config.essenceRarities[rName] = { enabled = enabled, threshold = 0 }
+                        saveConfig()
+                    end,
+                    rName
+                )
 
                 card.Parent = scroll
             end
@@ -873,11 +943,20 @@ local function createUI()
         elseif name == "Runes" then
             for _, runeName in ipairs(RuneValues) do
                 local rule = Config.runes[runeName] or { enabled = false, threshold = 0 }
+                local imageId = RuneImageIds[runeName]
 
-                local card = createItemCard(runeName, rule.enabled, rule.threshold or 0, function(enabled, threshold)
-                    Config.runes[runeName] = { enabled = enabled, threshold = threshold }
-                    saveConfig()
-                end, nil, "Rare")
+                local card = createItemCard(
+                    runeName,
+                    rule.enabled,
+                    rule.threshold or 0,
+                    function(enabled, threshold)
+                        Config.runes[runeName] = { enabled = enabled, threshold = threshold }
+                        saveConfig()
+                    end,
+                    nil,             -- no viewport
+                    "Rare",          -- treat as Rare for colour
+                    imageId          -- iconImageId
+                )
 
                 card.Parent = scroll
             end
