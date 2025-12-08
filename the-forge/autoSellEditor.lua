@@ -115,10 +115,8 @@ table.sort(OreNamesList, function(a, b)
 end)
 
 local OreRarityList     = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
--- UPDATED: Added Mythical and Legendary to the filter list
 local EssenceRarityList = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
 
--- Runes + image IDs
 local RuneValues = {
     "Miner Shard",
     "Blast Chip",
@@ -141,7 +139,6 @@ local RuneImageIds = {
     ["Venom Crumb"] = "77052262266995",
 }
 
--- ADDED: Essence Image IDs
 local EssenceImageIds = {
     ["Tiny Essence"]      = "72025528879375",
     ["Small Essence"]     = "117483889562292",
