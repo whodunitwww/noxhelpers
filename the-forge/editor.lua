@@ -1,10 +1,13 @@
 --[[
 
-Cerberus Forge Priority Editor (Live-sorting, Scroll-Safe)
+Cerberus Forge Priority Editor (Live-sorting, clamped, input-safe)
 
+• Reads / writes: Cerberus/The Forge/PriorityConfig.json
 • Priorities: 1 (highest) .. 999 (lowest)
-• Rows auto-resort instantly when values change.
-• Scroll position is saved during resort so the view doesn't jump.
+• Rows auto-resort whenever you change a value.
+• Non-numeric input is stripped; invalid/empty entries revert to last valid.
+• Changes save instantly, BUT you must press "Reload Priorities" in the main
+  Forge script to actually apply them in the autofarm.
 
 ]]
 
@@ -37,6 +40,7 @@ local DefaultOrePriority   = {
 
 local DefaultEnemyPriority = {
     ["Blazing Slime"]           = 1,
+    ["Blight Pyromancer"]       = 2,
     ["Elite Deathaxe Skeleton"] = 2,
     ["Reaper"]                  = 3,
     ["Elite Rogue Skeleton"]    = 4,
@@ -54,8 +58,12 @@ local DefaultEnemyPriority = {
 
 -- // Helpers
 local function ensureFolders()
-    if not isfolder(BaseFolder) then makefolder(BaseFolder) end
-    if not isfolder(ForgeFolder) then makefolder(ForgeFolder) end
+    if not isfolder(BaseFolder) then
+        makefolder(BaseFolder)
+    end
+    if not isfolder(ForgeFolder) then
+        makefolder(ForgeFolder)
+    end
 end
 
 local function deepCopy(tbl)
@@ -112,7 +120,6 @@ local function loadPriorityConfig()
         return
     end
 
-    -- Handle loading logic
     if result.Ores or result.Enemies then
         PriorityConfig.Ores = deepCopy(DefaultOrePriority)
         if type(result.Ores) == "table" then
@@ -128,7 +135,7 @@ local function loadPriorityConfig()
             end
         end
     else
-        -- Legacy flat format support
+        -- old flat format => treat as Ores
         PriorityConfig.Ores = deepCopy(DefaultOrePriority)
         for k, v in pairs(result) do
             PriorityConfig.Ores[k] = tonumber(v) or PriorityConfig.Ores[k] or 999
@@ -136,19 +143,22 @@ local function loadPriorityConfig()
         PriorityConfig.Enemies = deepCopy(DefaultEnemyPriority)
     end
 
-    -- Ensure defaults exist if missing from file
+    -- ensure defaults exist
     for k, v in pairs(DefaultOrePriority) do
-        if PriorityConfig.Ores[k] == nil then PriorityConfig.Ores[k] = v end
+        if PriorityConfig.Ores[k] == nil then
+            PriorityConfig.Ores[k] = v
+        end
     end
     for k, v in pairs(DefaultEnemyPriority) do
-        if PriorityConfig.Enemies[k] == nil then PriorityConfig.Enemies[k] = v end
+        if PriorityConfig.Enemies[k] == nil then
+            PriorityConfig.Enemies[k] = v
+        end
     end
 end
 
 loadPriorityConfig()
 
--- // Sorting Logic
--- Sorts by Value (Priority) first, then by Name (Alphabetical) for ties
+-- Sort helper: by priority (ascending), then name
 local function sortedKeysByPriority(tbl)
     local list = {}
     for k in pairs(tbl) do
@@ -157,28 +167,25 @@ local function sortedKeysByPriority(tbl)
     table.sort(list, function(a, b)
         local va = tonumber(tbl[a]) or 999
         local vb = tonumber(tbl[b]) or 999
-        
-        if va ~= vb then
-            return va < vb -- Smaller number = Higher Priority
+        if va == vb then
+            return tostring(a) < tostring(b)
         end
-        return tostring(a) < tostring(b) -- Alphabetical tie-breaker
+        return va < vb -- smaller number = higher priority
     end)
     return list
 end
 
 -- // UI creation
 local function createPriorityEditorGui()
+    -- Use CoreGui if possible, else PlayerGui
     local parent
-    local okCore, coreGui = pcall(function() return game:GetService("CoreGui") end)
+    local okCore, coreGui = pcall(function()
+        return game:GetService("CoreGui")
+    end)
     if okCore and coreGui then
         parent = coreGui
     else
         parent = LocalPlayer:WaitForChild("PlayerGui")
-    end
-    
-    -- Cleanup old GUI if exists
-    if parent:FindFirstChild("CerberusPriorityEditor") then
-        parent.CerberusPriorityEditor:Destroy()
     end
 
     local sg = Instance.new("ScreenGui")
@@ -240,33 +247,59 @@ local function createPriorityEditorGui()
     closeButton.TextSize = 14
     closeButton.TextColor3 = Color3.fromRGB(255, 200, 200)
     closeButton.Parent = topBar
-    Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
 
-    -- Draggable
-    local dragging, dragInput, dragStart, startPos
-    topBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = mainFrame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then dragging = false end
-            end)
-        end
-    end)
-    topBar.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 6)
+    closeCorner.Parent = closeButton
+
+    -- Drag logic
+    do
+        local dragging, dragInput, dragStart, startPos
+
+        local function update(input)
             local delta = input.Position - dragStart
-            mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            mainFrame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
         end
+
+        topBar.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1
+                or input.UserInputType == Enum.UserInputType.Touch then
+                dragging = true
+                dragStart = input.Position
+                startPos = mainFrame.Position
+
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
+
+        topBar.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement
+                or input.UserInputType == Enum.UserInputType.Touch then
+                dragInput = input
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(input)
+            if input == dragInput and dragging then
+                update(input)
+            end
+        end)
+    end
+
+    closeButton.MouseButton1Click:Connect(function()
+        sg:Destroy()
     end)
 
-    closeButton.MouseButton1Click:Connect(function() sg:Destroy() end)
-
-    -- Mode Switching
+    -- Mode buttons (Ores / Enemies)
     local modeBar = Instance.new("Frame")
     modeBar.Name = "ModeBar"
     modeBar.Size = UDim2.new(1, -20, 0, 28)
@@ -277,13 +310,17 @@ local function createPriorityEditorGui()
     local oresButton = Instance.new("TextButton")
     oresButton.Name = "OresButton"
     oresButton.Size = UDim2.new(0.5, -5, 1, 0)
+    oresButton.Position = UDim2.new(0, 0, 0, 0)
     oresButton.BackgroundColor3 = Color3.fromRGB(40, 40, 80)
     oresButton.Text = "Ores"
     oresButton.TextColor3 = Color3.fromRGB(230, 230, 255)
     oresButton.Font = Enum.Font.GothamBold
     oresButton.TextSize = 14
     oresButton.Parent = modeBar
-    Instance.new("UICorner", oresButton).CornerRadius = UDim.new(0, 6)
+
+    local oresCorner = Instance.new("UICorner")
+    oresCorner.CornerRadius = UDim.new(0, 6)
+    oresCorner.Parent = oresButton
 
     local enemiesButton = Instance.new("TextButton")
     enemiesButton.Name = "EnemiesButton"
@@ -295,9 +332,12 @@ local function createPriorityEditorGui()
     enemiesButton.Font = Enum.Font.GothamBold
     enemiesButton.TextSize = 14
     enemiesButton.Parent = modeBar
-    Instance.new("UICorner", enemiesButton).CornerRadius = UDim.new(0, 6)
 
-    -- Reset Row
+    local enemiesCorner = Instance.new("UICorner")
+    enemiesCorner.CornerRadius = UDim.new(0, 6)
+    enemiesCorner.Parent = enemiesButton
+
+    -- Reset buttons row
     local resetRow = Instance.new("Frame")
     resetRow.Name = "ResetRow"
     resetRow.Size = UDim2.new(1, -20, 0, 24)
@@ -306,16 +346,22 @@ local function createPriorityEditorGui()
     resetRow.Parent = mainFrame
 
     local resetOresBtn = Instance.new("TextButton")
+    resetOresBtn.Name = "ResetOres"
     resetOresBtn.Size = UDim2.new(0.5, -5, 1, 0)
+    resetOresBtn.Position = UDim2.new(0, 0, 0, 0)
     resetOresBtn.BackgroundColor3 = Color3.fromRGB(40, 60, 40)
     resetOresBtn.Text = "Reset Ores"
     resetOresBtn.Font = Enum.Font.Gotham
     resetOresBtn.TextSize = 13
     resetOresBtn.TextColor3 = Color3.fromRGB(220, 255, 220)
     resetOresBtn.Parent = resetRow
-    Instance.new("UICorner", resetOresBtn).CornerRadius = UDim.new(0, 6)
+
+    local resetOresCorner = Instance.new("UICorner")
+    resetOresCorner.CornerRadius = UDim.new(0, 6)
+    resetOresCorner.Parent = resetOresBtn
 
     local resetEnemiesBtn = Instance.new("TextButton")
+    resetEnemiesBtn.Name = "ResetEnemies"
     resetEnemiesBtn.Size = UDim2.new(0.5, -5, 1, 0)
     resetEnemiesBtn.Position = UDim2.new(0.5, 5, 0, 0)
     resetEnemiesBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 40)
@@ -324,31 +370,41 @@ local function createPriorityEditorGui()
     resetEnemiesBtn.TextSize = 13
     resetEnemiesBtn.TextColor3 = Color3.fromRGB(255, 230, 200)
     resetEnemiesBtn.Parent = resetRow
-    Instance.new("UICorner", resetEnemiesBtn).CornerRadius = UDim.new(0, 6)
 
-    -- Info Label
+    local resetEnemiesCorner = Instance.new("UICorner")
+    resetEnemiesCorner.CornerRadius = UDim.new(0, 6)
+    resetEnemiesCorner.Parent = resetEnemiesBtn
+
+    -- Info text
     local infoLabel = Instance.new("TextLabel")
+    infoLabel.Name = "InfoLabel"
     infoLabel.Size = UDim2.new(1, -20, 0, 40)
     infoLabel.Position = UDim2.new(0, 10, 0, 100)
     infoLabel.BackgroundTransparency = 1
     infoLabel.Font = Enum.Font.Gotham
     infoLabel.TextSize = 12
     infoLabel.TextWrapped = true
+    infoLabel.TextXAlignment = Enum.TextXAlignment.Left
+    infoLabel.TextYAlignment = Enum.TextYAlignment.Top
     infoLabel.TextColor3 = Color3.fromRGB(190, 190, 200)
-    infoLabel.Text = "Priority 1 is highest. Rows automatically resort when numbers change. Remember to click 'Reload Priorities' in the main script."
+    infoLabel.Text = "Priority 1 is highest, bigger numbers are lower priority. " ..
+        "Changes save instantly to PriorityConfig.json, but you MUST press 'Reload Priorities' " ..
+        "in the main Forge script for them to take effect."
     infoLabel.Parent = mainFrame
 
-    -- Content Areas
+    -- Scrolling content (below info text)
     local contentFrame = Instance.new("Frame")
+    contentFrame.Name = "ContentFrame"
     contentFrame.Size = UDim2.new(1, -20, 1, -150)
     contentFrame.Position = UDim2.new(0, 10, 0, 140)
     contentFrame.BackgroundTransparency = 1
     contentFrame.Parent = mainFrame
 
     local oresScroll = Instance.new("ScrollingFrame")
+    oresScroll.Name = "OresScroll"
     oresScroll.Size = UDim2.new(1, 0, 1, 0)
-    oresScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
     oresScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    oresScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
     oresScroll.ScrollBarThickness = 6
     oresScroll.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
     oresScroll.BorderSizePixel = 0
@@ -356,13 +412,14 @@ local function createPriorityEditorGui()
 
     local oresLayout = Instance.new("UIListLayout")
     oresLayout.Padding = UDim.new(0, 4)
-    oresLayout.SortOrder = Enum.SortOrder.LayoutOrder -- Using LayoutOrder is smoother
+    oresLayout.SortOrder = Enum.SortOrder.Name
     oresLayout.Parent = oresScroll
 
     local enemiesScroll = Instance.new("ScrollingFrame")
+    enemiesScroll.Name = "EnemiesScroll"
     enemiesScroll.Size = UDim2.new(1, 0, 1, 0)
-    enemiesScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
     enemiesScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    enemiesScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
     enemiesScroll.ScrollBarThickness = 6
     enemiesScroll.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
     enemiesScroll.BorderSizePixel = 0
@@ -371,10 +428,13 @@ local function createPriorityEditorGui()
 
     local enemiesLayout = Instance.new("UIListLayout")
     enemiesLayout.Padding = UDim.new(0, 4)
-    enemiesLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    enemiesLayout.SortOrder = Enum.SortOrder.Name
     enemiesLayout.Parent = enemiesScroll
 
-    -- Helper: Create Row
+    -- Forward declarations so callbacks can rebuild
+    local rebuildOresList, rebuildEnemiesList
+
+    -- Helper to build a row (name + priority text box)
     local function createPriorityRow(parent, labelText, initialValue, onChanged)
         local row = Instance.new("Frame")
         row.Name = labelText
@@ -382,9 +442,13 @@ local function createPriorityEditorGui()
         row.BackgroundColor3 = Color3.fromRGB(28, 28, 34)
         row.BorderSizePixel = 0
         row.Parent = parent
-        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
+
+        local rowCorner = Instance.new("UICorner")
+        rowCorner.CornerRadius = UDim.new(0, 6)
+        rowCorner.Parent = row
 
         local nameLabel = Instance.new("TextLabel")
+        nameLabel.Name = "NameLabel"
         nameLabel.BackgroundTransparency = 1
         nameLabel.Size = UDim2.new(0.7, -10, 1, 0)
         nameLabel.Position = UDim2.new(0, 10, 0, 0)
@@ -396,127 +460,147 @@ local function createPriorityEditorGui()
         nameLabel.Parent = row
 
         local box = Instance.new("TextBox")
+        box.Name = "PriorityBox"
         box.Size = UDim2.new(0.3, -10, 1, -6)
         box.Position = UDim2.new(0.7, 0, 0, 3)
         box.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
         box.TextColor3 = Color3.fromRGB(255, 255, 255)
         box.Font = Enum.Font.GothamSemibold
         box.TextSize = 14
-        box.TextXAlignment = Enum.TextXAlignment.Center
         box.ClearTextOnFocus = false
+        box.TextXAlignment = Enum.TextXAlignment.Center
         box.Parent = row
-        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
 
-        local lastValid = tonumber(initialValue) or 999
+        local lastValid = tonumber(initialValue) or 1
+        if lastValid < 1 then lastValid = 1 end
+        if lastValid > 999 then lastValid = 999 end
         box.Text = tostring(lastValid)
 
-        -- Input Sanitize (Numbers only)
+        local boxCorner = Instance.new("UICorner")
+        boxCorner.CornerRadius = UDim.new(0, 6)
+        boxCorner.Parent = box
+
+        -- Strip any non-digit characters live
         box:GetPropertyChangedSignal("Text"):Connect(function()
-            local t = box.Text
-            local d = t:gsub("%D", "")
-            if t ~= d then box.Text = d end
+            local raw = box.Text or ""
+            local digits = raw:gsub("%D", "")
+            if digits ~= raw then
+                local oldLen = #raw
+                local newLen = #digits
+                local curPos = box.CursorPosition
+                box.Text = digits
+                local delta = oldLen - newLen
+                if curPos ~= -1 then
+                    box.CursorPosition = math.clamp(curPos - delta, 1, #digits + 1)
+                end
+            end
         end)
 
-        -- Save & Trigger Sort on Focus Lost
+        -- Validate on focus lost
         box.FocusLost:Connect(function()
-            local num = tonumber(box.Text)
+            local raw = box.Text or ""
+            if raw == "" then
+                -- Reject empty: revert
+                box.Text = tostring(lastValid)
+                return
+            end
+
+            local num = tonumber(raw)
             if not num then
                 box.Text = tostring(lastValid)
                 return
             end
-            
-            num = math.clamp(math.floor(num), 1, 999)
+
+            num = math.floor(num)
+            if num < 1 then num = 1 end
+            if num > 999 then num = 999 end -- hard clamp
             lastValid = num
             box.Text = tostring(num)
-            
-            if onChanged then onChanged(num) end
+
+            if onChanged then
+                onChanged(num)
+            end
         end)
-        
+
         return row
     end
 
-    -- Rebuild Functions
-    local rebuildOresList, rebuildEnemiesList
+    -- Rebuilders
 
     rebuildOresList = function()
-        -- 1. SAVE SCROLL POSITION
-        local savedPos = oresScroll.CanvasPosition
-        
-        -- 2. CLEAR
-        for _, c in ipairs(oresScroll:GetChildren()) do
-            if c:IsA("Frame") then c:Destroy() end
+        for _, child in ipairs(oresScroll:GetChildren()) do
+            if child:IsA("Frame") then
+                child:Destroy()
+            end
         end
-        
-        -- 3. REPOPULATE (Sorted)
-        local sorted = sortedKeysByPriority(PriorityConfig.Ores)
-        for i, name in ipairs(sorted) do
-            local val = PriorityConfig.Ores[name]
-            local row = createPriorityRow(oresScroll, name, val, function(newVal)
-                PriorityConfig.Ores[name] = newVal
+
+        for _, name in ipairs(sortedKeysByPriority(PriorityConfig.Ores)) do
+            local value = PriorityConfig.Ores[name]
+            createPriorityRow(oresScroll, name, value, function(newValue)
+                PriorityConfig.Ores[name] = newValue
                 savePriorityConfig()
-                rebuildOresList() -- Recursive refresh triggers sort
+                -- re-sort list after every change
+                rebuildOresList()
             end)
-            row.LayoutOrder = i -- Enforce order
         end
-        
-        -- 4. RESTORE SCROLL
-        oresScroll.CanvasPosition = savedPos
     end
 
     rebuildEnemiesList = function()
-        local savedPos = enemiesScroll.CanvasPosition
-        
-        for _, c in ipairs(enemiesScroll:GetChildren()) do
-            if c:IsA("Frame") then c:Destroy() end
+        for _, child in ipairs(enemiesScroll:GetChildren()) do
+            if child:IsA("Frame") then
+                child:Destroy()
+            end
         end
-        
-        local sorted = sortedKeysByPriority(PriorityConfig.Enemies)
-        for i, name in ipairs(sorted) do
-            local val = PriorityConfig.Enemies[name]
-            local row = createPriorityRow(enemiesScroll, name, val, function(newVal)
-                PriorityConfig.Enemies[name] = newVal
+
+        for _, name in ipairs(sortedKeysByPriority(PriorityConfig.Enemies)) do
+            local value = PriorityConfig.Enemies[name]
+            createPriorityRow(enemiesScroll, name, value, function(newValue)
+                PriorityConfig.Enemies[name] = newValue
                 savePriorityConfig()
                 rebuildEnemiesList()
             end)
-            row.LayoutOrder = i
         end
-        
-        enemiesScroll.CanvasPosition = savedPos
     end
 
-    -- Initial Build
     rebuildOresList()
     rebuildEnemiesList()
 
-    -- Tab Switching
-    local function setMode(m)
-        if m == "Ores" then
-            oresScroll.Visible = true
-            enemiesScroll.Visible = false
-            oresButton.BackgroundColor3 = Color3.fromRGB(60, 60, 120)
-            oresButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    -- Mode switching
+    local function setMode(mode)
+        if mode == "Ores" then
+            oresScroll.Visible             = true
+            enemiesScroll.Visible          = false
+            oresButton.BackgroundColor3    = Color3.fromRGB(60, 60, 120)
+            oresButton.TextColor3          = Color3.fromRGB(255, 255, 255)
             enemiesButton.BackgroundColor3 = Color3.fromRGB(30, 40, 50)
-            enemiesButton.TextColor3 = Color3.fromRGB(200, 200, 210)
-        else
-            oresScroll.Visible = false
-            enemiesScroll.Visible = true
+            enemiesButton.TextColor3       = Color3.fromRGB(200, 200, 210)
+        elseif mode == "Enemies" then
+            oresScroll.Visible             = false
+            enemiesScroll.Visible          = true
             enemiesButton.BackgroundColor3 = Color3.fromRGB(120, 60, 40)
-            enemiesButton.TextColor3 = Color3.fromRGB(255, 240, 220)
-            oresButton.BackgroundColor3 = Color3.fromRGB(30, 40, 50)
-            oresButton.TextColor3 = Color3.fromRGB(200, 200, 210)
+            enemiesButton.TextColor3       = Color3.fromRGB(255, 240, 220)
+            oresButton.BackgroundColor3    = Color3.fromRGB(30, 40, 50)
+            oresButton.TextColor3          = Color3.fromRGB(200, 200, 210)
         end
     end
-    
-    oresButton.MouseButton1Click:Connect(function() setMode("Ores") end)
-    enemiesButton.MouseButton1Click:Connect(function() setMode("Enemies") end)
+
+    oresButton.MouseButton1Click:Connect(function()
+        setMode("Ores")
+    end)
+
+    enemiesButton.MouseButton1Click:Connect(function()
+        setMode("Enemies")
+    end)
+
     setMode("Ores")
 
-    -- Reset Handlers
+    -- Reset buttons
     resetOresBtn.MouseButton1Click:Connect(function()
         PriorityConfig.Ores = deepCopy(DefaultOrePriority)
         savePriorityConfig()
         rebuildOresList()
     end)
+
     resetEnemiesBtn.MouseButton1Click:Connect(function()
         PriorityConfig.Enemies = deepCopy(DefaultEnemyPriority)
         savePriorityConfig()
