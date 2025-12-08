@@ -7,21 +7,21 @@ return function(ctx)
     ----------------------------------------------------------------
     -- CONTEXT BINDINGS
     ----------------------------------------------------------------
-    local Services         = ctx.Services
-    local Tabs             = ctx.Tabs
-    local References       = ctx.References
-    local Library          = ctx.Library
-    local Options          = ctx.Options
-    local Toggles          = ctx.Toggles
-    local META             = ctx.META or {}
+    local Services            = ctx.Services
+    local Tabs                = ctx.Tabs
+    local References          = ctx.References
+    local Library             = ctx.Library
+    local Options             = ctx.Options
+    local Toggles             = ctx.Toggles
+    local META                = ctx.META or {}
 
-    local AttachPanel      = ctx.AttachPanel
-    local MoveToPos        = ctx.MoveToPos
-    local RunService       = Services.RunService
-    local UserInputService = Services.UserInputService
-    local HttpService      = Services.HttpService
+    local AttachPanel         = ctx.AttachPanel
+    local MoveToPos           = ctx.MoveToPos
+    local RunService          = Services.RunService
+    local UserInputService    = Services.UserInputService
+    local HttpService         = Services.HttpService
     local VirtualInputManager = game:GetService("VirtualInputManager")
-    local Players          = Services.Players
+    local Players             = Services.Players
 
     ----------------------------------------------------------------
     -- INTERNAL HELPERS (Global Scope)
@@ -59,6 +59,35 @@ return function(ctx)
         return h and h > 0
     end
 
+    local function isRockLastHitByOther(model)
+        if not model or not model.Parent then return false end
+
+        local ok, value = pcall(function()
+            return model:GetAttribute("LastHitPlayer")
+        end)
+        if not ok or value == nil then
+            -- no attribute / error => treat as free rock
+            return false
+        end
+
+        local plr = References.player or Players.LocalPlayer
+        if not plr then return false end
+
+        local v = tostring(value)
+
+        -- Allow a few common encodings of "us"
+        if v == plr.Name
+            or v == plr.DisplayName
+            or v == tostring(plr.UserId)
+        then
+            return false -- it's ours
+        end
+
+        -- Attribute exists and *doesn't* match us => someone else
+        return true
+    end
+
+
     local function rockRoot(model)
         if not model or not model.Parent then return nil end
         if model:IsA("BasePart") then
@@ -90,7 +119,7 @@ return function(ctx)
         :WaitForChild("ToolService")
         :WaitForChild("RF")
         :WaitForChild("ToolActivated")
-    
+
     local PurchaseRF = Services.ReplicatedStorage
         :WaitForChild("Shared")
         :WaitForChild("Packages")
@@ -127,12 +156,12 @@ return function(ctx)
     local function getPotionCount(displayName)
         local player = Players.LocalPlayer
         if not player then return 0 end
-        
-        local playerGui    = player:FindFirstChild("PlayerGui")
+
+        local playerGui   = player:FindFirstChild("PlayerGui")
         local backpackGui = playerGui and playerGui:FindFirstChild("BackpackGui")
         local backpack    = backpackGui and backpackGui:FindFirstChild("Backpack")
         local hotbar      = backpack and backpack:FindFirstChild("Hotbar")
-        
+
         if not hotbar then return 0 end
 
         for _, slot in pairs(hotbar:GetChildren()) do
@@ -157,59 +186,59 @@ return function(ctx)
         local root = char:FindFirstChild("HumanoidRootPart")
         local hum  = char:FindFirstChildOfClass("Humanoid")
         if not root or not hum then return end
-    
+
         -- Only save once
         if not root:GetAttribute("CerbStateSaved") then
             root:SetAttribute("CerbPrevAnchored", root.Anchored)
             root:SetAttribute("CerbPrevVel", root.AssemblyLinearVelocity)
             root:SetAttribute("CerbPrevRotVel", root.AssemblyAngularVelocity)
-    
+
             root:SetAttribute("CerbPrevState", hum:GetState())
             root:SetAttribute("CerbPrevWalkSpeed", hum.WalkSpeed)
             root:SetAttribute("CerbPrevJumpPower", hum.JumpPower)
             root:SetAttribute("CerbPrevPlatformStand", hum.PlatformStand)
             root:SetAttribute("CerbPrevAutoRotate", hum.AutoRotate)
-    
+
             root:SetAttribute("CerbStateSaved", true)
         end
-    
+
         -- HARD FREEZE
         root.Anchored = true
         root.AssemblyLinearVelocity = Vector3.zero
         root.AssemblyAngularVelocity = Vector3.zero
-    
+
         hum.WalkSpeed = 0
         hum.JumpPower = 0
         hum.AutoRotate = false
         hum.PlatformStand = true
-    
+
         pcall(function()
             hum:ChangeState(Enum.HumanoidStateType.Physics)
         end)
     end
-    
+
     local function unfreezeCharacter(char)
         if not char then return end
         local root = char:FindFirstChild("HumanoidRootPart")
         local hum  = char:FindFirstChildOfClass("Humanoid")
         if not root or not hum then return end
-    
+
         if not root:GetAttribute("CerbStateSaved") then return end
-    
+
         -- Restore values
         root.Anchored = root:GetAttribute("CerbPrevAnchored")
         root.AssemblyLinearVelocity = root:GetAttribute("CerbPrevVel")
         root.AssemblyAngularVelocity = root:GetAttribute("CerbPrevRotVel")
-    
+
         hum.WalkSpeed = root:GetAttribute("CerbPrevWalkSpeed")
         hum.JumpPower = root:GetAttribute("CerbPrevJumpPower")
         hum.AutoRotate = root:GetAttribute("CerbPrevAutoRotate")
         hum.PlatformStand = root:GetAttribute("CerbPrevPlatformStand")
-    
+
         pcall(function()
             hum:ChangeState(root:GetAttribute("CerbPrevState"))
         end)
-    
+
         -- Allow new freeze cycles
         root:SetAttribute("CerbStateSaved", nil)
     end
@@ -217,9 +246,10 @@ return function(ctx)
     local function equipHotbarItemByName(name)
         local player = Players.LocalPlayer
         local pg = player:FindFirstChild("PlayerGui")
-        local hb = pg and pg:FindFirstChild("BackpackGui") and pg.BackpackGui:FindFirstChild("Backpack") and pg.BackpackGui.Backpack:FindFirstChild("Hotbar")
+        local hb = pg and pg:FindFirstChild("BackpackGui") and pg.BackpackGui:FindFirstChild("Backpack") and
+            pg.BackpackGui.Backpack:FindFirstChild("Hotbar")
         if not hb then return false end
-    
+
         for _, slot in ipairs(hb:GetChildren()) do
             local idx = tonumber(slot.Name)
             if idx then
@@ -233,7 +263,7 @@ return function(ctx)
                         Enum.KeyCode.Zero,
                     }
                     local kc = fallback[idx]
-    
+
                     if kc then
                         VirtualInputManager:SendKeyEvent(true, kc, false, player)
                         task.wait(0.05)
@@ -252,7 +282,7 @@ return function(ctx)
 
     local PRIORITY_CONFIG_VERSION = 1.1
 
-    local DefaultOrePriority   = {
+    local DefaultOrePriority      = {
         ["Crimson Crystal"] = 1,
         ["Violet Crystal"]  = 1,
         ["Cyan Crystal"]    = 1,
@@ -268,7 +298,7 @@ return function(ctx)
         ["Lucky Block"]     = 6,
     }
 
-    local PermOreList          = {
+    local PermOreList             = {
         "Crimson Crystal",
         "Cyan Crystal",
         "Earth Crystal",
@@ -278,9 +308,9 @@ return function(ctx)
         "Basalt Core",
     }
 
-    local DefaultEnemyPriority = {
+    local DefaultEnemyPriority    = {
         ["Blazing Slime"]           = 1,
-        ["Blight Pyromancer"] = 2,
+        ["Blight Pyromancer"]       = 2,
         ["Elite Deathaxe Skeleton"] = 2,
         ["Reaper"]                  = 3,
         ["Elite Rogue Skeleton"]    = 4,
@@ -296,8 +326,8 @@ return function(ctx)
         ["Brute Zombie"]            = 9,
     }
 
-    local OrePriority   = {}
-    local EnemyPriority = {}
+    local OrePriority             = {}
+    local EnemyPriority           = {}
 
     -- start with defaults in memory
     for k, v in pairs(DefaultOrePriority) do OrePriority[k] = v end
@@ -360,7 +390,10 @@ return function(ctx)
                 if fileVersion < PRIORITY_CONFIG_VERSION then
                     applyDefaultPriorities()
                     writeDefaultPriorityConfig()
-                    notify("Priority config outdated (v" .. fileVersion .. " vs v" .. PRIORITY_CONFIG_VERSION .. "). Resetting.", 5)
+                    notify(
+                        "Priority config outdated (v" ..
+                        fileVersion .. " vs v" .. PRIORITY_CONFIG_VERSION .. "). Resetting.",
+                        5)
                     return
                 end
 
@@ -436,7 +469,7 @@ return function(ctx)
         nameMap             = {},
 
         -- Potion Interop
-        restocking          = false, 
+        restocking          = false,
         potionThread        = nil,
 
         currentTarget       = nil,
@@ -447,6 +480,7 @@ return function(ctx)
         attached            = false,
         lastHit             = 0,
         detourActive        = false,
+        detourNotified      = false,
 
         lastTargetRef       = nil,
         lastTargetHealth    = 0,
@@ -466,8 +500,8 @@ return function(ctx)
     --  CONFIG SYSTEM (HUD)
     -- ====================================================================
 
-    local ConfigFolder          = "Cerberus/The Forge"
-    local ConfigFile            = ConfigFolder .. "/HudConfig.json"
+    local ConfigFolder         = "Cerberus/The Forge"
+    local ConfigFile           = ConfigFolder .. "/HudConfig.json"
 
     local function saveHudConfig(position, size)
         if not isfolder("Cerberus") then makefolder("Cerberus") end
@@ -523,32 +557,6 @@ return function(ctx)
     end
 
     -- ====================================================================
-    --  NEW AVOIDANCE LOGIC (Bounding Box)
-    -- ====================================================================
-
-    local AVOID_P1 = Vector3.new(71.883743, 20.598356, -309.188538)
-    local AVOID_P2 = Vector3.new(252.321289, 49.092030, 61.109535)
-
-    local AVOID_MIN = Vector3.new(
-        math.min(AVOID_P1.X, AVOID_P2.X),
-        math.min(AVOID_P1.Y, AVOID_P2.Y),
-        math.min(AVOID_P1.Z, AVOID_P2.Z)
-    )
-
-    local AVOID_MAX = Vector3.new(
-        math.max(AVOID_P1.X, AVOID_P2.X),
-        math.max(AVOID_P1.Y, AVOID_P2.Y),
-        math.max(AVOID_P1.Z, AVOID_P2.Z)
-    )
-
-    local function isInAvoidBox(pos)
-        if not pos then return false end
-        return pos.X >= AVOID_MIN.X and pos.X <= AVOID_MAX.X and
-            pos.Y >= AVOID_MIN.Y and pos.Y <= AVOID_MAX.Y and
-            pos.Z >= AVOID_MIN.Z and pos.Z <= AVOID_MAX.Z
-    end
-
-    -- ====================================================================
     --  ORE HELPERS
     -- ====================================================================
 
@@ -576,16 +584,13 @@ return function(ctx)
             if inst:IsA("Model") then
                 local parent = inst.Parent
                 if not (parent and parent ~= rocksFolder and parent:IsA("Model")) then
-                    local rPos = rockPosition(inst)
-                    if rPos and isInAvoidBox(rPos) then continue end
-
                     local passedZone = true
                     if ZoneWhitelistEnabled then
                         local zoneName = getZoneFromDescendant(inst)
                         if not zoneName or not WhitelistedZones[zoneName] then passedZone = false end
                     end
 
-                    if passedZone and rockHealth(inst) then
+                    if passedZone and rockHealth(inst) and not isRockLastHitByOther(inst) then
                         local name = inst.Name
                         if not nameMap[name] then
                             nameMap[name] = {}
@@ -716,7 +721,6 @@ return function(ctx)
             if m:IsA("Model") and not isPlayerModel(m) and isMobAlive(m) then
                 local root = getMobRoot(m)
                 if root then
-                    if isInAvoidBox(root.Position) then continue end
                     local dist = (root.Position - myPos).Magnitude
                     if dist <= bestDist then
                         bestDist = dist
@@ -920,7 +924,6 @@ return function(ctx)
 
     local function isPointInHazard(point)
         if #LavaParts == 0 then refreshHazards() end
-        if isInAvoidBox(point) then return true end
         if AvoidLava then
             for _, part in ipairs(LavaParts) do
                 if pointInsidePart(point, part) then return true end
@@ -1087,6 +1090,11 @@ return function(ctx)
             if models then
                 for _, model in ipairs(models) do
                     if model and model.Parent and def.isAlive(model) and not isTargetBlacklisted(model) then
+                        -- extra guard: if this is an ore and someone else last-hit it, skip it
+                        if def.name == FARM_MODE_ORES and isRockLastHitByOther(model) then
+                            continue
+                        end
+
                         local pos = def.getPos(model)
                         if pos then
                             local skip = false
@@ -1132,6 +1140,8 @@ return function(ctx)
     -- ====================================================================
     --  ATTACH + MOVEMENT
     -- ====================================================================
+
+    local DETOUR_ENABLED = (game.PlaceId == 129009554587176)
 
     local function realignAttach(target, overrideDef)
         if not target then return end
@@ -1208,7 +1218,7 @@ return function(ctx)
         FarmState.lastMovePos = startPos
         FarmState.lastMoveTime = os.clock()
 
-        local useDetour = (startPos.X < DETOUR_THRESHOLD_X)
+        local useDetour = DETOUR_ENABLED and (startPos.X < DETOUR_THRESHOLD_X)
 
         if not useDetour then
             local waypoints = { finalPos }
@@ -1334,49 +1344,54 @@ return function(ctx)
         end)
     end
 
--- ====================================================================
+    -- ====================================================================
     --  RESTOCK LOGIC
     -- ====================================================================
 
     local function restockPotions(doFreeze)
         local selected = Options.AutoPotions_List.Value
         local didSomething = false
-    
+
         -- ensure something is selected
         local any = false
-        for _, sel in pairs(selected) do if sel then any = true break end end
+        for _, sel in pairs(selected) do
+            if sel then
+                any = true
+                break
+            end
+        end
         if not any then
             return
         end
-    
+
         local player = Players.LocalPlayer
         local char = player.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
         if not root then return end
-    
+
         FarmState.restocking = true
-        
+
         -- Detach/Stop farm movement
         stopMoving()
         if AttachPanel.DestroyAttach then pcall(AttachPanel.DestroyAttach) end
         FarmState.attached = false
         FarmState.currentTarget = nil
-    
+
         -- Instead of freezing, just kill momentum so we don't slide
         root.AssemblyLinearVelocity = Vector3.zero
         root.AssemblyAngularVelocity = Vector3.zero
-        
+
         -- Teleport
         root.CFrame = RESTOCK_CFRAME
         task.wait(0.15) -- Small wait for replication
-    
+
         -- Buy potions
         for displayName, isOn in pairs(selected) do
             if isOn then
                 local current = getPotionCount(displayName)
                 local needed = 10 - current
                 local toolId = PotionDisplayToToolId[displayName]
-    
+
                 if needed > 0 and toolId then
                     pcall(function()
                         PurchaseRF:InvokeServer(toolId, needed)
@@ -1386,10 +1401,10 @@ return function(ctx)
                 end
             end
         end
-        
+
         -- Release control back to farm loop
         FarmState.restocking = false
-    
+
         if didSomething then
             notify("Potions restocked.", 2)
         end
@@ -1399,7 +1414,7 @@ return function(ctx)
         threshold = threshold or 2
         local selected = Options.AutoPotions_List and Options.AutoPotions_List.Value
         if type(selected) ~= "table" then return false end
-    
+
         for name, isOn in pairs(selected) do
             if isOn and getPotionCount(name) < threshold then
                 return true
@@ -1408,36 +1423,36 @@ return function(ctx)
         return false
     end
 
--- ====================================================================
+    -- ====================================================================
     --  POTION LOOP (RUNS IN PARALLEL)
     -- ====================================================================
 
     local function startPotionLoop()
         if FarmState.potionThread then return end
-        
+
         FarmState.potionThread = task.spawn(function()
             local lastUse = 0
             while true do
                 task.wait(1)
-                
-                if not (Toggles.AutoPotions_Enable and Toggles.AutoPotions_Enable.Value) then 
-                    continue 
+
+                if not (Toggles.AutoPotions_Enable and Toggles.AutoPotions_Enable.Value) then
+                    continue
                 end
 
                 -- >>> CHECK RESTOCK FIRST <<<
                 if Toggles.AutoPotions_AutoRestock.Value and needsRestock(2) then
                     -- Signal restocking so farm loop pauses
                     FarmState.restocking = true
-                    
+
                     local success, err = pcall(function()
-                        restockPotions(false) 
+                        restockPotions(false)
                     end)
-                    
+
                     if not success then warn("Restock failed:", err) end
-                    
+
                     -- Wait a moment to ensure inventory updates
                     task.wait(1)
-                    
+
                     -- Release lock
                     FarmState.restocking = false
                 end
@@ -1445,12 +1460,12 @@ return function(ctx)
                 -- >>> USE POTIONS <<<
                 local interval = Options.AutoPotions_Interval.Value
                 if os.clock() - lastUse < interval then continue end
-                
+
                 lastUse = os.clock()
 
                 local selected = Options.AutoPotions_List.Value
                 local player = Players.LocalPlayer
-                
+
                 if player and player.Character then
                     local char = player.Character
                     local hum = char:FindFirstChild("Humanoid")
@@ -1459,14 +1474,14 @@ return function(ctx)
                     if hum and backpack then
                         -- 1. Save currently equipped tool (Pickaxe/Weapon)
                         local previouslyEquipped = char:FindFirstChildOfClass("Tool")
-                        
+
                         for displayName, isOn in pairs(selected) do
                             if isOn then
                                 local toolId = PotionDisplayToToolId[displayName]
-                                
+
                                 -- Find the potion in Backpack or Character
                                 local tool = backpack:FindFirstChild(displayName) or char:FindFirstChild(displayName)
-                                
+
                                 -- Fallback: check by internal Tool ID if Display Name failed
                                 if not tool and toolId then
                                     tool = backpack:FindFirstChild(toolId) or char:FindFirstChild(toolId)
@@ -1476,7 +1491,7 @@ return function(ctx)
                                     -- Equip Potion
                                     hum:EquipTool(tool)
                                     task.wait(0.3) -- Wait for server to register equip
-                                    
+
                                     -- Drink
                                     if toolId then
                                         pcall(function()
@@ -1485,7 +1500,7 @@ return function(ctx)
                                     else
                                         tool:Activate() -- Fallback if remote ID missing
                                     end
-                                    
+
                                     task.wait(0.5) -- Small delay between drinks
                                 end
                             end
@@ -1894,10 +1909,10 @@ return function(ctx)
                     notify("Took damage! Ditching.", 2)
                     blacklistTarget(FarmState.currentTarget, 60)
                     stopMoving()
-                    FarmState.currentTarget    = nil
-                    FarmState.attached         = false
-                    FarmState.detourActive     = false
-                    FarmState.tempMobTarget    = nil
+                    FarmState.currentTarget   = nil
+                    FarmState.attached        = false
+                    FarmState.detourActive    = false
+                    FarmState.tempMobTarget   = nil
 
                     FarmState.LastLocalHealth = humHealth
                     task.wait(0.15)
@@ -1956,6 +1971,29 @@ return function(ctx)
 
                 if not activeDef then
                     task.wait(0.3)
+                    return
+                end
+
+                -- If we're on an ore and someone else tagged it, ditch it immediately
+                if activeTarget
+                    and activeDef.name == FARM_MODE_ORES
+                    and isRockLastHitByOther(activeTarget)
+                then
+                    -- Optional: temporarily blacklist so we don't re-pick while it's still owned
+                    blacklistTarget(activeTarget, 60)
+
+                    stopMoving()
+                    FarmState.attached     = false
+                    FarmState.detourActive = false
+
+                    if isDistracted then
+                        FarmState.tempMobTarget = nil
+                    else
+                        FarmState.currentTarget = nil
+                    end
+
+                    -- Let next loop iteration choose a new rock
+                    task.wait(0.1)
                     return
                 end
 
@@ -2149,17 +2187,28 @@ return function(ctx)
                 -- Detour Logic
                 if activeTarget and not FarmState.attached and not isDistracted then
                     local hrpPos = hrp.Position
-                    if hrpPos.X < DETOUR_THRESHOLD_X then
+                    if DETOUR_ENABLED and hrpPos.X < DETOUR_THRESHOLD_X then
                         if not FarmState.detourActive then
                             FarmState.detourActive = true
+
+                            -- 🔔 One-time detour notification
+                            if not FarmState.detourNotified then
+                                FarmState.detourNotified = true
+                                notify("Detour engaged to avoid lagback chunks and players.", 3)
+                            end
+
                             stopMoving()
                             startMovingToTarget(activeTarget, activeDef)
                         end
                     else
-                        FarmState.detourActive = false
+                        -- Left detour zone, clear flags
+                        FarmState.detourActive   = false
+                        FarmState.detourNotified = false
                     end
                 else
-                    FarmState.detourActive = false
+                    -- No valid target / distracted, ensure detour is off
+                    FarmState.detourActive   = false
+                    FarmState.detourNotified = false
                 end
 
                 if pos then
@@ -2327,28 +2376,28 @@ return function(ctx)
     --  UI
     -- ====================================================================
 
-    local AutoTab          = Tabs["Auto"] or Tabs.Main
+    local AutoTab             = Tabs["Auto"] or Tabs.Main
     local AutoPotionsGroupbox = AutoTab:AddRightGroupbox("Auto Potions", "flask-round") -- NEW UI BOX
-    local WhitelistGroup   = AutoTab:AddLeftGroupbox("Whitelists", "list")
-    local FarmGroup        = AutoTab:AddLeftGroupbox("Auto Farm", "pickaxe")
-    local TrackingGroupbox = Tabs.Auto:AddRightGroupbox("Tracking", "compass")
+    local WhitelistGroup      = AutoTab:AddLeftGroupbox("Whitelists", "list")
+    local FarmGroup           = AutoTab:AddLeftGroupbox("Auto Farm", "pickaxe")
+    local TrackingGroupbox    = Tabs.Auto:AddRightGroupbox("Tracking", "compass")
 
     -- >>> AUTO POTIONS UI <<<
-    local potionValues = {
+    local potionValues        = {
         "Damage Potion I",
         "Speed Potion I",
         "Health Potion I",
         "Luck Potion I",
         "Miner Potion I",
     }
-    
+
     AutoPotionsGroupbox:AddDropdown("AutoPotions_List", {
         Text    = "Potions to Manage",
         Values  = potionValues,
         Default = {},
         Multi   = true,
     })
-    
+
     AutoPotionsGroupbox:AddSlider("AutoPotions_Interval", {
         Text     = "Auto Use Interval",
         Default  = 300,
@@ -2357,17 +2406,17 @@ return function(ctx)
         Rounding = 0,
         Suffix   = " sec",
     })
-    
+
     AutoPotionsGroupbox:AddToggle("AutoPotions_Enable", {
-        Text    = "Auto Use Potions",
-        Default = false,
+        Text     = "Auto Use Potions",
+        Default  = false,
         Callback = function(state)
             if state then
                 startPotionLoop()
             end
         end
     })
-    
+
     AutoPotionsGroupbox:AddToggle("AutoPotions_AutoRestock", {
         Text    = "Auto Restock",
         Default = false,
@@ -2376,7 +2425,7 @@ return function(ctx)
     AutoPotionsGroupbox:AddButton("Manual Restock", function()
         restockPotions(false)
     end)
-    
+
     -- >>> AUTO FARM UI <<<
 
     local ModeDropdown
