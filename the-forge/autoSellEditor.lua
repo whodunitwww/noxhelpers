@@ -1,13 +1,15 @@
 -- AutoSellConfigEditor.lua
 -- Standalone config editor for AutoSell thresholds, with pretty UI + live ore icons.
+-- UPDATED: mobile-friendly layout (responsive window, dynamic grid columns, scrollable tab bar)
 
 -- CONFIG PATH
 local BASE_DIR            = "Cerberus/The Forge"  -- <== make sure this matches References.gameDir in your main script
 local AutoSellConfigFile = BASE_DIR .. "/AutoSellConfig.json"
 
-local Players      = game:GetService("Players")
-local HttpService = game:GetService("HttpService")
-local CoreGui      = game:GetService("CoreGui")
+local Players       = game:GetService("Players")
+local HttpService   = game:GetService("HttpService")
+local CoreGui       = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -20,7 +22,7 @@ local EssenceRarityMap = {
     ["Medium Essence"]    = "Uncommon",
     ["Large Essence"]     = "Uncommon",
     ["Greater Essence"]   = "Rare",
-    ["Superior Essence"] = "Epic",
+    ["Superior Essence"]  = "Epic",
     ["Epic Essence"]      = "Epic",
 }
 
@@ -298,10 +300,19 @@ local function createUI()
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     safeParentGui(gui)
 
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+
     -- main window
     local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(0, 900, 0, 480) -- 900px width
-    mainFrame.Position = UDim2.new(0.5, -450, 0.5, -240)
+    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    if isMobile then
+        -- Scale-based, fills most of the screen on phones
+        mainFrame.Size = UDim2.new(0.96, 0, 0.85, 0)
+    else
+        -- Desktop-style fixed size
+        mainFrame.Size = UDim2.new(0, 900, 0, 480)
+    end
+    mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
     mainFrame.BorderSizePixel = 0
     mainFrame.ZIndex = 2
@@ -359,7 +370,7 @@ local function createUI()
     subtitle.TextSize = 12
     subtitle.TextXAlignment = Enum.TextXAlignment.Right
     subtitle.TextColor3 = Color3.fromRGB(185, 185, 210)
-    subtitle.Text = "WORK IN PROGRESS!"
+    subtitle.Text = "Threshold = how many to keep. Extra gets auto-sold."
     subtitle.ZIndex = 4
     subtitle.Parent = titleBar
 
@@ -386,15 +397,22 @@ local function createUI()
     infoLabel.TextColor3 = Color3.fromRGB(220, 220, 230)
     infoLabel.ZIndex = 3
     infoLabel.Text =
-        "Threshold is how many to keep, extra gets auto-sold. " ..
+        "Threshold is how many to keep; any extra gets auto-sold. " ..
         "Changes save instantly; hit Reload AutoSell in the main script to apply."
     infoLabel.Parent = mainFrame
 
-    local tabBar = Instance.new("Frame")
+    ----------------------------------------------------------------
+    -- TAB BAR (scrollable for mobile)
+    ----------------------------------------------------------------
+    local tabBar = Instance.new("ScrollingFrame")
     tabBar.Size = UDim2.new(1, -32, 0, 30)
     tabBar.Position = UDim2.new(0, 16, 0, 90)
     tabBar.BackgroundTransparency = 1
     tabBar.ZIndex = 3
+    tabBar.ScrollBarThickness = isMobile and 6 or 3
+    tabBar.ScrollingDirection = Enum.ScrollingDirection.X
+    tabBar.CanvasSize = UDim2.new(0, 0, 0, 0)
+    tabBar.BorderSizePixel = 0
     tabBar.Parent = mainFrame
 
     local tabLayout = Instance.new("UIListLayout")
@@ -403,6 +421,13 @@ local function createUI()
     tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
     tabLayout.Parent = tabBar
 
+    tabLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        tabBar.CanvasSize = UDim2.new(0, tabLayout.AbsoluteContentSize.X + 8, 0, 0)
+    end)
+
+    ----------------------------------------------------------------
+    -- CONTENT AREA
+    ----------------------------------------------------------------
     local contentFrame = Instance.new("Frame")
     contentFrame.Size = UDim2.new(1, -32, 1, -146)
     contentFrame.Position = UDim2.new(0, 16, 0, 130)
@@ -425,14 +450,14 @@ local function createUI()
     scroll.Size = UDim2.new(1, -8, 1, -8)
     scroll.Position = UDim2.new(0, 4, 0, 4)
     scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-    scroll.ScrollBarThickness = 6
+    scroll.ScrollBarThickness = isMobile and 10 or 6
     scroll.BackgroundTransparency = 1
     scroll.ZIndex = 2
+    scroll.BorderSizePixel = 0
     scroll.Parent = contentFrame
 
     local grid = Instance.new("UIGridLayout")
-    -- Width 275 * 3 = 825. Available ~860px. Fits 3.
-    grid.CellSize = UDim2.new(0, 275, 0, 55)
+    grid.CellSize = UDim2.new(0, 275, 0, 55) -- will be updated responsively
     grid.CellPadding = UDim2.new(0, 8, 0, 8)
     grid.FillDirection = Enum.FillDirection.Horizontal
     grid.SortOrder = Enum.SortOrder.LayoutOrder
@@ -449,24 +474,58 @@ local function createUI()
         scroll.CanvasSize = UDim2.new(0, 0, 0, grid.AbsoluteContentSize.Y + 16)
     end)
 
-    -- drag logic for title bar
+    ----------------------------------------------------------------
+    -- RESPONSIVE GRID (desktop / tablet / phone)
+    ----------------------------------------------------------------
+    local function updateGridLayout()
+        local width = scroll.AbsoluteSize.X - 16 -- padding
+        if width <= 0 then return end
+
+        local columns
+        if width >= 820 then
+            columns = 3
+        elseif width >= 540 then
+            columns = 2
+        else
+            columns = 1
+        end
+
+        local cardWidth = math.floor((width - (columns - 1) * 8) / columns)
+        grid.CellSize = UDim2.new(0, cardWidth, 0, 55)
+    end
+
+    scroll:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateGridLayout)
+    mainFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateGridLayout)
+
+    -- initial layout
+    task.defer(updateGridLayout)
+
+    ----------------------------------------------------------------
+    -- drag logic for title bar (mouse + touch)
+    ----------------------------------------------------------------
     do
-        local UIS = game:GetService("UserInputService")
         local dragging, dragStart, startPos
         titleBar.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            if input.UserInputType == Enum.UserInputType.MouseButton1
+                or input.UserInputType == Enum.UserInputType.Touch
+            then
                 dragging = true
                 dragStart = input.Position
                 startPos  = mainFrame.Position
             end
         end)
         titleBar.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            if input.UserInputType == Enum.UserInputType.MouseButton1
+                or input.UserInputType == Enum.UserInputType.Touch
+            then
                 dragging = false
             end
         end)
-        UIS.InputChanged:Connect(function(input)
-            if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        UserInputService.InputChanged:Connect(function(input)
+            if dragging and (
+                input.UserInputType == Enum.UserInputType.MouseMovement
+                or input.UserInputType == Enum.UserInputType.Touch
+            ) then
                 local delta = input.Position - dragStart
                 mainFrame.Position = UDim2.new(
                     startPos.X.Scale,
@@ -662,7 +721,7 @@ local function createUI()
             updateCallback()
         end)
 
-        -- hover highlight
+        -- hover highlight (mouse only)
         card.MouseEnter:Connect(function()
             card.BackgroundColor3 = Color3.fromRGB(26, 26, 36)
         end)
@@ -823,6 +882,9 @@ local function createUI()
                 card.Parent = scroll
             end
         end
+
+        -- recalc scroll / grid layout after repopulating
+        task.defer(updateGridLayout)
     end
 
     local function makeTabButton(name)
