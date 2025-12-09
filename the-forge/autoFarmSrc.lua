@@ -4,20 +4,20 @@ return function(ctx)
     ----------------------------------------------------------------
     -- CONTEXT BINDINGS
     ----------------------------------------------------------------
-    local Services            = ctx.Services or {}
-    local Tabs                = ctx.Tabs
-    local References          = ctx.References
-    local Library             = ctx.Library
-    local Options             = ctx.Options
-    local Toggles             = ctx.Toggles
-    local META                = ctx.META or {}
-    local AttachPanel         = ctx.AttachPanel
-    local MoveToPos           = ctx.MoveToPos
-    local RunService          = Services.RunService or game:GetService("RunService")
-    local UserInputService    = Services.UserInputService or game:GetService("UserInputService")
-    local HttpService         = Services.HttpService or game:GetService("HttpService")
-    local VirtualInputManager = Services.VirtualInputManager or game:GetService("VirtualInputManager")
-    local Players             = game:GetService("Players")
+    local Services             = ctx.Services or {}
+    local Tabs                 = ctx.Tabs
+    local References           = ctx.References
+    local Library              = ctx.Library
+    local Options              = ctx.Options
+    local Toggles              = ctx.Toggles
+    local META                 = ctx.META or {}
+    local AttachPanel          = ctx.AttachPanel
+    local MoveToPos            = ctx.MoveToPos
+    local RunService           = Services.RunService or game:GetService("RunService")
+    local UserInputService     = Services.UserInputService or game:GetService("UserInputService")
+    local HttpService          = Services.HttpService or game:GetService("HttpService")
+    local VirtualInputManager  = Services.VirtualInputManager or game:GetService("VirtualInputManager")
+    local Players              = game:GetService("Players")
 
     local ALT_FARM_MODE_MAIN   = "Main Alt"
     local ALT_FARM_MODE_HELPER = "Helper Alt"
@@ -26,33 +26,33 @@ return function(ctx)
     ----------------------------------------------------------------
     -- CONFIGURATION FLAGS & STATE
     ----------------------------------------------------------------
-    local AF_Config           = {
-        AvoidLava            = false,
-        AvoidPlayers         = false,
-        DamageDitchEnabled   = false,
-        DamageDitchThreshold = 100,
-        TargetFullHealth     = false,
-        PlayerAvoidRadius    = 40,
-        AttackNearbyMobs     = false,
-        NearbyMobRange       = 40,
-        OreWhitelistEnabled  = false,
-        WhitelistedOres      = {},
-        WhitelistAppliesTo   = {},
-        ZoneWhitelistEnabled = false,
-        WhitelistedZones     = {},
-        TargetBlacklist      = {},
-        ExtraYOffset         = 0,
-        FarmSpeed            = 80,
-        MaxTargetHeight      = 100,
-        AltFarmEnabled       = false,
-        AltFarmMode          = ALT_FARM_MODE_MAIN,
-        AltNames             = {},
-        AltNameSet           = {},
+    local AF_Config            = {
+        AvoidLava                    = false,
+        AvoidPlayers                 = false,
+        DamageDitchEnabled           = false,
+        DamageDitchThreshold         = 100,
+        TargetFullHealth             = false,
+        PlayerAvoidRadius            = 40,
+        AttackNearbyMobs             = false,
+        NearbyMobRange               = 40,
+        OreWhitelistEnabled          = false,
+        WhitelistedOres              = {},
+        WhitelistAppliesTo           = {},
+        ZoneWhitelistEnabled         = false,
+        WhitelistedZones             = {},
+        TargetBlacklist              = {},
+        ExtraYOffset                 = 0,
+        FarmSpeed                    = 80,
+        MaxTargetHeight              = 100,
+        AltFarmEnabled               = false,
+        AltFarmMode                  = ALT_FARM_MODE_MAIN,
+        AltNames                     = {},
+        AltNameSet                   = {},
         QuestPriorityOverrideEnabled = false,
-        QuestAutoCompleteEnabled   = false,
+        QuestAutoCompleteEnabled     = false,
     }
 
-    local FarmState           = {
+    local FarmState            = {
         enabled             = false,
         mode                = "Ores",
         nameMap             = {},
@@ -221,31 +221,31 @@ return function(ctx)
     ----------------------------------------------------------------
     -- Alias commonly used module functions for clarity
     ----------------------------------------------------------------
-    local getLocalHRP               = Helpers.getLocalHRP
-    local notify                    = Helpers.notify
-    local swingTool                 = Remotes.swingTool
-    local stopMoving                = Movement.stopMoving
-    local startMovingToTarget       = Movement.startMovingToTarget
-    local attachToTarget            = Movement.attachToTarget
-    local realignAttach             = Movement.realignAttach
-    local saveAttachSettings        = Movement.saveAttachSettings
-    local restoreAttachSettings     = Movement.restoreAttachSettings
-    local isPointInHazard           = Avoidance.isPointInHazard
-    local isAnyPlayerNearHRP        = Avoidance.isAnyPlayerNearHRP
-    local isAnyPlayerNearPosition   = Avoidance.isAnyPlayerNearPosition
-    local moveAwayFromNearbyPlayers = Avoidance.moveAwayFromNearbyPlayers
-    local isRockLastHitByOther      = Ores.isRockLastHitByOther
-    local isMobAlive                = Mobs.isMobAlive
-    local getMobRoot                = Mobs.getMobRoot
-    local findNearbyEnemy           = Mobs.findNearbyEnemy
-    local questTargets              = QuestTargets
+    local getLocalHRP                = Helpers.getLocalHRP
+    local notify                     = Helpers.notify
+    local swingTool                  = Remotes.swingTool
+    local stopMoving                 = Movement.stopMoving
+    local startMovingToTarget        = Movement.startMovingToTarget
+    local attachToTarget             = Movement.attachToTarget
+    local realignAttach              = Movement.realignAttach
+    local saveAttachSettings         = Movement.saveAttachSettings
+    local restoreAttachSettings      = Movement.restoreAttachSettings
+    local isPointInHazard            = Avoidance.isPointInHazard
+    local isAnyPlayerNearHRP         = Avoidance.isAnyPlayerNearHRP
+    local isAnyPlayerNearPosition    = Avoidance.isAnyPlayerNearPosition
+    local moveAwayFromNearbyPlayers  = Avoidance.moveAwayFromNearbyPlayers
+    local isRockLastHitByOther       = Ores.isRockLastHitByOther
+    local isMobAlive                 = Mobs.isMobAlive
+    local getMobRoot                 = Mobs.getMobRoot
+    local findNearbyEnemy            = Mobs.findNearbyEnemy
+    local questTargets               = QuestTargets
 
     local AUTO_QUEST_SCAN_INTERVAL   = 5
     local AUTO_QUEST_REPEAT_INTERVAL = 60
 
-    local RunCommandRemote      = nil
-    local autoQuestMissingWarn  = false
-    local AutoQuestState        = {
+    local RunCommandRemote           = nil
+    local autoQuestMissingWarn       = false
+    local AutoQuestState             = {
         running         = false,
         thread          = nil,
         lastCommandTime = {},
@@ -261,13 +261,39 @@ return function(ctx)
             return nil
         end
 
-        local shared = storage:FindFirstChild("Shared")
-        local packages = shared and shared:FindFirstChild("Packages")
-        local knit = packages and packages:FindFirstChild("Knit")
-        local services = knit and knit:FindFirstChild("Services")
-        local dialogue = services and services:FindFirstChild("DialogueService")
-        local rf = dialogue and dialogue:FindFirstChild("RF")
-        local runCommand = rf and rf:FindFirstChild("RunCommand")
+        -- Safe child resolver with fallback to WaitForChild and a timeout
+        local function safeGetChild(parent, name, timeout)
+            if not parent then return nil end
+
+            local child = parent:FindFirstChild(name)
+            if child then return child end
+
+            timeout = timeout or 10
+            local ok, result = pcall(function()
+                return parent:WaitForChild(name, timeout)
+            end)
+
+            if ok then
+                return result
+            else
+                return nil
+            end
+        end
+
+        -- Resolve hierarchy
+        local shared     = safeGetChild(storage, "Shared")
+        local packages   = safeGetChild(shared, "Packages")
+        local knitFolder = safeGetChild(packages, "Knit")
+        local services   = safeGetChild(knitFolder, "Services")
+        local dialogue   = safeGetChild(services, "DialogueService")
+        local rf         = safeGetChild(dialogue, "RF")
+        local runCommand = safeGetChild(rf, "RunCommand")
+
+        if not runCommand then
+            warn(
+            "[Cerberus] DialogueService.RF.RunCommand not found; autosell Dialogue commands will be disabled until it exists.")
+        end
+
 
         if runCommand then
             RunCommandRemote = runCommand
@@ -385,10 +411,10 @@ return function(ctx)
     ----------------------------------------------------------------
     -- MODE DEFINITIONS (for target scanning and hitting)
     ----------------------------------------------------------------
-    local FARM_MODE_ORES            = "Ores"
-    local FARM_MODE_ENEMIES         = "Enemies"
+    local FARM_MODE_ORES    = "Ores"
+    local FARM_MODE_ENEMIES = "Enemies"
 
-    local ModeDefs                  = {
+    local ModeDefs          = {
         [FARM_MODE_ORES] = {
             name          = FARM_MODE_ORES,
             scan          = Ores.scanRocks,
@@ -917,8 +943,8 @@ return function(ctx)
                     return
                 end
 
-                local humState  = hum:GetState()
-                local humHealth = hum.Health
+                local humState        = hum:GetState()
+                local humHealth       = hum.Health
 
                 local helperAltActive = isHelperAltEnabled()
                 local mainAltActive   = isMainAltEnabled()
@@ -1056,8 +1082,8 @@ return function(ctx)
                         FarmState.tempMobTarget = nil
                         FarmState.lastTargetRef = nil
                         FarmState.currentTarget = altCandidate
-                        activeTarget           = altCandidate
-                        activeDef              = ModeDefs[FARM_MODE_ORES]
+                        activeTarget            = altCandidate
+                        activeDef               = ModeDefs[FARM_MODE_ORES]
                     end
                 end
 
@@ -1832,7 +1858,9 @@ return function(ctx)
     ----------------------------------------------------------------
     local AltFarmGroup = AutoTab:AddRightGroupbox("Alt Farm", "bot")
 
-    AltFarmGroup:AddLabel("To use this you need to set one account as the main alt, and the rest as helper alts. Then in all accounts, select the ores you want the main alt to steal under whitelisted ores. Then whenever one of your alts finds a whitelisted or, it will ditch the rock, and your main will go in to mine it.", true)
+    AltFarmGroup:AddLabel(
+    "To use this you need to set one account as the main alt, and the rest as helper alts. Then in all accounts, select the ores you want the main alt to steal under whitelisted ores. Then whenever one of your alts finds a whitelisted or, it will ditch the rock, and your main will go in to mine it.",
+        true)
 
     AltFarmGroup:AddToggle("AF_AltFarmEnabled", {
         Text     = "Enable Alt Farm",
@@ -1885,18 +1913,18 @@ return function(ctx)
     QuestGroup:AddLabel("This is partially done. Will be finished tommorow.", true)
 
     QuestGroup:AddToggle("AF_QuestPriorityOverride", {
-        Text    = "Quest Priority Override",
-        Default = AF_Config.QuestPriorityOverrideEnabled,
-        Tooltip = "Overrides targets with quest objectives.",
+        Text     = "Quest Priority Override",
+        Default  = AF_Config.QuestPriorityOverrideEnabled,
+        Tooltip  = "Overrides targets with quest objectives.",
         Callback = function(state)
             AF_Config.QuestPriorityOverrideEnabled = state
         end,
     })
 
     QuestGroup:AddToggle("AF_QuestAutoComplete", {
-        Text    = "Quest Autocomplete",
-        Default = AF_Config.QuestAutoCompleteEnabled,
-        Tooltip = "Automatically finishes some quests.",
+        Text     = "Quest Autocomplete",
+        Default  = AF_Config.QuestAutoCompleteEnabled,
+        Tooltip  = "Automatically finishes some quests.",
         Callback = function(state)
             AF_Config.QuestAutoCompleteEnabled = state
             if state then
@@ -1908,10 +1936,12 @@ return function(ctx)
     })
 
     QuestGroup:AddToggle("AF_QuestAutoStart", {
-        Text    = "Quest Autocomplete [soon]",
-        Default = AF_Config.QuestAutoCompleteEnabled,
+        Text     = "Quest Autocomplete [soon]",
+        Default  = AF_Config.QuestAutoCompleteEnabled,
         Callback = function(state)
-            Library:Notify("Coming next update.", 3)
+            if state then
+                Library:Notify("Coming next update.", 3)
+            end
         end,
     })
 
