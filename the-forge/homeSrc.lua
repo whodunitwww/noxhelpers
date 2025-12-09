@@ -1,1 +1,1138 @@
-return function(a)local b=a.Services;local c=a.Tabs;local d=a.References;local e=a.Library;local f=a.Options;local g=a.Toggles;local h=a.META or{}local i=a.copyLink;local j=a.SendDiscordWebhook;local k={}local function l(m)if m then k[#k+1]=m end;return m end;local n,o;local p,q;local r=c.Home:AddLeftGroupbox(h.name or"Cerberus","info")r:AddDivider()r:AddLabel(("Script Version: %s"):format(h.version or"v1.0.0"))r:AddLabel(("Last Updated: %s"):format(h.updated or"Unknown"))r:AddLabel("Status: "..(h.status or"Stable Release"))r:AddDivider()local s=h.urls or{}local t=c.Home:AddLeftGroupbox("Links","link")if i and s.docs then t:AddButton({Text="Cerberus Docs",Tooltip=s.docs,Func=function()i(s.docs,"Docs link copied!")end})end;if i and s.website then t:AddButton({Text="Website",Tooltip=s.website,Func=function()i(s.website,"Website link copied!")end})end;if i and s.discord then t:AddButton({Text="Discord",Tooltip=s.discord,Func=function()i(s.discord,"Discord invite copied!")end})end;if i and s.youtube then t:AddButton({Text="Youtube",Tooltip=s.youtube,Func=function()i(s.youtube,"Youtube link copied!")end})end;if i and s.scripts then t:AddButton({Text="More Scripts",Tooltip=s.scripts,Func=function()i(s.scripts,"Scripts link copied!")end})end;if i and s.bunni then t:AddButton({Text="Premier Executor",Tooltip=s.bunni,Func=function()i(s.bunni,"Bunni link copied!")end})end;local u=c.Home:AddLeftGroupbox("Executor","codesandbox")local function v()local function w(x)local y=string.find(x,".",1,true)if y then local z,A=x:sub(1,y-1),x:sub(y+1)local B;if getgenv then B=rawget(getgenv(),z)end;if B==nil then B=rawget(_G,z)end;if B==nil and getrenv then B=rawget(getrenv(),z)end;if type(B)=="table"then return rawget(B,A)end;return nil end;local C;if getgenv then C=rawget(getgenv(),x)end;if C==nil then C=rawget(_G,x)end;if C==nil and getrenv then C=rawget(getrenv(),x)end;return C end;local D={"makefolder","isfile","readfile","writefile","sethiddenproperty","setclipboard","identifyexecutor","setfpscap","gethui","server_desync","http_request","request","syn.request"}local E,F=#D,0;local G={}for H=1,E do local x=D[H]local C=w(x)local I=x=="gethui"and C~=nil or type(C)=="function"if I then F=F+1 else G[#G+1]=x end end;local J=tostring(d.executorName or""):lower()local K=J:find("xeno",1,true)~=nil;local L;if F==E then if K then local M="Xeno detected: ESP will not work due to weak drawing API."e:Notify(M,6)L=M else L="Full support"end else local N=string.format("Your executor does not fully support this script, %d/%d required functions available.\nMissing: %s",F,E,table.concat(G,", "))e:Notify(N,6)L=string.format("Partial support: %d/%d required functions.",F,E)if K then L=L.."\nNote: ESP will not work due to weak drawing API (Xeno)."e:Notify("Xeno detected: ESP will not work due to weak drawing API.",6)end end;return L end;u:AddLabel("Executor: "..tostring(d.executorName or"Unknown"),true)u:AddLabel(v(),true)local O=b.Players or game:GetService("Players")local P=b.RunService or game:GetService("RunService")local Q=b.HttpService;local R=O.LocalPlayer;local S={WebhookURL="",WebhookColor=Color3.fromRGB(54,150,45),WebhookAnon=false,WH_EventSelection={}}local function T(U)if typeof(U)~="Color3"then return{r=54,g=150,b=45}end;return{r=math.floor(U.R*255+0.5),g=math.floor(U.G*255+0.5),b=math.floor(U.B*255+0.5)}end;local function V(C)if typeof(C)=="Color3"then return C end;if type(C)=="table"and tonumber(C.r)and tonumber(C.g)and tonumber(C.b)then return Color3.fromRGB(C.r,C.g,C.b)end;return Color3.fromRGB(54,150,45)end;local function W(X)if type(X)~="table"then return{}end;local Y,Z={},{}for A,_ in pairs(X)do if _==true then if not Z[A]then table.insert(Y,A)Z[A]=true end elseif type(_)=="string"then if not Z[_]then table.insert(Y,_)Z[_]=true end end end;return Y end;if isfile and isfile(d.gameDir.."/__WebhookDefaults.json")then local I,a0=pcall(function()return Q:JSONDecode(readfile(d.gameDir.."/__WebhookDefaults.json"))end)if I and type(a0)=="table"then S.WebhookURL=a0.WebhookURL or S.WebhookURL;S.WebhookColor=V(a0.WebhookColor)S.WebhookAnon=a0.WebhookAnon or S.WebhookAnon;S.WH_EventSelection=W(a0.WH_EventSelection or S.WH_EventSelection)end end;local a1="Launch"local a2="InventoryChange"local a3="Chat"local a4="PlayerJoinLeave"local a5="GoldChange"local a6={a1,a2,a3,a4,a5}local a7=c.Home:AddLeftGroupbox("Webhook","send")a7:AddInput("WebhookURL",{Text="Default Webhook",Default=S.WebhookURL,Placeholder="https://discord.com/api/webhooks/...",ClearTextOnFocus=false})a7:AddLabel("Default Color"):AddColorPicker("WebhookColor",{Title="Default Color",Default=S.WebhookColor,Transparency=0})a7:AddToggle("WebhookAnon",{Text="Anonymize User Data",Default=S.WebhookAnon})a7:AddDropdown("WH_EventSelection",{Text="Reported Events",Values=a6,Default=S.WH_EventSelection,Multi=true,Tooltip="Select which events you want to send to your webhook."})local function a8()local U=f.WebhookColor and f.WebhookColor.Value or Color3.fromRGB(54,150,45)local a9,aa,ab=math.floor(U.R*255),math.floor(U.G*255),math.floor(U.B*255)return a9*65536+aa*256+ab end;local function ac(ad)local ae=f.WH_EventSelection and f.WH_EventSelection.Value;if type(ae)~="table"then return false end;if ae[ad]==true then return true end;for af,C in pairs(ae)do if C==ad then return true end end;return false end;local ag=false;local function ah(ad,ai,aj,ak,al,am)local an=f.WebhookURL and f.WebhookURL.Value or""if not an:match("https://discord.com/api/webhooks/")then if not ag then ag=true end;return end;if not ac(ad)then return end;local ao=al or a8 and a8()or 3577389;local ap=g.WebhookAnon and g.WebhookAnon.Value or false;local aq=ak or"Cerberus Webhook"task.spawn(function()pcall(j,an,ai,aj,aq,ao,am,ap)end)end;do local function ar()if not writefile then return end;local a0={WebhookURL=f.WebhookURL and f.WebhookURL.Value or"",WebhookColor=T(f.WebhookColor and f.WebhookColor.Value or S.WebhookColor),WebhookAnon=g.WebhookAnon and g.WebhookAnon.Value or false,WH_EventSelection=W(f.WH_EventSelection and f.WH_EventSelection.Value)}pcall(function()writefile(d.gameDir.."/__WebhookDefaults.json",Q:JSONEncode(a0))end)end;if not(isfile and isfile(d.gameDir.."/__WebhookDefaults.json"))then ar()end;for af,as in ipairs({"WebhookURL","WebhookColor","WH_EventSelection"})do if f[as]then f[as]:OnChanged(ar)end end;if g.WebhookAnon then g.WebhookAnon:OnChanged(ar)end end;do local function at(au)if not au then return"Unknown"end;local av=au.DisplayName or au.Name;if av~=au.Name then return string.format("%s (%s)",av,au.Name)end;return au.Name end;n={}p=os.clock()local aw=10;local ax=20;local ay=1900;local function az()if not ac(a3)then table.clear(n)return end;if#n==0 then return end;local aA={}local aB=0;local aC=0;local function aD()if#aA==0 then return end;local aE=table.concat(aA,"\n")ah(a3,"Chat Log",aE)aA={}aB=0;aC=0 end;for af,aF in ipairs(n)do local aG=#aF+1;if aC>=ax or aB+aG>ay then aD()end;table.insert(aA,aF)aB=aB+aG;aC=aC+1 end;aD()table.clear(n)end;local function aH(au)if not au then return end;l(au.Chatted:Connect(function(N)if not ac(a3)then return end;N=tostring(N or"")if#N>256 then N=N:sub(1,253).."..."end;local aF=string.format("**%s**: %s",at(au),N)table.insert(n,aF)end))end;for af,au in ipairs(O:GetPlayers())do aH(au)end;l(O.PlayerAdded:Connect(function(au)aH(au)end))l(O.PlayerAdded:Connect(function(au)if au==R then return end;if not ac(a4)then return end;local aE=string.format("**%s** joined the server.",at(au))ah(a4,"Player Joined",aE)end))l(O.PlayerRemoving:Connect(function(au)if au==R then return end;if not ac(a4)then return end;local aE=string.format("**%s** left the server.",at(au))ah(a4,"Player Left",aE)end))o={}q=os.clock()local aI=15;local aJ=40;local aK=1900;local function aL()local aM=R and R:FindFirstChild("PlayerGui")local aN=aM and aM:FindFirstChild("Menu")local aO=aN and aN:FindFirstChild("Frame")local aP=aO and aO:FindFirstChild("Frame")local aQ=aP and aP:FindFirstChild("Menus")local aR=aQ and aQ:FindFirstChild("Stash")return aR and aR:FindFirstChild("Background")end;local function aS()local aT={}local aU=aL()if not aU then return aT end;for af,aV in ipairs(aU:GetChildren())do if aV:IsA("Frame")then local aW=aV.Name;local aX=aV:FindFirstChild("Main")local aY=aX and aX:FindFirstChild("Quantity")local aZ=1;if aY and aY:IsA("TextLabel")then local M=tostring(aY.Text or""):gsub("%s+","")if M~=""then local a_=M:match("x(%d+)")or M:match("(%d+)")aZ=tonumber(a_)or 1 end end;if aZ>0 then aT[aW]=aZ end end end;return aT end;local b0=aS()local b1=os.clock()local b2=2;local function b3(b4,b5,b6)for x,b7 in pairs(b5)do local b8=b4[x]or 0;if b7>b8 then table.insert(b6,string.format("+ %dx %s (Stash)",b7-b8,x))end end;for x,b8 in pairs(b4)do local b7=b5[x]or 0;if b7<b8 then table.insert(b6,string.format("- %dx %s (Stash)",b8-b7,x))end end end;local function b9()if not ac(a2)then b0=aS()return end;local ba=b0;local bb=aS()local bc={}b3(ba,bb,bc)b0=bb;if#bc==0 then return end;for H,aF in ipairs(bc)do if H>aJ then table.insert(o,string.format("... %d more change(s)",#bc-aJ))break end;table.insert(o,aF)end end;local function bd()if not ac(a2)then table.clear(o)return end;if#o==0 then return end;local be=string.format("**%s** stash changes:",at(R))local bf={"```diff"}for H,bg in ipairs(o)do if H>aJ then table.insert(bf,string.format("# ... %d more change(s)",#o-aJ))break end;table.insert(bf,bg)end;table.insert(bf,"```")local aE=be.."\n"..table.concat(bf,"\n")if#aE>aK then aE=aE:sub(1,aK-3).."..."end;ah(a2,"Stash Changes",aE)table.clear(o)end;local bh={}local bi=os.clock()local bj=os.clock()local bk=nil;local bl=1.5;local bm=15;local bn=30;local bo=1900;local function bp()local I,bq=pcall(function()local aM=R and R:FindFirstChild("PlayerGui")local aX=aM and aM:FindFirstChild("Main")local br=aX and aX:FindFirstChild("Screen")local bs=br and br:FindFirstChild("Hud")return bs and bs:FindFirstChild("Gold")end)if I then return bq end end;local function bt()local bu=bp()if not(bu and bu:IsA("TextLabel"))then return nil end;local bv=tostring(bu.Text or"")bv=bv:gsub("[%$,]","")local bw=tonumber(bv)return bw end;local function bx()if not ac(a5)then bk=bt()or bk;return end;local by=bt()if not by then return end;if bk==nil then bk=by;return end;if by~=bk then local bz=by-bk;local bA=bz>0 and"+"or""local aF=string.format("%s%.2f ( %.2f -> %.2f )",bA,bz,bk,by)table.insert(bh,aF)bk=by end end;local function bB()if not ac(a5)then table.clear(bh)return end;if#bh==0 then return end;local be=string.format("**%s** gold changes:",at(R))local bC={"```diff"}for H,aF in ipairs(bh)do if H>bn then table.insert(bC,string.format("# ... %d more change(s)",#bh-bn))break end;table.insert(bC,aF)end;table.insert(bC,"```")local aE=be.."\n"..table.concat(bC,"\n")if#aE>bo then aE=aE:sub(1,bo-3).."..."end;ah(a5,"Gold Changes",aE)table.clear(bh)end;l(P.Heartbeat:Connect(function()local bD=os.clock()if bD-p>=aw then p=bD;az()end;if bD-b1>=b2 then b1=bD;b9()end;if bD-q>=aI then q=bD;bd()end;if bD-bj>=bl then bj=bD;bx()end;if bD-bi>=bm then bi=bD;bB()end end))end;local bE=c.Home:AddRightGroupbox("Latest Updates","sparkles")bE:AddLabel("Changelogs:",true)local bF=h.changelog or{"Added Auto Proximity Prompt","Added Zoom","Added Custom Cursor Builder","Added Emotes","Improved ESP"}bE:AddLabel("• "..table.concat(bF,"\n• "),true)local bG=c.Home:AddRightGroupbox("Feedback","quote")local bH=false;bG:AddInput("feedbackTextbox",{Text="Message",Default=nil,Numeric=false,Finished=false,ClearTextOnFocus=true,Placeholder="Write a message to the dev team here.",Callback=function(af)end})bG:AddButton("Send Feedback",function()if bH then e:Notify("You've already sent feedback, you can come back another time and send some more later.",5)return end;local N=f.feedbackTextbox and f.feedbackTextbox.Value;if N and N~=""then if j then j("https://discord.com/api/webhooks/1430125097129214003/mHA_d9XyFaRTfGM9Enf7jZgso358XRmmCFiuwGs6ZO-vws0qPdRLKQH19zRWJ5kZC7hW",d.player.Name.." has provided feedback.",N,"Cerberus Feedback",nil,nil,false)e:Notify("Your feedback has successfully been sent to the developers!",5)bH=true else e:Notify("Feedback webhook function not available.",3)end else e:Notify("You need to type your feedback into the box above before you can send it.",3)end end)local bI=c.Home:AddRightGroupbox("Credits + Disclaimer","shield-alert")bI:AddLabel("Script by @tevilii")bI:AddLabel("Obsidian UI Library by deivid")if i and s.obsidian then bI:AddButton({Text="Obsidian Library",Tooltip=s.obsidian,Func=function()i(s.obsidian,"Obsidian link copied!")end})end;bI:AddDivider()bI:AddLabel("This script is provided for educational and customization purposes. ".."Respect Roblox and game TOS. You are responsible for your usage.",true)ah("Launch","Cerberus Initialized",string.format("**Join Script:**\n```lua\ngame:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\", game.Players.LocalPlayer)```%s",game.PlaceId,game.JobId,math.random(1,5)==1 and"\n*Join our Discord for the best scripts! https://getcerberus.com/discord*"or""))local bJ={}function bJ.Unload()for H,m in ipairs(k)do if m and m.Disconnect then pcall(function()m:Disconnect()end)end;k[H]=nil end;if n then table.clear(n)end;if o then table.clear(o)end;local bD=os.clock()p=bD;q=bD end;return bJ end
+return function(ctx)
+    ----------------------------------------------------------------
+    -- CONTEXT / DEPENDENCIES
+    ----------------------------------------------------------------
+    local Services    = ctx.Services
+    local Tabs        = ctx.Tabs
+    local References  = ctx.References
+    local Library     = ctx.Library
+    local Options     = ctx.Options
+    local Toggles     = ctx.Toggles
+    local META        = ctx.META or {}
+    local copyLink    = ctx.copyLink
+    local sendWebhook = ctx.SendDiscordWebhook
+
+    ----------------------------------------------------------------
+    -- CONNECTION TRACKING / UNLOAD SUPPORT
+    ----------------------------------------------------------------
+    local TrackedConnections = {}
+
+    local function trackConnection(conn)
+        if conn then
+            TrackedConnections[#TrackedConnections + 1] = conn
+        end
+        return conn
+    end
+
+    -- Buffers for webhook batching
+    local ChatBuffer          -- list<string>
+    local StashDiffBuffer     -- list<string>
+
+    -- Time markers for batching
+    local lastChatFlushTime
+    local lastStashScanTime
+    local lastStashSummaryTime
+    local lastGoldPollTime
+    local lastGoldSummaryTime
+
+    ----------------------------------------------------------------
+    -- HOME: INFO / METADATA
+    ----------------------------------------------------------------
+    local infoGroup = Tabs.Home:AddLeftGroupbox(META.name or "Cerberus", "info")
+
+    infoGroup:AddDivider()
+    infoGroup:AddLabel(("Script Version: %s"):format(META.version or "v1.0.0"))
+    infoGroup:AddLabel(("Last Updated: %s"):format(META.updated or "Unknown"))
+    infoGroup:AddLabel("Status: " .. (META.status or "Stable Release"))
+    infoGroup:AddDivider()
+
+    ----------------------------------------------------------------
+    -- HOME: LINKS
+    ----------------------------------------------------------------
+    local urls = META.urls or {}
+    local linksGroup = Tabs.Home:AddLeftGroupbox("Links", "link")
+
+    if copyLink and urls.docs then
+        linksGroup:AddButton({
+            Text    = "Cerberus Docs",
+            Tooltip = urls.docs,
+            Func    = function()
+                copyLink(urls.docs, "Docs link copied!")
+            end,
+        })
+    end
+
+    if copyLink and urls.website then
+        linksGroup:AddButton({
+            Text    = "Website",
+            Tooltip = urls.website,
+            Func    = function()
+                copyLink(urls.website, "Website link copied!")
+            end,
+        })
+    end
+
+    if copyLink and urls.discord then
+        linksGroup:AddButton({
+            Text    = "Discord",
+            Tooltip = urls.discord,
+            Func    = function()
+                copyLink(urls.discord, "Discord invite copied!")
+            end,
+        })
+    end
+
+    if copyLink and urls.youtube then
+        linksGroup:AddButton({
+            Text    = "Youtube",
+            Tooltip = urls.youtube,
+            Func    = function()
+                copyLink(urls.youtube, "Youtube link copied!")
+            end,
+        })
+    end
+
+    if copyLink and urls.scripts then
+        linksGroup:AddButton({
+            Text    = "More Scripts",
+            Tooltip = urls.scripts,
+            Func    = function()
+                copyLink(urls.scripts, "Scripts link copied!")
+            end,
+        })
+    end
+
+    if copyLink and urls.bunni then
+        linksGroup:AddButton({
+            Text    = "Premier Executor",
+            Tooltip = urls.bunni,
+            Func    = function()
+                copyLink(urls.bunni, "Bunni link copied!")
+            end,
+        })
+    end
+
+    ----------------------------------------------------------------
+    -- HOME: EXECUTOR INFO / CAPABILITY CHECK
+    ----------------------------------------------------------------
+    local executorGroup = Tabs.Home:AddLeftGroupbox("Executor", "codesandbox")
+
+    -- Check required exploit functions to see how "compatible" we are.
+    local function detectExecutorSupport()
+        -- Resolve a global, including dotted paths: "syn.request"
+        local function resolveGlobal(name)
+            local dotIndex = string.find(name, ".", 1, true)
+            if dotIndex then
+                local root   = name:sub(1, dotIndex - 1)
+                local member = name:sub(dotIndex + 1)
+
+                local rootTable
+                if getgenv then
+                    rootTable = rawget(getgenv(), root)
+                end
+                if rootTable == nil then
+                    rootTable = rawget(_G, root)
+                end
+                if rootTable == nil and getrenv then
+                    rootTable = rawget(getrenv(), root)
+                end
+
+                if type(rootTable) == "table" then
+                    return rawget(rootTable, member)
+                end
+
+                return nil
+            end
+
+            local value
+            if getgenv then
+                value = rawget(getgenv(), name)
+            end
+            if value == nil then
+                value = rawget(_G, name)
+            end
+            if value == nil and getrenv then
+                value = rawget(getrenv(), name)
+            end
+            return value
+        end
+
+        local requiredGlobals = {
+            "makefolder",
+            "isfile",
+            "readfile",
+            "writefile",
+            "sethiddenproperty",
+            "setclipboard",
+            "identifyexecutor",
+            "setfpscap",
+            "gethui",
+            "http_request",
+            "request",
+        }
+
+        local requiredCount  = #requiredGlobals
+        local availableCount = 0
+        local missingList    = {}
+
+        for index = 1, requiredCount do
+            local name  = requiredGlobals[index]
+            local value = resolveGlobal(name)
+
+            local isAvailable =
+                (name == "gethui" and value ~= nil) or
+                (type(value) == "function")
+
+            if isAvailable then
+                availableCount += 1
+            else
+                missingList[#missingList + 1] = name
+            end
+        end
+
+        local executorNameLower = tostring(References.executorName or ""):lower()
+        local isXeno = executorNameLower:find("xeno", 1, true) ~= nil
+
+        local statusMessage
+
+        if availableCount == requiredCount then
+            -- Full support
+            if isXeno then
+                local warnMsg = "Xeno detected: ESP will not work due to weak drawing API."
+                Library:Notify(warnMsg, 6)
+                statusMessage = warnMsg
+            else
+                statusMessage = "Full support"
+            end
+        else
+            local notifyText = string.format(
+                "Your executor does not fully support this script, %d/%d required functions available.\nMissing: %s",
+                availableCount,
+                requiredCount,
+                table.concat(missingList, ", ")
+            )
+
+            Library:Notify(notifyText, 6)
+            statusMessage = string.format("Partial support: %d/%d required functions.", availableCount, requiredCount)
+
+            if isXeno then
+                statusMessage = statusMessage .. "\nNote: ESP will not work due to weak drawing API (Xeno)."
+                Library:Notify("Xeno detected: ESP will not work due to weak drawing API.", 6)
+            end
+        end
+
+        return statusMessage
+    end
+
+    executorGroup:AddLabel("Executor: " .. tostring(References.executorName or "Unknown"), true)
+    executorGroup:AddLabel(detectExecutorSupport(), true)
+
+    ----------------------------------------------------------------
+    -- BASIC SERVICES / PLAYER
+    ----------------------------------------------------------------
+    local Players     = Services.Players or game:GetService("Players")
+    local RunService  = Services.RunService or game:GetService("RunService")
+    local HttpService = Services.HttpService
+    local LocalPlayer = Players.LocalPlayer
+
+    ----------------------------------------------------------------
+    -- INVENTORY ITEM LISTS (FOR WHITELIST DROPDOWN)
+    ----------------------------------------------------------------
+    local EssenceRarityMap = {
+        ["Tiny Essence"]      = "Common",
+        ["Small Essence"]     = "Common",
+        ["Medium Essence"]    = "Uncommon",
+        ["Large Essence"]     = "Uncommon",
+        ["Greater Essence"]   = "Rare",
+        ["Superior Essence"]  = "Epic",
+        ["Epic Essence"]      = "Epic",
+        ["Legendary Essence"] = "Legendary",
+        ["Mythical Essence"]  = "Mythical",
+    }
+
+    local OreRarityMap = {
+        ["Stone"]         = "Common",
+        ["Sand Stone"]    = "Common",
+        ["Copper"]        = "Common",
+        ["Iron"]          = "Common",
+        ["Tin"]           = "Uncommon",
+        ["Silver"]        = "Uncommon",
+        ["Gold"]          = "Uncommon",
+        ["Mushroomite"]   = "Rare",
+        ["Platinum"]      = "Rare",
+        ["Bananite"]      = "Uncommon",
+        ["Cardboardite"]  = "Common",
+        ["Aite"]          = "Epic",
+        ["Poopite"]       = "Epic",
+        ["Slimite"]       = "Epic",
+        ["Cobalt"]        = "Uncommon",
+        ["Titanium"]      = "Uncommon",
+        ["Volcanic Rock"] = "Rare",
+        ["Lapis Lazuli"]  = "Uncommon",
+        ["Quartz"]        = "Rare",
+        ["Amethyst"]      = "Rare",
+        ["Topaz"]         = "Rare",
+        ["Diamond"]       = "Rare",
+        ["Sapphire"]      = "Rare",
+        ["Boneite"]       = "Rare",
+        ["Dark Boneite"]  = "Rare",
+        ["Cuprite"]       = "Epic",
+        ["Obsidian"]      = "Epic",
+        ["Emerald"]       = "Epic",
+        ["Ruby"]          = "Epic",
+        ["Rivalite"]      = "Epic",
+        ["Uranium"]       = "Legendary",
+        ["Mythril"]       = "Legendary",
+        ["Eye Ore"]       = "Legendary",
+        ["Fireite"]       = "Legendary",
+        ["Magmaite"]      = "Legendary",
+        ["Lightite"]      = "Legendary",
+        ["Demonite"]      = "Mythical",
+        ["Darkryte"]      = "Mythical",
+    }
+
+    local RuneValues = {
+        "Miner Shard",
+        "Blast Chip",
+        "Flame Spark",
+        "Briar Notch",
+        "Rage Mark",
+        "Drain Edge",
+        "Ward Patch",
+        "Venom Crumb",
+    }
+
+    local InventoryWhitelistValues do
+        local set = {}
+        for name in pairs(EssenceRarityMap) do
+            set[name] = true
+        end
+        for name in pairs(OreRarityMap) do
+            set[name] = true
+        end
+        for _, name in ipairs(RuneValues) do
+            set[name] = true
+        end
+
+        InventoryWhitelistValues = {}
+        for name in pairs(set) do
+            table.insert(InventoryWhitelistValues, name)
+        end
+        table.sort(InventoryWhitelistValues)
+    end
+
+    ----------------------------------------------------------------
+    -- WEBHOOK CONFIG / UI
+    ----------------------------------------------------------------
+    local WebhookConfig = {
+        WebhookURL          = "",
+        WebhookColor        = Color3.fromRGB(54, 150, 45),
+        WebhookAnon         = false,
+        WH_EventSelection   = {},
+        WH_InventoryWhitelist = {},
+    }
+
+    local function color3ToTable(color)
+        if typeof(color) ~= "Color3" then
+            return { r = 54, g = 150, b = 45 }
+        end
+
+        return {
+            r = math.floor(color.R * 255 + 0.5),
+            g = math.floor(color.G * 255 + 0.5),
+            b = math.floor(color.B * 255 + 0.5),
+        }
+    end
+
+    local function tableToColor3(value)
+        if typeof(value) == "Color3" then
+            return value
+        end
+
+        if type(value) == "table"
+            and tonumber(value.r)
+            and tonumber(value.g)
+            and tonumber(value.b)
+        then
+            return Color3.fromRGB(value.r, value.g, value.b)
+        end
+
+        return Color3.fromRGB(54, 150, 45)
+    end
+
+    -- Normalise selection table (can be { [value]=true } or array of strings)
+    local function normalizeSelection(selection)
+        if type(selection) ~= "table" then
+            return {}
+        end
+
+        local list = {}
+        local seen = {}
+
+        for key, value in pairs(selection) do
+            if value == true then
+                if not seen[key] then
+                    table.insert(list, key)
+                    seen[key] = true
+                end
+            elseif type(value) == "string" then
+                if not seen[value] then
+                    table.insert(list, value)
+                    seen[value] = true
+                end
+            end
+        end
+
+        return list
+    end
+
+    -- Load persisted defaults (if any)
+    if isfile and isfile(References.gameDir .. "/__WebhookDefaults.json") then
+        local ok, decoded = pcall(function()
+            return HttpService:JSONDecode(readfile(References.gameDir .. "/__WebhookDefaults.json"))
+        end)
+
+        if ok and type(decoded) == "table" then
+            WebhookConfig.WebhookURL   = decoded.WebhookURL or WebhookConfig.WebhookURL
+            WebhookConfig.WebhookColor = tableToColor3(decoded.WebhookColor)
+            WebhookConfig.WebhookAnon  = decoded.WebhookAnon or WebhookConfig.WebhookAnon
+            WebhookConfig.WH_EventSelection =
+                normalizeSelection(decoded.WH_EventSelection or WebhookConfig.WH_EventSelection)
+            WebhookConfig.WH_InventoryWhitelist =
+                normalizeSelection(decoded.WH_InventoryWhitelist or WebhookConfig.WH_InventoryWhitelist)
+        end
+    end
+
+    -- Webhook event types
+    local EVENT_LAUNCH            = "Launch"
+    local EVENT_INVENTORY_CHANGE  = "InventoryChange"
+    local EVENT_CHAT              = "Chat"
+    local EVENT_PLAYER_JOIN_LEAVE = "PlayerJoinLeave"
+    local EVENT_GOLD_CHANGE       = "GoldChange"
+
+    local ALL_EVENT_TYPES = {
+        EVENT_LAUNCH,
+        EVENT_INVENTORY_CHANGE,
+        EVENT_CHAT,
+        EVENT_PLAYER_JOIN_LEAVE,
+        EVENT_GOLD_CHANGE,
+    }
+
+    -- Webhook UI
+    local webhookGroup = Tabs.Home:AddLeftGroupbox("Webhook", "send")
+
+    webhookGroup:AddInput("WebhookURL", {
+        Text             = "Default Webhook",
+        Default          = WebhookConfig.WebhookURL,
+        Placeholder      = "https://discord.com/api/webhooks/...",
+        ClearTextOnFocus = false,
+    })
+
+    webhookGroup:AddLabel("Default Color")
+        :AddColorPicker("WebhookColor", {
+            Title        = "Default Color",
+            Default      = WebhookConfig.WebhookColor,
+            Transparency = 0,
+        })
+
+    webhookGroup:AddToggle("WebhookAnon", {
+        Text    = "Anonymize User Data",
+        Default = WebhookConfig.WebhookAnon,
+    })
+
+    webhookGroup:AddDropdown("WH_EventSelection", {
+        Text    = "Reported Events",
+        Values  = ALL_EVENT_TYPES,
+        Default = WebhookConfig.WH_EventSelection,
+        Multi   = true,
+        Tooltip = "Select which events you want to send to your webhook.",
+    })
+
+    -- NEW: Inventory Change Whitelist
+    webhookGroup:AddDropdown("WH_InventoryWhitelist", {
+        Text    = "Inventory Change Whitelist",
+        Values  = InventoryWhitelistValues,
+        Default = WebhookConfig.WH_InventoryWhitelist,
+        Multi   = true,
+        Tooltip = "Only these items will be reported in stash changes. Leave empty for ALL.",
+    })
+
+    ----------------------------------------------------------------
+    -- WEBHOOK: UTILITIES
+    ----------------------------------------------------------------
+    local function getCurrentWebhookColorInt()
+        local color = Options.WebhookColor and Options.WebhookColor.Value or Color3.fromRGB(54, 150, 45)
+        local r, g, b = math.floor(color.R * 255), math.floor(color.G * 255), math.floor(color.B * 255)
+        return r * 65536 + g * 256 + b
+    end
+
+    local function selectionContains(selection, value)
+        if type(selection) ~= "table" then
+            return false
+        end
+
+        if selection[value] == true then
+            return true
+        end
+
+        for _, v in pairs(selection) do
+            if v == value then
+                return true
+            end
+        end
+
+        return false
+    end
+
+    local function isEventEnabled(eventName)
+        local selection = Options.WH_EventSelection and Options.WH_EventSelection.Value
+        if type(selection) ~= "table" then
+            return false
+        end
+
+        return selectionContains(selection, eventName)
+    end
+
+    -- Inventory whitelist:
+    --  - If no selection (empty), treat as ALL ITEMS allowed.
+    --  - Otherwise only items present in the selection are reported.
+    local function isItemWhitelisted(itemName)
+        local selection = Options.WH_InventoryWhitelist and Options.WH_InventoryWhitelist.Value
+        if type(selection) ~= "table" then
+            return true
+        end
+
+        -- Detect if there's any actual entry; if not, treat as "no filter" (allow all)
+        local hasAny = false
+        for k, v in pairs(selection) do
+            if v == true or type(v) == "string" then
+                hasAny = true
+                break
+            end
+        end
+
+        if not hasAny then
+            return true
+        end
+
+        return selectionContains(selection, itemName)
+    end
+
+    local hasWarnedInvalidWebhook = false
+
+    --- Sends a webhook if enabled for the given event.
+    -- @param eventName string (one of EVENT_*)
+    -- @param title     string
+    -- @param description string
+    -- @param usernameOverride string | nil
+    -- @param colorOverride number | nil
+    -- @param fields    table | nil
+    local function sendEventWebhook(eventName, title, description, usernameOverride, colorOverride, fields)
+        local url = (Options.WebhookURL and Options.WebhookURL.Value) or ""
+
+        -- Validate URL
+        if not url:match("https://discord.com/api/webhooks/") then
+            if not hasWarnedInvalidWebhook then
+                hasWarnedInvalidWebhook = true
+                -- Keeping this silent to avoid spam.
+            end
+            return
+        end
+
+        -- Check event toggle
+        if not isEventEnabled(eventName) then
+            return
+        end
+
+        local color     = colorOverride or (getCurrentWebhookColorInt and getCurrentWebhookColorInt()) or 3577389
+        local anonymize = Toggles.WebhookAnon and Toggles.WebhookAnon.Value or false
+        local username  = usernameOverride or "Cerberus Webhook"
+
+        task.spawn(function()
+            pcall(sendWebhook, url, title, description, username, color, fields, anonymize)
+        end)
+    end
+
+    ----------------------------------------------------------------
+    -- WEBHOOK DEFAULTS: AUTO SAVE ON CHANGE
+    ----------------------------------------------------------------
+    do
+        local function saveWebhookDefaults()
+            if not writefile then
+                return
+            end
+
+            local payload = {
+                WebhookURL           = Options.WebhookURL and Options.WebhookURL.Value or "",
+                WebhookColor         = color3ToTable(Options.WebhookColor and Options.WebhookColor.Value or WebhookConfig.WebhookColor),
+                WebhookAnon          = Toggles.WebhookAnon and Toggles.WebhookAnon.Value or false,
+                WH_EventSelection    = normalizeSelection(Options.WH_EventSelection and Options.WH_EventSelection.Value),
+                WH_InventoryWhitelist = normalizeSelection(Options.WH_InventoryWhitelist and Options.WH_InventoryWhitelist.Value),
+            }
+
+            pcall(function()
+                writefile(References.gameDir .. "/__WebhookDefaults.json", HttpService:JSONEncode(payload))
+            end)
+        end
+
+        -- If there is no defaults file yet, create it once.
+        if not (isfile and isfile(References.gameDir .. "/__WebhookDefaults.json")) then
+            saveWebhookDefaults()
+        end
+
+        -- Hook changes
+        for _, optName in ipairs({ "WebhookURL", "WebhookColor", "WH_EventSelection", "WH_InventoryWhitelist" }) do
+            if Options[optName] then
+                Options[optName]:OnChanged(saveWebhookDefaults)
+            end
+        end
+
+        if Toggles.WebhookAnon then
+            Toggles.WebhookAnon:OnChanged(saveWebhookDefaults)
+        end
+    end
+
+    ----------------------------------------------------------------
+    -- PLAYER HELPER (FOR WEBHOOK TEXT)
+    ----------------------------------------------------------------
+    local function getPrettyPlayerName(player)
+        if not player then
+            return "Unknown"
+        end
+
+        local displayName = player.DisplayName or player.Name
+        if displayName ~= player.Name then
+            return string.format("%s (%s)", displayName, player.Name)
+        end
+
+        return player.Name
+    end
+
+    ----------------------------------------------------------------
+    -- CHAT LOGGING
+    ----------------------------------------------------------------
+    ChatBuffer        = {}
+    lastChatFlushTime = os.clock()
+
+    local CHAT_FLUSH_INTERVAL   = 10    -- seconds
+    local CHAT_LINES_PER_BATCH  = 20    -- max lines per message
+    local CHAT_MAX_CHARS        = 1900  -- max characters in a single webhook description
+
+    local function flushChatBuffer()
+        if not isEventEnabled(EVENT_CHAT) then
+            table.clear(ChatBuffer)
+            return
+        end
+
+        if #ChatBuffer == 0 then
+            return
+        end
+
+        local messageBatch = {}
+        local charsInBatch = 0
+        local linesInBatch = 0
+
+        local function sendBatch()
+            if #messageBatch == 0 then
+                return
+            end
+
+            local body = table.concat(messageBatch, "\n")
+            sendEventWebhook(EVENT_CHAT, "Chat Log", body)
+
+            messageBatch = {}
+            charsInBatch = 0
+            linesInBatch = 0
+        end
+
+        for _, line in ipairs(ChatBuffer) do
+            local lineLength = #line + 1
+            if linesInBatch >= CHAT_LINES_PER_BATCH or (charsInBatch + lineLength) > CHAT_MAX_CHARS then
+                sendBatch()
+            end
+
+            table.insert(messageBatch, line)
+            charsInBatch += lineLength
+            linesInBatch += 1
+        end
+
+        sendBatch()
+        table.clear(ChatBuffer)
+    end
+
+    local function hookPlayerChat(player)
+        if not player then
+            return
+        end
+
+        trackConnection(player.Chatted:Connect(function(message)
+            if not isEventEnabled(EVENT_CHAT) then
+                return
+            end
+
+            message = tostring(message or "")
+            if #message > 256 then
+                message = message:sub(1, 253) .. "..."
+            end
+
+            local line = string.format("**%s**: %s", getPrettyPlayerName(player), message)
+            table.insert(ChatBuffer, line)
+        end))
+    end
+
+    -- Existing players
+    for _, player in ipairs(Players:GetPlayers()) do
+        hookPlayerChat(player)
+    end
+
+    -- New players
+    trackConnection(Players.PlayerAdded:Connect(function(player)
+        hookPlayerChat(player)
+    end))
+
+    ----------------------------------------------------------------
+    -- JOIN / LEAVE WEBHOOKS
+    ----------------------------------------------------------------
+    trackConnection(Players.PlayerAdded:Connect(function(player)
+        if player == LocalPlayer then
+            return
+        end
+        if not isEventEnabled(EVENT_PLAYER_JOIN_LEAVE) then
+            return
+        end
+
+        local text = string.format("**%s** joined the server.", getPrettyPlayerName(player))
+        sendEventWebhook(EVENT_PLAYER_JOIN_LEAVE, "Player Joined", text)
+    end))
+
+    trackConnection(Players.PlayerRemoving:Connect(function(player)
+        if player == LocalPlayer then
+            return
+        end
+        if not isEventEnabled(EVENT_PLAYER_JOIN_LEAVE) then
+            return
+        end
+
+        local text = string.format("**%s** left the server.", getPrettyPlayerName(player))
+        sendEventWebhook(EVENT_PLAYER_JOIN_LEAVE, "Player Left", text)
+    end))
+
+    ----------------------------------------------------------------
+    -- STASH CHANGE TRACKING (INVENTORY MENU)
+    ----------------------------------------------------------------
+    StashDiffBuffer      = {}
+    lastStashScanTime    = os.clock()
+    lastStashSummaryTime = os.clock()
+
+    local STASH_SCAN_INTERVAL     = 2   -- seconds
+    local STASH_SUMMARY_INTERVAL  = 15  -- seconds
+    local STASH_MAX_LINES_SUMMARY = 40
+    local STASH_MAX_CHARS         = 1900
+
+    -- Locates the stash UI frame
+    local function getStashBackgroundFrame()
+        local playerGui   = LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui")
+        local menuGui     = playerGui and playerGui:FindFirstChild("Menu")
+        local frame       = menuGui and menuGui:FindFirstChild("Frame")
+        local innerFrame  = frame and frame:FindFirstChild("Frame")
+        local menus       = innerFrame and innerFrame:FindFirstChild("Menus")
+        local stashMenu   = menus and menus:FindFirstChild("Stash")
+        return stashMenu and stashMenu:FindFirstChild("Background")
+    end
+
+    -- Reads the stash items and returns a map { [name] = quantity }
+    local function readStashSnapshot()
+        local snapshot   = {}
+        local background = getStashBackgroundFrame()
+        if not background then
+            return snapshot
+        end
+
+        for _, child in ipairs(background:GetChildren()) do
+            if child:IsA("Frame") then
+                local itemName   = child.Name
+                local mainFrame  = child:FindFirstChild("Main")
+                local qtyLabel   = mainFrame and mainFrame:FindFirstChild("Quantity")
+
+                local qty = 1
+                if qtyLabel and qtyLabel:IsA("TextLabel") then
+                    local text = tostring(qtyLabel.Text or ""):gsub("%s+", "")
+                    if text ~= "" then
+                        local match = text:match("x(%d+)") or text:match("(%d+)")
+                        qty = tonumber(match) or 1
+                    end
+                end
+
+                if qty > 0 then
+                    snapshot[itemName] = qty
+                end
+            end
+        end
+
+        return snapshot
+    end
+
+    local lastStashSnapshot = readStashSnapshot()
+
+    -- Diff and record stash changes, respecting the whitelist and including total
+    local function diffStashSnapshots(oldSnapshot, newSnapshot, outDiffList)
+        -- Additions / increases
+        for itemName, newQty in pairs(newSnapshot) do
+            local oldQty = oldSnapshot[itemName] or 0
+            if newQty > oldQty and isItemWhitelisted(itemName) then
+                local delta = newQty - oldQty
+                table.insert(outDiffList, string.format(
+                    "+ %dx %s (Stash, Total: %d)",
+                    delta,
+                    itemName,
+                    newQty
+                ))
+            end
+        end
+
+        -- Decreases / removals
+        for itemName, oldQty in pairs(oldSnapshot) do
+            local newQty = newSnapshot[itemName] or 0
+            if newQty < oldQty and isItemWhitelisted(itemName) then
+                local delta = oldQty - newQty
+                table.insert(outDiffList, string.format(
+                    "- %dx %s (Stash, Total: %d)",
+                    delta,
+                    itemName,
+                    newQty
+                ))
+            end
+        end
+    end
+
+    local function captureStashChanges()
+        if not isEventEnabled(EVENT_INVENTORY_CHANGE) then
+            lastStashSnapshot = readStashSnapshot()
+            return
+        end
+
+        local prevSnapshot = lastStashSnapshot
+        local newSnapshot  = readStashSnapshot()
+        local diffLines    = {}
+
+        diffStashSnapshots(prevSnapshot, newSnapshot, diffLines)
+        lastStashSnapshot = newSnapshot
+
+        if #diffLines == 0 then
+            return
+        end
+
+        for index, line in ipairs(diffLines) do
+            if index > STASH_MAX_LINES_SUMMARY then
+                table.insert(StashDiffBuffer, string.format("... %d more change(s)", #diffLines - STASH_MAX_LINES_SUMMARY))
+                break
+            end
+            table.insert(StashDiffBuffer, line)
+        end
+    end
+
+    local function sendStashSummary()
+        if not isEventEnabled(EVENT_INVENTORY_CHANGE) then
+            table.clear(StashDiffBuffer)
+            return
+        end
+
+        if #StashDiffBuffer == 0 then
+            return
+        end
+
+        local header = string.format("**%s** stash changes:", getPrettyPlayerName(LocalPlayer))
+        local lines  = { "```diff" }
+
+        for index, line in ipairs(StashDiffBuffer) do
+            if index > STASH_MAX_LINES_SUMMARY then
+                table.insert(lines, string.format("# ... %d more change(s)", #StashDiffBuffer - STASH_MAX_LINES_SUMMARY))
+                break
+            end
+            table.insert(lines, line)
+        end
+
+        table.insert(lines, "```")
+
+        local body = header .. "\n" .. table.concat(lines, "\n")
+        if #body > STASH_MAX_CHARS then
+            body = body:sub(1, STASH_MAX_CHARS - 3) .. "..."
+        end
+
+        sendEventWebhook(EVENT_INVENTORY_CHANGE, "Stash Changes", body)
+        table.clear(StashDiffBuffer)
+    end
+
+    ----------------------------------------------------------------
+    -- GOLD CHANGE TRACKING
+    ----------------------------------------------------------------
+    local goldChangeBuffer     = {}
+    lastGoldPollTime           = os.clock()
+    lastGoldSummaryTime        = os.clock()
+    local lastGoldValue        = nil
+
+    local GOLD_POLL_INTERVAL   = 1.5
+    local GOLD_SUMMARY_INTERVAL= 15
+    local GOLD_MAX_LINES       = 30
+    local GOLD_MAX_CHARS       = 1900
+
+    local function getGoldLabel()
+        local ok, result = pcall(function()
+            local playerGui = LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui")
+            local main      = playerGui and playerGui:FindFirstChild("Main")
+            local screen    = main and main:FindFirstChild("Screen")
+            local hud       = screen and screen:FindFirstChild("Hud")
+            return hud and hud:FindFirstChild("Gold")
+        end)
+
+        if ok then
+            return result
+        end
+    end
+
+    local function readGoldAmount()
+        local label = getGoldLabel()
+        if not (label and label:IsA("TextLabel")) then
+            return nil
+        end
+
+        local text = tostring(label.Text or "")
+        text = text:gsub("[%$,]", "")
+        local num = tonumber(text)
+        return num
+    end
+
+    local function pollGoldChange()
+        if not isEventEnabled(EVENT_GOLD_CHANGE) then
+            lastGoldValue = readGoldAmount() or lastGoldValue
+            return
+        end
+
+        local current = readGoldAmount()
+        if not current then
+            return
+        end
+
+        if lastGoldValue == nil then
+            lastGoldValue = current
+            return
+        end
+
+        if current ~= lastGoldValue then
+            local delta = current - lastGoldValue
+            local sign  = delta > 0 and "+" or ""
+            local line  = string.format("%s%.2f ( %.2f -> %.2f )", sign, delta, lastGoldValue, current)
+            table.insert(goldChangeBuffer, line)
+            lastGoldValue = current
+        end
+    end
+
+    local function sendGoldSummary()
+        if not isEventEnabled(EVENT_GOLD_CHANGE) then
+            table.clear(goldChangeBuffer)
+            return
+        end
+
+        if #goldChangeBuffer == 0 then
+            return
+        end
+
+        local header = string.format("**%s** gold changes:", getPrettyPlayerName(LocalPlayer))
+        local lines  = { "```diff" }
+
+        for index, line in ipairs(goldChangeBuffer) do
+            if index > GOLD_MAX_LINES then
+                table.insert(lines, string.format("# ... %d more change(s)", #goldChangeBuffer - GOLD_MAX_LINES))
+                break
+            end
+            table.insert(lines, line)
+        end
+
+        table.insert(lines, "```")
+
+        local body = header .. "\n" .. table.concat(lines, "\n")
+        if #body > GOLD_MAX_CHARS then
+            body = body:sub(1, GOLD_MAX_CHARS - 3) .. "..."
+        end
+
+        sendEventWebhook(EVENT_GOLD_CHANGE, "Gold Changes", body)
+        table.clear(goldChangeBuffer)
+    end
+
+    ----------------------------------------------------------------
+    -- HEARTBEAT TICK: BATCH + POLL
+    ----------------------------------------------------------------
+    trackConnection(RunService.Heartbeat:Connect(function()
+        local now = os.clock()
+
+        -- Chat batches
+        if now - lastChatFlushTime >= CHAT_FLUSH_INTERVAL then
+            lastChatFlushTime = now
+            flushChatBuffer()
+        end
+
+        -- Stash scans
+        if now - lastStashScanTime >= STASH_SCAN_INTERVAL then
+            lastStashScanTime = now
+            captureStashChanges()
+        end
+
+        -- Stash summary
+        if now - lastStashSummaryTime >= STASH_SUMMARY_INTERVAL then
+            lastStashSummaryTime = now
+            sendStashSummary()
+        end
+
+        -- Gold poll
+        if now - lastGoldPollTime >= GOLD_POLL_INTERVAL then
+            lastGoldPollTime = now
+            pollGoldChange()
+        end
+
+        -- Gold summary
+        if now - lastGoldSummaryTime >= GOLD_SUMMARY_INTERVAL then
+            lastGoldSummaryTime = now
+            sendGoldSummary()
+        end
+    end))
+
+    ----------------------------------------------------------------
+    -- LATEST UPDATES / CHANGELOG
+    ----------------------------------------------------------------
+    local updatesGroup = Tabs.Home:AddRightGroupbox("Latest Updates", "sparkles")
+    updatesGroup:AddLabel("Changelogs:", true)
+
+    local changelog = META.changelog or {
+        "Added Auto Proximity Prompt",
+        "Added Zoom",
+        "Added Custom Cursor Builder",
+        "Added Emotes",
+        "Improved ESP",
+    }
+
+    updatesGroup:AddLabel("• " .. table.concat(changelog, "\n• "), true)
+
+    ----------------------------------------------------------------
+    -- FEEDBACK BOX
+    ----------------------------------------------------------------
+    local feedbackGroup = Tabs.Home:AddRightGroupbox("Feedback", "quote")
+    local feedbackSent  = false
+
+    feedbackGroup:AddInput("feedbackTextbox", {
+        Text             = "Message",
+        Default          = nil,
+        Numeric          = false,
+        Finished         = false,
+        ClearTextOnFocus = true,
+        Placeholder      = "Write a message to the dev team here.",
+        Callback         = function(_) end,
+    })
+
+    feedbackGroup:AddButton("Send Feedback", function()
+        if feedbackSent then
+            Library:Notify(
+                "You've already sent feedback, you can come back another time and send some more later.",
+                5
+            )
+            return
+        end
+
+        local text = Options.feedbackTextbox and Options.feedbackTextbox.Value
+        if text and text ~= "" then
+            if sendWebhook then
+                sendWebhook(
+                    "https://discord.com/api/webhooks/1430125097129214003/mHA_d9XyFaRTfGM9Enf7jZgso358XRmmCFiuwGs6ZO-vws0qPdRLKQH19zRWJ5kZC7hW",
+                    References.player.Name .. " has provided feedback.",
+                    text,
+                    "Cerberus Feedback",
+                    nil,
+                    nil,
+                    false
+                )
+
+                Library:Notify("Your feedback has successfully been sent to the developers!", 5)
+                feedbackSent = true
+            else
+                Library:Notify("Feedback webhook function not available.", 3)
+            end
+        else
+            Library:Notify("You need to type your feedback into the box above before you can send it.", 3)
+        end
+    end)
+
+    ----------------------------------------------------------------
+    -- CREDITS + DISCLAIMER
+    ----------------------------------------------------------------
+    local creditsGroup = Tabs.Home:AddRightGroupbox("Credits + Disclaimer", "shield-alert")
+
+    creditsGroup:AddLabel("Script by @tevilii")
+    creditsGroup:AddLabel("Obsidian UI Library by deivid")
+
+    if copyLink and urls.obsidian then
+        creditsGroup:AddButton({
+            Text    = "Obsidian Library",
+            Tooltip = urls.obsidian,
+            Func    = function()
+                copyLink(urls.obsidian, "Obsidian link copied!")
+            end,
+        })
+    end
+
+    creditsGroup:AddDivider()
+    creditsGroup:AddLabel(
+        "This script is provided for educational and customization purposes. " ..
+        "Respect Roblox and game TOS. You are responsible for your usage.",
+        true
+    )
+
+    ----------------------------------------------------------------
+    -- LAUNCH WEBHOOK
+    ----------------------------------------------------------------
+    sendEventWebhook(
+        EVENT_LAUNCH,
+        "Cerberus Initialized",
+        string.format(
+            "**Join Script:**\n```lua\ngame:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\", game.Players.LocalPlayer)```%s",
+            game.PlaceId,
+            game.JobId,
+            math.random(1, 5) == 1
+                and "\n*Join our Discord for the best scripts! https://getcerberus.com/discord*"
+                or ""
+        )
+    )
+
+    ----------------------------------------------------------------
+    -- MODULE API
+    ----------------------------------------------------------------
+    local HomeModule = {}
+
+    function HomeModule.Unload()
+        -- Disconnect all tracked connections
+        for index, conn in ipairs(TrackedConnections) do
+            if conn and conn.Disconnect then
+                pcall(function()
+                    conn:Disconnect()
+                end)
+            end
+            TrackedConnections[index] = nil
+        end
+
+        -- Clear buffers
+        if ChatBuffer then
+            table.clear(ChatBuffer)
+        end
+        if StashDiffBuffer then
+            table.clear(StashDiffBuffer)
+        end
+
+        -- Reset timers
+        local now = os.clock()
+        lastChatFlushTime     = now
+        lastStashScanTime     = now
+        lastStashSummaryTime  = now
+        lastGoldPollTime      = now
+        lastGoldSummaryTime   = now
+    end
+
+    return HomeModule
+end
