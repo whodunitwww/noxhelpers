@@ -1,22 +1,28 @@
 -- AutoSellConfigEditor.lua
 -- Standalone config editor for AutoSell thresholds, with pretty UI + live ore icons.
--- UPDATED: Added Legendary/Mythical Essence and Essence Icons.
+-- UPDATED:
+--   • Ores use in-game ViewportFrames + cameras (no static ore image IDs).
+--   • Legendary/Mythical Essence and Essence Icons supported.
+--   • "Rune Traits" tab with per-trait stat filters (Above/Below).
+--   • Rune trait config is saved under Config.runeTraits[traitId].
+--   • Rune trait cards: no description, proper stat labels, stats fit in card.
+--   • ADDED: Per-tab Search box (filters items in the current tab).
 
 -- CONFIG PATH
-local BASE_DIR             = "Cerberus/The Forge"  -- <== make sure this matches References.gameDir in your main script
-local AutoSellConfigFile   = BASE_DIR .. "/AutoSellConfig.json"
+local BASE_DIR           = "Cerberus/The Forge"   -- <== make sure this matches References.gameDir in your main script
+local AutoSellConfigFile = BASE_DIR .. "/AutoSellConfig.json"
 
-local Players          = game:GetService("Players")
-local HttpService      = game:GetService("HttpService")
-local CoreGui          = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
+local Players            = game:GetService("Players")
+local HttpService        = game:GetService("HttpService")
+local CoreGui            = game:GetService("CoreGui")
+local UserInputService   = game:GetService("UserInputService")
 
-local LocalPlayer = Players.LocalPlayer
+local LocalPlayer        = Players.LocalPlayer
 
 ----------------------------------------------------------------
 -- DATA (mirrors main script)
 ----------------------------------------------------------------
-local EssenceRarityMap = {
+local EssenceRarityMap   = {
     ["Tiny Essence"]      = "Common",
     ["Small Essence"]     = "Common",
     ["Medium Essence"]    = "Uncommon",
@@ -24,53 +30,53 @@ local EssenceRarityMap = {
     ["Greater Essence"]   = "Rare",
     ["Superior Essence"]  = "Epic",
     ["Epic Essence"]      = "Epic",
-    ["Legendary Essence"] = "Legendary", -- ADDED
-    ["Mythical Essence"]  = "Mythical",  -- ADDED
+    ["Legendary Essence"] = "Legendary",
+    ["Mythical Essence"]  = "Mythical",
 }
 
-local OreRarityMap = {
-    ["Stone"]             = "Common",
-    ["Sand Stone"]        = "Common",
-    ["Copper"]            = "Common",
-    ["Iron"]              = "Common",
-    ["Tin"]               = "Uncommon",
-    ["Silver"]            = "Uncommon",
-    ["Gold"]              = "Uncommon",
-    ["Mushroomite"]       = "Rare",
-    ["Platinum"]          = "Rare",
-    ["Bananite"]          = "Uncommon",
-    ["Cardboardite"]      = "Common",
-    ["Aite"]              = "Epic",
-    ["Poopite"]           = "Epic",
-    ["Slimite"]           = "Epic",
-    ["Cobalt"]            = "Uncommon",
-    ["Titanium"]          = "Uncommon",
-    ["Volcanic Rock"]     = "Rare",
-    ["Lapis Lazuli"]      = "Uncommon",
-    ["Quartz"]            = "Rare",
-    ["Amethyst"]          = "Rare",
-    ["Topaz"]             = "Rare",
-    ["Diamond"]           = "Rare",
-    ["Sapphire"]          = "Rare",
-    ["Boneite"]           = "Rare",
-    ["Dark Boneite"]      = "Rare",
-    ["Cuprite"]           = "Epic",
-    ["Obsidian"]          = "Epic",
-    ["Emerald"]           = "Epic",
-    ["Ruby"]              = "Epic",
-    ["Rivalite"]          = "Epic",
-    ["Uranium"]           = "Legendary",
-    ["Mythril"]           = "Legendary",
-    ["Eye Ore"]           = "Legendary",
-    ["Fireite"]           = "Legendary",
-    ["Magmaite"]          = "Legendary",
-    ["Lightite"]          = "Legendary",
-    ["Demonite"]          = "Mythical",
-    ["Darkryte"]          = "Mythical",
+local OreRarityMap       = {
+    ["Stone"]         = "Common",
+    ["Sand Stone"]    = "Common",
+    ["Copper"]        = "Common",
+    ["Iron"]          = "Common",
+    ["Tin"]           = "Uncommon",
+    ["Silver"]        = "Uncommon",
+    ["Gold"]          = "Uncommon",
+    ["Mushroomite"]   = "Rare",
+    ["Platinum"]      = "Rare",
+    ["Bananite"]      = "Uncommon",
+    ["Cardboardite"]  = "Common",
+    ["Aite"]          = "Epic",
+    ["Poopite"]       = "Epic",
+    ["Slimite"]       = "Epic",
+    ["Cobalt"]        = "Uncommon",
+    ["Titanium"]      = "Uncommon",
+    ["Volcanic Rock"] = "Rare",
+    ["Lapis Lazuli"]  = "Uncommon",
+    ["Quartz"]        = "Rare",
+    ["Amethyst"]      = "Rare",
+    ["Topaz"]         = "Rare",
+    ["Diamond"]       = "Rare",
+    ["Sapphire"]      = "Rare",
+    ["Boneite"]       = "Rare",
+    ["Dark Boneite"]  = "Rare",
+    ["Cuprite"]       = "Epic",
+    ["Obsidian"]      = "Epic",
+    ["Emerald"]       = "Epic",
+    ["Ruby"]          = "Epic",
+    ["Rivalite"]      = "Epic",
+    ["Uranium"]       = "Legendary",
+    ["Mythril"]       = "Legendary",
+    ["Eye Ore"]       = "Legendary",
+    ["Fireite"]       = "Legendary",
+    ["Magmaite"]      = "Legendary",
+    ["Lightite"]      = "Legendary",
+    ["Demonite"]      = "Mythical",
+    ["Darkryte"]      = "Mythical",
 }
 
 -- strong rarity colours
-local RarityColors = {
+local RarityColors       = {
     Common    = Color3.fromRGB(140, 140, 140),
     Uncommon  = Color3.fromRGB(80, 190, 120),
     Rare      = Color3.fromRGB(90, 140, 240),
@@ -79,7 +85,7 @@ local RarityColors = {
     Mythical  = Color3.fromRGB(255, 80, 110),
 }
 
-local EssenceNamesList = {
+local EssenceNamesList   = {
     "Tiny Essence",
     "Small Essence",
     "Medium Essence",
@@ -87,11 +93,11 @@ local EssenceNamesList = {
     "Greater Essence",
     "Superior Essence",
     "Epic Essence",
-    "Legendary Essence", -- ADDED
-    "Mythical Essence",  -- ADDED
+    "Legendary Essence",
+    "Mythical Essence",
 }
 
-local OreNamesList = {}
+local OreNamesList       = {}
 for oreName in pairs(OreRarityMap) do
     table.insert(OreNamesList, oreName)
 end
@@ -114,10 +120,11 @@ table.sort(OreNamesList, function(a, b)
     return ra < rb
 end)
 
-local OreRarityList     = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
-local EssenceRarityList = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
+local OreRarityList        = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
+local EssenceRarityList    = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
 
-local RuneValues = {
+-- existing rune *items* (shards etc)
+local RuneValues           = {
     "Miner Shard",
     "Blast Chip",
     "Flame Spark",
@@ -128,7 +135,7 @@ local RuneValues = {
     "Venom Crumb",
 }
 
-local RuneImageIds = {
+local RuneImageIds         = {
     ["Ward Patch"]  = "136618198347198",
     ["Briar Notch"] = "130375351000261",
     ["Rage Mark"]   = "74377849245058",
@@ -139,7 +146,7 @@ local RuneImageIds = {
     ["Venom Crumb"] = "77052262266995",
 }
 
-local EssenceImageIds = {
+local EssenceImageIds      = {
     ["Tiny Essence"]      = "72025528879375",
     ["Small Essence"]     = "117483889562292",
     ["Medium Essence"]    = "92874766076839",
@@ -152,7 +159,319 @@ local EssenceImageIds = {
 }
 
 ----------------------------------------------------------------
--- GRAB ORE ICONS FROM IN-GAME MENU
+-- RUNE TRAIT DEFINITIONS (from your dump)
+----------------------------------------------------------------
+
+local RuneTraitDefinitions = {
+    {
+        id = "Radioactive",
+        name = "Radioactive",
+        description = "Deal nil% of max health as damage as AoE while in-combat.",
+        iconImageId = "126391228181883",
+    },
+    {
+        id = "Berserker",
+        name = "Berserker",
+        description =
+        "Boosts physical damage and movement speed by nil% for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.",
+        iconImageId = "99579458536104",
+    },
+    {
+        id = "Poison",
+        name = "Poison",
+        description = "Deals nil% of weapon damage as poison per second for nil seconds. nil% chance on hit.",
+        iconImageId = "77726317529525",
+    },
+    {
+        id = "FlatHealthRegen",
+        name = "Flat Regen",
+        description = "Regen nil health per second.",
+        iconImageId = "92712417449524",
+    },
+    {
+        id = "Thorn",
+        name = "Thorn",
+        description =
+        "Reflect nil% physical damage taken. Maximum damage given limits at 5% max health of user. 0.05 seconds cooldown.",
+        iconImageId = "126391228181883",
+    },
+    {
+        id = "UndeadSecondChance",
+        name = "Second Chance",
+        description = "Refills 50% of max hp when hp is under 10% every 5 minutes",
+        iconImageId = "94132270840631",
+    },
+    {
+        id = "DemonDevilsFinger",
+        name = "Devil's Finger",
+        description =
+        "When you dash, teleport with hellfire particles and 35% chance to create a hellfire circle deal AOE to the enemies inside dealing 45% damage of your weapon per second for 3 sec.",
+        iconImageId = "126391228181883",
+    },
+    {
+        id = "AttackSpeedBoost",
+        name = "Attack Speed",
+        description = "Increase attack speed by nil%.",
+        iconImageId = "74403354215536",
+    },
+    {
+        id = "JumpBoost",
+        name = "Jump Boost",
+        description = "nil% longer jump.",
+        iconImageId = "99963424031166",
+    },
+    {
+        id = "ShadowPhantomStep",
+        name = "Phantom Step",
+        description = "nil% to be immortal and gain movement speed for a brief duration.",
+        iconImageId = "94132270840631",
+    },
+    {
+        id = "ToxicVeins",
+        name = "Toxic Veins",
+        description =
+        "Deals nil% poison damage around the character for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.",
+        iconImageId = "131438262369264",
+    },
+    {
+        id = "MoveSpeed",
+        name = "Swiftness",
+        description = "nil% extra movement speed.",
+        iconImageId = "92712417449524",
+    },
+    {
+        id = "Explosion",
+        name = "Explosion",
+        description =
+        "Cause an explosion at location of victim, dealing nil% of weapon damage as AOE damage. nil% chance on hit.",
+        iconImageId = "110063824255919",
+    },
+    {
+        id = "MinePower",
+        name = "Mine Power",
+        description = "nil% extra mine damage.",
+        iconImageId = "138135219973840",
+    },
+    {
+        id = "BullsFury",
+        name = "Bull's Fury",
+        description = "Boosts physical damage and movement speed by 30% while health is under 50%.",
+        iconImageId = "99579458536104",
+    },
+    {
+        id = "NegativeHealthBoost",
+        name = "Negative Vitality",
+        description = "-nil% health.",
+        iconImageId = "92712417449524",
+    },
+    {
+        id = "Fire",
+        name = "Burn",
+        description = "Deals nil% of weapon damage as fire per second for nil seconds. nil% chance on hit.",
+        iconImageId = "130243970954297",
+    },
+    {
+        id = "DashIFrame",
+        name = "Phase",
+        description = "nil% longer invincibility on dash.",
+        iconImageId = "110461678599478",
+    },
+    {
+        id = "Shield",
+        name = "Shield",
+        description = "Reduce incoming physical damage by nil%. Has nil% chance per hit.",
+        iconImageId = "94132270840631",
+    },
+    {
+        id = "AngelHolyHand",
+        name = "Holy Hand",
+        description = "Have infinite stamina while below 20% health.",
+        iconImageId = "99579458536104",
+    },
+    {
+        id = "AngelSmite",
+        name = "Angel Smite",
+        description = "50% chance to call upon Smite on-hit for 30% of physical damage.",
+        iconImageId = "110063824255919",
+    },
+    {
+        id = "NegativeStaminaBoost",
+        name = "Negative Endurance",
+        description = "-nil% stamina.",
+        iconImageId = "99963424031166",
+    },
+    {
+        id = "MineSpeed",
+        name = "Swift Mining",
+        description = "nil% faster mining.",
+        iconImageId = "138135219973840",
+    },
+    {
+        id = "CriticalChance",
+        name = "Critical Chance",
+        description = "Increase critical chance by nil%.",
+        iconImageId = "118179174921595",
+    },
+    {
+        id = "LuckBoost",
+        name = "Luck",
+        description = "nil% overall luck increase.",
+        iconImageId = "109268611568059",
+    },
+    {
+        id = "Snow",
+        name = "Snow",
+        description = "Applies nil% attack speed and movement speed slow for nil seconds. nil% chance on hit.",
+        iconImageId = "103795067047772",
+    },
+    {
+        id = "ExtraMineDrop",
+        name = "Yield",
+        description = "nil% chance to drop nil extra ore(s) from mines.",
+        iconImageId = "134056473233081",
+    },
+    {
+        id = "BadSmell",
+        name = "Bad Smell",
+        description =
+        "Deals nil% poison damage around the character for nil seconds, fearing enemies. Has nil seconds cooldown. Activates when health is below 35%.",
+        iconImageId = "133381322224239",
+    },
+    {
+        id = "StaminaBoost",
+        name = "Endurance",
+        description = "nil% more stamina.",
+        iconImageId = "99963424031166",
+    },
+    {
+        id = "DashDistance",
+        name = "Stride",
+        description = "nil% longer dash distance.",
+        iconImageId = "112354247336206",
+    },
+    {
+        id = "DashCooldown",
+        name = "Surge",
+        description = "nil% less dash cooldown.",
+        iconImageId = "132915742367432",
+    },
+    {
+        id = "CriticalDamage",
+        name = "Critical Damage",
+        description = "Increase critical damage by nil%.",
+        iconImageId = "134197413281062",
+    },
+    {
+        id = "XPBoost",
+        name = "EXP Boost",
+        description = "nil% extra xp gain.",
+        iconImageId = "92712417449524",
+    },
+    {
+        id = "HealthBoost",
+        name = "Vitality",
+        description = "nil% extra health.",
+        iconImageId = "92712417449524",
+    },
+    {
+        id = "StunDamage",
+        name = "Fracture",
+        description = "nil% extra stun damage on-hit.",
+        iconImageId = "129442737645310",
+    },
+    {
+        id = "DemonCursedAura",
+        name = "Cursed Aura",
+        description = "Deal 10% of weapon damage as AoE while in-combat.",
+        iconImageId = "126391228181883",
+    },
+    {
+        id = "NegativeMoveSpeed",
+        name = "Negative Swiftness",
+        description = "-nil% movement speed.",
+        iconImageId = "92712417449524",
+    },
+    {
+        id = "DemonBackfire",
+        name = "Backfire",
+        description = "nil% chance to burn the enemy upon taking damage.",
+        iconImageId = "126391228181883",
+    },
+    {
+        id = "DamageBoost",
+        name = "Lethality",
+        description = "Increase physical damage by nil%.",
+        iconImageId = "105965083804844",
+    },
+    {
+        id = "ZombieAbsorb",
+        name = "Absorb",
+        description = "nil% to convert damage taken into health instead.",
+        iconImageId = "94132270840631",
+    },
+    {
+        id = "LifeSteal",
+        name = "Life Steal",
+        description = "Heal nil% of physical damage dealt on-hit.",
+        iconImageId = "116807775361910",
+    },
+    {
+        id = "Ice",
+        name = "Ice",
+        description = "Freeze enemies for nil seconds. nil% chance on hit. Has a cooldown of nil.",
+        iconImageId = "132472537758179",
+    },
+}
+
+local RuneTraitParamLabels = {
+    Radioactive = { "AoE % Max HP" },
+    Berserker = { "Buff % (DMG+MS)", "Buff Duration (s)", "Cooldown (s)" },
+    Poison = { "Poison % / sec", "Duration (s)", "Proc Chance %" },
+    FlatHealthRegen = { "HP / sec" },
+    Thorn = { "Reflect % Damage" },
+    AttackSpeedBoost = { "Attack Speed %" },
+    JumpBoost = { "Jump Height %" },
+    ShadowPhantomStep = { "Immortality Chance %" },
+    ToxicVeins = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
+    MoveSpeed = { "Move Speed %" },
+    Explosion = { "Explosion DMG %", "Proc Chance %" },
+    MinePower = { "Mine Damage %" },
+    NegativeHealthBoost = { "Max HP Penalty %" },
+    Fire = { "Burn % / sec", "Duration (s)", "Proc Chance %" },
+    DashIFrame = { "Dash I-Frame %" },
+    Shield = { "Damage Reduction %", "Proc Chance %" },
+    NegativeStaminaBoost = { "Stamina Penalty %" },
+    MineSpeed = { "Mining Speed %" },
+    CriticalChance = { "Crit Chance %" },
+    LuckBoost = { "Luck %" },
+    Snow = { "Slow Amount %", "Duration (s)", "Proc Chance %" },
+    ExtraMineDrop = { "Extra Drop Chance %", "Extra Ores Count" },
+    BadSmell = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
+    StaminaBoost = { "Stamina %" },
+    DashDistance = { "Dash Distance %" },
+    DashCooldown = { "Dash CD Reduction %" },
+    CriticalDamage = { "Crit Damage %" },
+    XPBoost = { "XP Gain %" },
+    HealthBoost = { "Max HP %" },
+    StunDamage = { "Stun Damage %" },
+    NegativeMoveSpeed = { "Move Speed Penalty %" },
+    DemonBackfire = { "Burn Proc Chance %" },
+    DamageBoost = { "Physical Damage %" },
+    ZombieAbsorb = { "Absorb Chance %" },
+    LifeSteal = { "Life Steal %" },
+    Ice = { "Freeze Duration (s)", "Proc Chance %", "Cooldown (s)" },
+}
+
+local function countNilPlaceholders(desc)
+    local count = 0
+    for _ in string.gmatch(desc or "", "nil") do
+        count += 1
+    end
+    return count
+end
+
+----------------------------------------------------------------
+-- GRAB ORE ICONS FROM IN-GAME MENU (ViewportFrames)
 ----------------------------------------------------------------
 local OreIconSources = {}
 local GenericOreIconTemplate = nil
@@ -216,7 +535,7 @@ local function initOreIcons()
     end)
 
     if not ok or not oresRoot then
-        warn("[AutoSellEditor] Could not locate Menu.Ores root; icons will be generic.")
+        warn("[AutoSellEditor] Could not locate Menu.Ores root; ore icons will be generic.")
         return
     end
 
@@ -231,7 +550,8 @@ local function initOreIcons()
             for _, oreFrame in ipairs(listFolder:GetChildren()) do
                 if oreFrame:IsA("Frame") then
                     local main = oreFrame:FindFirstChild("Main")
-                    local vf   = main and main:FindFirstChild("ViewportFrame")
+                    local vf   = main and
+                    (main:FindFirstChildOfClass("ViewportFrame") or main:FindFirstChild("ViewportFrame"))
                     if vf and vf:IsA("ViewportFrame") then
                         OreIconSources[oreFrame.Name] = vf
                     end
@@ -241,7 +561,7 @@ local function initOreIcons()
     end
 end
 
-initOreIcons()
+pcall(initOreIcons)
 
 ----------------------------------------------------------------
 -- CONFIG
@@ -254,6 +574,7 @@ local function makeDefaultConfig()
         essence         = {},
         essenceRarities = {},
         runes           = {},
+        runeTraits      = {},
     }
 end
 
@@ -277,11 +598,23 @@ local function loadConfig()
     end
 
     decoded.version         = decoded.version or 1
-    decoded.ores            = decoded.ores            or {}
-    decoded.oreRarities     = decoded.oreRarities     or {}
-    decoded.essence         = decoded.essence         or {}
+    decoded.ores            = decoded.ores or {}
+    decoded.oreRarities     = decoded.oreRarities or {}
+    decoded.essence         = decoded.essence or {}
     decoded.essenceRarities = decoded.essenceRarities or {}
-    decoded.runes           = decoded.runes           or {}
+    decoded.runes           = decoded.runes or {}
+    decoded.runeTraits      = decoded.runeTraits or {}
+
+    for traitId, rule in pairs(decoded.runeTraits) do
+        if type(rule) ~= "table" then
+            decoded.runeTraits[traitId] = { enabled = false, params = {} }
+        else
+            rule.enabled = rule.enabled == true
+            if type(rule.params) ~= "table" then
+                rule.params = {}
+            end
+        end
+    end
 
     return decoded
 end
@@ -333,11 +666,9 @@ local function createUI()
     local mainFrame = Instance.new("Frame")
     mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     if isMobile then
-        -- Scale-based, fills most of the screen on phones
         mainFrame.Size = UDim2.new(0.96, 0, 0.85, 0)
     else
-        -- Desktop-style fixed size
-        mainFrame.Size = UDim2.new(0, 900, 0, 480)
+        mainFrame.Size = UDim2.new(0, 900, 0, 520)
     end
     mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
@@ -378,7 +709,7 @@ local function createUI()
     tbGrad.Parent = titleBar
 
     local titleText = Instance.new("TextLabel")
-    titleText.Size = UDim2.new(0, 300, 1, 0)
+    titleText.Size = UDim2.new(0, 340, 1, 0)
     titleText.Position = UDim2.new(0, 16, 0, 0)
     titleText.BackgroundTransparency = 1
     titleText.Font = Enum.Font.GothamBold
@@ -397,7 +728,7 @@ local function createUI()
     subtitle.TextSize = 12
     subtitle.TextXAlignment = Enum.TextXAlignment.Right
     subtitle.TextColor3 = Color3.fromRGB(185, 185, 210)
-    subtitle.Text = "WORK IN PROGRESS"
+    subtitle.Text = "BETA - Please report any issues in the Cerberus Discord!"
     subtitle.ZIndex = 4
     subtitle.Parent = titleBar
 
@@ -413,7 +744,7 @@ local function createUI()
     closeButton.Parent = titleBar
 
     local infoLabel = Instance.new("TextLabel")
-    infoLabel.Size = UDim2.new(1, -32, 0, 42)
+    infoLabel.Size = UDim2.new(1, -32, 0, 56)
     infoLabel.Position = UDim2.new(0, 16, 0, 44)
     infoLabel.BackgroundTransparency = 1
     infoLabel.Font = Enum.Font.Gotham
@@ -424,16 +755,17 @@ local function createUI()
     infoLabel.TextColor3 = Color3.fromRGB(220, 220, 230)
     infoLabel.ZIndex = 3
     infoLabel.Text =
-        "Threshold is how many to keep; any extra gets auto-sold. " ..
-        "Changes save instantly; hit Reload AutoSell in the main script to apply."
+        "• Ores / Essences: Threshold = how many to keep; extras get auto-sold.\n" ..
+        "• Rune Traits: enable traits + set stat filters (▲ = at or above, ▼ = at or below) to protect runes.\n" ..
+        "• Changes save instantly; hit Reload AutoSell in the main script to actually apply."
     infoLabel.Parent = mainFrame
 
     ----------------------------------------------------------------
-    -- TAB BAR (scrollable for mobile)
+    -- TAB BAR
     ----------------------------------------------------------------
     local tabBar = Instance.new("ScrollingFrame")
     tabBar.Size = UDim2.new(1, -32, 0, 30)
-    tabBar.Position = UDim2.new(0, 16, 0, 90)
+    tabBar.Position = UDim2.new(0, 16, 0, 106)
     tabBar.BackgroundTransparency = 1
     tabBar.ZIndex = 3
     tabBar.ScrollBarThickness = isMobile and 6 or 3
@@ -453,59 +785,96 @@ local function createUI()
     end)
 
     ----------------------------------------------------------------
-    -- CONTENT AREA
+    -- CONTENT AREA + SEARCH ROW
     ----------------------------------------------------------------
-    local contentFrame = Instance.new("Frame")
-    contentFrame.Size = UDim2.new(1, -32, 1, -146)
-    contentFrame.Position = UDim2.new(0, 16, 0, 130)
-    contentFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
-    contentFrame.BorderSizePixel = 0
-    contentFrame.ZIndex = 2
-    contentFrame.Parent = mainFrame
+    local contentFrame               = Instance.new("Frame")
+    contentFrame.Size                = UDim2.new(1, -32, 1, -176)
+    contentFrame.Position            = UDim2.new(0, 16, 0, 138)
+    contentFrame.BackgroundColor3    = Color3.fromRGB(12, 12, 16)
+    contentFrame.BorderSizePixel     = 0
+    contentFrame.ZIndex              = 2
+    contentFrame.Parent              = mainFrame
 
-    local cfCorner = Instance.new("UICorner")
-    cfCorner.CornerRadius = UDim.new(0, 10)
-    cfCorner.Parent = contentFrame
+    local cfCorner                   = Instance.new("UICorner")
+    cfCorner.CornerRadius            = UDim.new(0, 10)
+    cfCorner.Parent                  = contentFrame
 
-    local cfStroke = Instance.new("UIStroke")
-    cfStroke.Color = Color3.fromRGB(60, 60, 90)
-    cfStroke.Thickness = 1
-    cfStroke.Transparency = 0.35
-    cfStroke.Parent = contentFrame
+    local cfStroke                   = Instance.new("UIStroke")
+    cfStroke.Color                   = Color3.fromRGB(60, 60, 90)
+    cfStroke.Thickness               = 1
+    cfStroke.Transparency            = 0.35
+    cfStroke.Parent                  = contentFrame
 
-    local scroll = Instance.new("ScrollingFrame")
-    scroll.Size = UDim2.new(1, -8, 1, -8)
-    scroll.Position = UDim2.new(0, 4, 0, 4)
-    scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-    scroll.ScrollBarThickness = isMobile and 10 or 6
-    scroll.BackgroundTransparency = 1
-    scroll.ZIndex = 2
-    scroll.BorderSizePixel = 0
-    scroll.Parent = contentFrame
+    -- Header row: now JUST the search bar (no label)
+    local headerRow                  = Instance.new("Frame")
+    headerRow.Size                   = UDim2.new(1, -8, 0, 28)
+    headerRow.Position               = UDim2.new(0, 4, 0, 4)
+    headerRow.BackgroundTransparency = 1
+    headerRow.ZIndex                 = 3
+    headerRow.Parent                 = contentFrame
 
-    local grid = Instance.new("UIGridLayout")
-    grid.CellSize = UDim2.new(0, 275, 0, 55) -- will be updated responsively
-    grid.CellPadding = UDim2.new(0, 8, 0, 8)
-    grid.FillDirection = Enum.FillDirection.Horizontal
-    grid.SortOrder = Enum.SortOrder.LayoutOrder
-    grid.Parent = scroll
+    local searchBox                  = Instance.new("TextBox")
+    searchBox.AnchorPoint            = Vector2.new(0, 0.5)
+    searchBox.Position               = UDim2.new(0, 0, 0.5, 0)
+    searchBox.Size                   = UDim2.new(1, 0, 1, 0)
+    searchBox.BackgroundColor3       = Color3.fromRGB(24, 24, 34)
+    searchBox.BorderSizePixel        = 0
+    searchBox.PlaceholderText        = "Search..."
+    searchBox.Font                   = Enum.Font.Gotham
+    searchBox.TextSize               = 12
+    searchBox.TextColor3             = Color3.fromRGB(255, 255, 255)
+    searchBox.TextXAlignment         = Enum.TextXAlignment.Left
+    searchBox.ClearTextOnFocus       = false
+    searchBox.ZIndex                 = 4
+    searchBox.Text                   = "" -- prevent "TextBox"
+    searchBox.Parent                 = headerRow
 
-    local padding = Instance.new("UIPadding")
-    padding.PaddingTop    = UDim.new(0, 8)
-    padding.PaddingLeft   = UDim.new(0, 8)
-    padding.PaddingRight  = UDim.new(0, 8)
-    padding.PaddingBottom = UDim.new(0, 8)
-    padding.Parent = scroll
+    local sbCorner                   = Instance.new("UICorner")
+    sbCorner.CornerRadius            = UDim.new(0, 6)
+    sbCorner.Parent                  = searchBox
+
+    local sbPadding                  = Instance.new("UIPadding")
+    sbPadding.PaddingLeft            = UDim.new(0, 8)
+    sbPadding.Parent                 = searchBox
+
+    ----------------------------------------------------------------
+    -- CARD SCROLL AREA
+    ----------------------------------------------------------------
+    local scroll                     = Instance.new("ScrollingFrame")
+    scroll.Size                      = UDim2.new(1, -8, 1, -40)
+    scroll.Position                  = UDim2.new(0, 4, 0, 36)
+    scroll.CanvasSize                = UDim2.new(0, 0, 0, 0)
+    scroll.ScrollBarThickness        = isMobile and 10 or 6
+    scroll.BackgroundTransparency    = 1
+    scroll.ZIndex                    = 2
+    scroll.BorderSizePixel           = 0
+    scroll.Parent                    = contentFrame
+
+    local grid                       = Instance.new("UIGridLayout")
+    grid.CellSize                    = UDim2.new(0, 275, 0, 55)
+    grid.CellPadding                 = UDim2.new(0, 8, 0, 8)
+    grid.FillDirection               = Enum.FillDirection.Horizontal
+    grid.SortOrder                   = Enum.SortOrder.LayoutOrder
+    grid.Parent                      = scroll
+
+    local padding                    = Instance.new("UIPadding")
+    padding.PaddingTop               = UDim.new(0, 8)
+    padding.PaddingLeft              = UDim.new(0, 8)
+    padding.PaddingRight             = UDim.new(0, 8)
+    padding.PaddingBottom            = UDim.new(0, 8)
+    padding.Parent                   = scroll
 
     grid:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         scroll.CanvasSize = UDim2.new(0, 0, 0, grid.AbsoluteContentSize.Y + 16)
     end)
 
     ----------------------------------------------------------------
-    -- RESPONSIVE GRID (desktop / tablet / phone)
+    -- RESPONSIVE GRID
     ----------------------------------------------------------------
+    local currentCellHeight = 55
+
     local function updateGridLayout()
-        local width = scroll.AbsoluteSize.X - 16 -- padding
+        local width = scroll.AbsoluteSize.X - 16
         if width <= 0 then return end
 
         local columns
@@ -518,17 +887,15 @@ local function createUI()
         end
 
         local cardWidth = math.floor((width - (columns - 1) * 8) / columns)
-        grid.CellSize = UDim2.new(0, cardWidth, 0, 55)
+        grid.CellSize = UDim2.new(0, cardWidth, 0, currentCellHeight)
     end
 
     scroll:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateGridLayout)
     mainFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateGridLayout)
-
-    -- initial layout
     task.defer(updateGridLayout)
 
     ----------------------------------------------------------------
-    -- drag logic for title bar (mouse + touch)
+    -- drag logic
     ----------------------------------------------------------------
     do
         local dragging, dragStart, startPos
@@ -536,7 +903,7 @@ local function createUI()
             if input.UserInputType == Enum.UserInputType.MouseButton1
                 or input.UserInputType == Enum.UserInputType.Touch
             then
-                dragging = true
+                dragging  = true
                 dragStart = input.Position
                 startPos  = mainFrame.Position
             end
@@ -550,9 +917,9 @@ local function createUI()
         end)
         UserInputService.InputChanged:Connect(function(input)
             if dragging and (
-                input.UserInputType == Enum.UserInputType.MouseMovement
-                or input.UserInputType == Enum.UserInputType.Touch
-            ) then
+                    input.UserInputType == Enum.UserInputType.MouseMovement
+                    or input.UserInputType == Enum.UserInputType.Touch
+                ) then
                 local delta = input.Position - dragStart
                 mainFrame.Position = UDim2.new(
                     startPos.X.Scale,
@@ -571,7 +938,7 @@ local function createUI()
     closeButton.MouseButton1Click:Connect(closeGui)
 
     ----------------------------------------------------------------
-    -- Card creators
+    -- Card helpers
     ----------------------------------------------------------------
     local function makeToggleButton(parent, initialEnabled, rarityName, onChanged)
         local btn = Instance.new("TextButton")
@@ -611,10 +978,9 @@ local function createUI()
         return btn
     end
 
-    -- item card (with threshold)
-    -- iconTemplate: ViewportFrame (ores)
-    -- iconImageId: string assetId (runes)
-    local function createItemCard(labelText, initialEnabled, initialThreshold, onChanged, iconTemplate, rarityName, iconImageId)
+    -- item card (ores/essences/runes)
+    local function createItemCard(labelText, initialEnabled, initialThreshold, onChanged, iconTemplate, rarityName,
+                                  iconImageId)
         local card = Instance.new("Frame")
         card.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
         card.BorderSizePixel = 0
@@ -627,10 +993,10 @@ local function createUI()
         local stroke = Instance.new("UIStroke")
         stroke.Thickness = 1
         stroke.Transparency = 0.35
-        stroke.Color = rarityName and (RarityColors[rarityName] or Color3.fromRGB(70, 70, 90)) or Color3.fromRGB(70, 70, 90)
+        stroke.Color = rarityName and (RarityColors[rarityName] or Color3.fromRGB(70, 70, 90)) or
+        Color3.fromRGB(70, 70, 90)
         stroke.Parent = card
 
-        -- subtle gradient tinted by rarity
         local grad = Instance.new("UIGradient")
         local base1 = Color3.fromRGB(26, 26, 36)
         local base2 = Color3.fromRGB(16, 16, 24)
@@ -649,7 +1015,7 @@ local function createUI()
         grad.Rotation = 90
         grad.Parent = card
 
-        -- icon
+        -- icon holder
         local iconHolder = Instance.new("Frame")
         iconHolder.AnchorPoint = Vector2.new(0, 0.5)
         iconHolder.Size = UDim2.new(0, 38, 0, 38)
@@ -676,7 +1042,9 @@ local function createUI()
         iconStroke.Parent = iconBG
 
         local icon
+
         if iconTemplate then
+            -- ORE PATH: clone the in-game ViewportFrame and ensure it has a Camera.
             icon = iconTemplate:Clone()
             icon.Size = UDim2.fromScale(1, 1)
             icon.Position = UDim2.new(0, 0, 0, 0)
@@ -687,10 +1055,22 @@ local function createUI()
             icon.Parent = iconBG
 
             local cam = icon:FindFirstChildOfClass("Camera")
-            if cam then
-                icon.CurrentCamera = cam
+
+            if not cam and iconTemplate.CurrentCamera then
+                cam = Instance.new("Camera")
+                cam.CFrame = iconTemplate.CurrentCamera.CFrame
+                cam.Parent = icon
             end
+
+            if not cam then
+                cam = Instance.new("Camera")
+                cam.CFrame = CFrame.new(Vector3.new(4, 3, 4), Vector3.new(0, 0, 0))
+                cam.Parent = icon
+            end
+
+            icon.CurrentCamera = cam
         elseif iconImageId then
+            -- Essence / Rune sprite path
             icon = Instance.new("ImageLabel")
             icon.Size = UDim2.fromScale(1, 1)
             icon.Position = UDim2.new(0, 0, 0, 0)
@@ -704,35 +1084,32 @@ local function createUI()
         end
 
         -- name
-        local nameLabel = Instance.new("TextLabel")
-        nameLabel.Position = UDim2.new(0, 54, 0, 0)
-        nameLabel.Size = UDim2.new(1, -120, 1, 0)
+        local nameLabel                  = Instance.new("TextLabel")
+        nameLabel.Position               = UDim2.new(0, 54, 0, 0)
+        nameLabel.Size                   = UDim2.new(1, -120, 1, 0)
         nameLabel.BackgroundTransparency = 1
-        nameLabel.Font = Enum.Font.GothamSemibold
-        nameLabel.TextSize = 13
-        nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-        nameLabel.TextYAlignment = Enum.TextYAlignment.Center
-        nameLabel.TextColor3 = Color3.fromRGB(235, 235, 245)
-        nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
-        nameLabel.Text = labelText
-        nameLabel.ZIndex = 4
-        nameLabel.Parent = card
+        nameLabel.Font                   = Enum.Font.GothamSemibold
+        nameLabel.TextSize               = 13
+        nameLabel.TextXAlignment         = Enum.TextXAlignment.Left
+        nameLabel.TextYAlignment         = Enum.TextYAlignment.Center
+        nameLabel.TextColor3             = Color3.fromRGB(235, 235, 245)
+        nameLabel.TextTruncate           = Enum.TextTruncate.AtEnd
+        nameLabel.Text                   = labelText
+        nameLabel.ZIndex                 = 4
+        nameLabel.Parent                 = card
 
-        -- internal state
-        local enabledState    = initialEnabled
-        local currentThreshold = initialThreshold or 0
+        local enabledState               = initialEnabled
+        local currentThreshold           = initialThreshold or 0
 
-        -- toggle button
         makeToggleButton(card, enabledState, rarityName, function(enabled)
             enabledState = enabled
             onChanged(enabledState, currentThreshold)
         end)
 
-        -- threshold box
         local thresholdBox = Instance.new("TextBox")
         thresholdBox.AnchorPoint = Vector2.new(1, 0.5)
         thresholdBox.Size = UDim2.new(0, 44, 0, 24)
-        thresholdBox.Position = UDim2.new(1, -64, 0.5, 0) -- 64px from right
+        thresholdBox.Position = UDim2.new(1, -64, 0.5, 0)
         thresholdBox.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
         thresholdBox.BorderSizePixel = 0
         thresholdBox.Font = Enum.Font.Gotham
@@ -757,11 +1134,8 @@ local function createUI()
             onChanged(enabledState, currentThreshold)
         end
 
-        thresholdBox.FocusLost:Connect(function()
-            updateCallback()
-        end)
+        thresholdBox.FocusLost:Connect(updateCallback)
 
-        -- hover highlight (mouse only)
         card.MouseEnter:Connect(function()
             card.BackgroundColor3 = Color3.fromRGB(26, 26, 36)
         end)
@@ -772,7 +1146,6 @@ local function createUI()
         return card
     end
 
-    -- rarity card (no quantity)
     local function createRarityCard(labelText, initialEnabled, onChanged, rarityName)
         local card = Instance.new("Frame")
         card.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
@@ -786,7 +1159,8 @@ local function createUI()
         local stroke = Instance.new("UIStroke")
         stroke.Thickness = 1
         stroke.Transparency = 0.35
-        stroke.Color = rarityName and (RarityColors[rarityName] or Color3.fromRGB(70, 70, 90)) or Color3.fromRGB(70, 70, 90)
+        stroke.Color = rarityName and (RarityColors[rarityName] or Color3.fromRGB(70, 70, 90)) or
+        Color3.fromRGB(70, 70, 90)
         stroke.Parent = card
 
         local grad = Instance.new("UIGradient")
@@ -837,10 +1211,249 @@ local function createUI()
     end
 
     ----------------------------------------------------------------
-    -- Tabs / population
+    -- TRAIT CARD
+    ----------------------------------------------------------------
+    local function createTraitCard(traitDef, rule, onChanged)
+        local desc = traitDef.description or ""
+        local paramCount = countNilPlaceholders(desc)
+
+        rule = rule or {}
+        rule.enabled = rule.enabled == true
+        rule.params = rule.params or {}
+
+        for i = 1, paramCount do
+            rule.params[i] = rule.params[i] or { value = 0, direction = "above" }
+            if rule.params[i].direction ~= "below" then
+                rule.params[i].direction = "above"
+            end
+            if type(rule.params[i].value) ~= "number" then
+                rule.params[i].value = 0
+            end
+        end
+
+        local card = Instance.new("Frame")
+        card.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+        card.BorderSizePixel = 0
+        card.ZIndex = 2
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 8)
+        corner.Parent = card
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Thickness = 1
+        stroke.Transparency = 0.35
+        stroke.Color = Color3.fromRGB(90, 90, 130)
+        stroke.Parent = card
+
+        local grad = Instance.new("UIGradient")
+        grad.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 44)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(16, 16, 26)),
+        })
+        grad.Rotation = 90
+        grad.Parent = card
+
+        local topRow = Instance.new("Frame")
+        topRow.BackgroundTransparency = 1
+        topRow.Size = UDim2.new(1, -8, 0, 40)
+        topRow.Position = UDim2.new(0, 4, 0, 2)
+        topRow.ZIndex = 3
+        topRow.Parent = card
+
+        local iconHolder = Instance.new("Frame")
+        iconHolder.AnchorPoint = Vector2.new(0, 0.5)
+        iconHolder.Size = UDim2.new(0, 34, 0, 34)
+        iconHolder.Position = UDim2.new(0, 4, 0.5, 0)
+        iconHolder.BackgroundTransparency = 1
+        iconHolder.ZIndex = 3
+        iconHolder.Parent = topRow
+
+        local iconBG = Instance.new("Frame")
+        iconBG.Size = UDim2.new(1, 0, 1, 0)
+        iconBG.BackgroundColor3 = Color3.fromRGB(10, 10, 16)
+        iconBG.BorderSizePixel = 0
+        iconBG.ZIndex = 3
+        iconBG.Parent = iconHolder
+
+        local iconCorner = Instance.new("UICorner")
+        iconCorner.CornerRadius = UDim.new(0, 6)
+        iconCorner.Parent = iconBG
+
+        local iconStroke = Instance.new("UIStroke")
+        iconStroke.Color = stroke.Color
+        iconStroke.Transparency = 0.25
+        iconStroke.Thickness = 1
+        iconStroke.Parent = iconBG
+
+        local icon = Instance.new("ImageLabel")
+        icon.Size = UDim2.fromScale(1, 1)
+        icon.Position = UDim2.new(0, 0, 0, 0)
+        icon.AnchorPoint = Vector2.new(0, 0)
+        icon.BackgroundTransparency = 1
+        icon.BorderSizePixel = 0
+        icon.Image = "rbxassetid://" .. tostring(traitDef.iconImageId or "")
+        icon.ScaleType = Enum.ScaleType.Fit
+        icon.ZIndex = 4
+        icon.Parent = iconBG
+
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Position = UDim2.new(0, 46, 0, 0)
+        nameLabel.Size = UDim2.new(1, -140, 1, 0)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Font = Enum.Font.GothamSemibold
+        nameLabel.TextSize = 13
+        nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+        nameLabel.TextYAlignment = Enum.TextYAlignment.Center
+        nameLabel.TextColor3 = Color3.fromRGB(235, 235, 245)
+        nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+        nameLabel.Text = traitDef.name or traitDef.id
+        nameLabel.ZIndex = 4
+        nameLabel.Parent = topRow
+
+        local enabledState = rule.enabled
+        local params = rule.params
+
+        makeToggleButton(topRow, enabledState, nil, function(enabled)
+            enabledState = enabled
+            onChanged(enabledState, params)
+        end)
+
+        local paramContainer = Instance.new("Frame")
+        paramContainer.BackgroundTransparency = 1
+        paramContainer.Position = UDim2.new(0, 8, 0, 44)
+        paramContainer.Size = UDim2.new(1, -16, 1, -50)
+        paramContainer.ZIndex = 3
+        paramContainer.Parent = card
+
+        local paramLayout = Instance.new("UIListLayout")
+        paramLayout.FillDirection = Enum.FillDirection.Vertical
+        paramLayout.Padding = UDim.new(0, 4)
+        paramLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        paramLayout.Parent = paramContainer
+
+        local function applyDirection(btn, dir)
+            if dir == "below" then
+                btn.Text = "▼"
+                btn.BackgroundColor3 = Color3.fromRGB(200, 90, 90)
+            else
+                btn.Text = "▲"
+                btn.BackgroundColor3 = Color3.fromRGB(90, 200, 120)
+            end
+        end
+
+        local function commit()
+            onChanged(enabledState, params)
+        end
+
+        local paramLabels = RuneTraitParamLabels[traitDef.id]
+
+        for i = 1, paramCount do
+            local p = params[i]
+
+            local row = Instance.new("Frame")
+            row.BackgroundTransparency = 1
+            row.Size = UDim2.new(1, 0, 0, 22)
+            row.ZIndex = 3
+            row.Parent = paramContainer
+
+            local label = Instance.new("TextLabel")
+            label.BackgroundTransparency = 1
+            label.Position = UDim2.new(0, 0, 0, 0)
+            label.Size = UDim2.new(0, 110, 1, 0)
+            label.Font = Enum.Font.Gotham
+            label.TextSize = 11
+            label.TextXAlignment = Enum.TextXAlignment.Left
+            label.TextYAlignment = Enum.TextYAlignment.Center
+            label.TextColor3 = Color3.fromRGB(180, 180, 200)
+            label.Text = (paramLabels and paramLabels[i]) or ("Stat " .. i)
+            label.ZIndex = 4
+            label.Parent = row
+
+            local valueBox = Instance.new("TextBox")
+            valueBox.AnchorPoint = Vector2.new(1, 0.5)
+            valueBox.Size = UDim2.new(0, 48, 0, 20)
+            valueBox.Position = UDim2.new(1, -4, 0.5, 0)
+            valueBox.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+            valueBox.BorderSizePixel = 0
+            valueBox.Font = Enum.Font.Gotham
+            valueBox.TextSize = 11
+            valueBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+            valueBox.Text = tostring(p.value or 0)
+            valueBox.PlaceholderText = "0"
+            valueBox.ClearTextOnFocus = false
+            valueBox.ZIndex = 4
+            valueBox.Parent = row
+
+            local vbCorner = Instance.new("UICorner")
+            vbCorner.CornerRadius = UDim.new(0, 5)
+            vbCorner.Parent = valueBox
+
+            local dirButton = Instance.new("TextButton")
+            dirButton.AnchorPoint = Vector2.new(1, 0.5)
+            dirButton.Size = UDim2.new(0, 24, 0, 20)
+            dirButton.Position = UDim2.new(1, -54, 0.5, 0)
+            dirButton.BackgroundColor3 = Color3.fromRGB(90, 200, 120)
+            dirButton.BorderSizePixel = 0
+            dirButton.Font = Enum.Font.GothamBold
+            dirButton.TextSize = 13
+            dirButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            dirButton.AutoButtonColor = false
+            dirButton.ZIndex = 4
+            dirButton.Parent = row
+
+            local dbCorner = Instance.new("UICorner")
+            dbCorner.CornerRadius = UDim.new(0, 5)
+            dbCorner.Parent = dirButton
+
+            applyDirection(dirButton, p.direction)
+
+            dirButton.MouseButton1Click:Connect(function()
+                if p.direction == "below" then
+                    p.direction = "above"
+                else
+                    p.direction = "below"
+                end
+                applyDirection(dirButton, p.direction)
+                commit()
+            end)
+
+            valueBox.FocusLost:Connect(function()
+                local txt = valueBox.Text:gsub("%D", "")
+                local num = tonumber(txt) or 0
+                num = math.clamp(num, 0, 9999)
+                valueBox.Text = tostring(num)
+                p.value = num
+                commit()
+            end)
+        end
+
+        card.MouseEnter:Connect(function()
+            card.BackgroundColor3 = Color3.fromRGB(26, 26, 38)
+        end)
+        card.MouseLeave:Connect(function()
+            card.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+        end)
+
+        commit()
+
+        return card
+    end
+
+    ----------------------------------------------------------------
+    -- Tabs + Search integration
     ----------------------------------------------------------------
     local currentTab = nil
     local tabButtons = {}
+    local currentSearchText = ""
+
+    local function matchesSearch(name)
+        if currentSearchText == "" then
+            return true
+        end
+        name = string.lower(name or "")
+        return string.find(name, currentSearchText, 1, true) ~= nil
+    end
 
     local function clearCards()
         for _, child in ipairs(scroll:GetChildren()) do
@@ -850,117 +1463,153 @@ local function createUI()
         end
     end
 
+    local function populateTab()
+        if not currentTab then return end
+
+        clearCards()
+
+        if currentTab == "Ores" then
+            for _, oreName in ipairs(OreNamesList) do
+                if matchesSearch(oreName) then
+                    local rule = Config.ores[oreName] or { enabled = false, threshold = 0 }
+                    local iconTemplate = getOreIconTemplate(oreName)
+                    local rarityName = OreRarityMap[oreName]
+
+                    local card = createItemCard(
+                        oreName,
+                        rule.enabled,
+                        rule.threshold or 0,
+                        function(enabled, threshold)
+                            Config.ores[oreName] = { enabled = enabled, threshold = threshold }
+                            saveConfig()
+                        end,
+                        iconTemplate,
+                        rarityName
+                    )
+
+                    card.Parent = scroll
+                end
+            end
+        elseif currentTab == "Ore Rarities" then
+            for _, rName in ipairs(OreRarityList) do
+                if matchesSearch(rName) then
+                    local rule = Config.oreRarities[rName] or { enabled = false, threshold = 0 }
+
+                    local card = createRarityCard(
+                        rName,
+                        rule.enabled,
+                        function(enabled)
+                            Config.oreRarities[rName] = { enabled = enabled, threshold = 0 }
+                            saveConfig()
+                        end,
+                        rName
+                    )
+
+                    card.Parent = scroll
+                end
+            end
+        elseif currentTab == "Essence" then
+            for _, essName in ipairs(EssenceNamesList) do
+                if matchesSearch(essName) then
+                    local rule = Config.essence[essName] or { enabled = false, threshold = 0 }
+                    local rarityName = EssenceRarityMap[essName]
+                    local imageId = EssenceImageIds[essName]
+
+                    local card = createItemCard(
+                        essName,
+                        rule.enabled,
+                        rule.threshold or 0,
+                        function(enabled, threshold)
+                            Config.essence[essName] = { enabled = enabled, threshold = threshold }
+                            saveConfig()
+                        end,
+                        nil,
+                        rarityName,
+                        imageId
+                    )
+
+                    card.Parent = scroll
+                end
+            end
+        elseif currentTab == "Essence Rarities" then
+            for _, rName in ipairs(EssenceRarityList) do
+                if matchesSearch(rName) then
+                    local rule = Config.essenceRarities[rName] or { enabled = false, threshold = 0 }
+
+                    local card = createRarityCard(
+                        rName,
+                        rule.enabled,
+                        function(enabled)
+                            Config.essenceRarities[rName] = { enabled = enabled, threshold = 0 }
+                            saveConfig()
+                        end,
+                        rName
+                    )
+
+                    card.Parent = scroll
+                end
+            end
+        elseif currentTab == "Runes" then
+            for _, runeName in ipairs(RuneValues) do
+                if matchesSearch(runeName) then
+                    local rule = Config.runes[runeName] or { enabled = false, threshold = 0 }
+                    local imageId = RuneImageIds[runeName]
+
+                    local card = createItemCard(
+                        runeName,
+                        rule.enabled,
+                        rule.threshold or 0,
+                        function(enabled, threshold)
+                            Config.runes[runeName] = { enabled = enabled, threshold = threshold }
+                            saveConfig()
+                        end,
+                        nil,
+                        "Rare",
+                        imageId
+                    )
+
+                    card.Parent = scroll
+                end
+            end
+        elseif currentTab == "Rune Traits" then
+            for _, traitDef in ipairs(RuneTraitDefinitions) do
+                local nameToMatch = (traitDef.name or traitDef.id or "")
+                if matchesSearch(nameToMatch) then
+                    local existingRule = Config.runeTraits[traitDef.id] or { enabled = false, params = {} }
+                    local card = createTraitCard(
+                        traitDef,
+                        existingRule,
+                        function(enabled, params)
+                            Config.runeTraits[traitDef.id] = {
+                                enabled = enabled,
+                                params = params,
+                            }
+                            saveConfig()
+                        end
+                    )
+                    card.Parent = scroll
+                end
+            end
+        end
+
+        task.defer(updateGridLayout)
+    end
+
     local function setTab(name)
         currentTab = name
         for tabName, btn in pairs(tabButtons) do
             btn.BackgroundColor3 = (tabName == name) and Color3.fromRGB(70, 70, 110) or Color3.fromRGB(35, 35, 50)
         end
 
-        clearCards()
-
-        if name == "Ores" then
-            for _, oreName in ipairs(OreNamesList) do
-                local rule = Config.ores[oreName] or { enabled = false, threshold = 0 }
-                local iconTemplate = getOreIconTemplate(oreName)
-                local rarityName = OreRarityMap[oreName]
-
-                local card = createItemCard(
-                    oreName,
-                    rule.enabled,
-                    rule.threshold or 0,
-                    function(enabled, threshold)
-                        Config.ores[oreName] = { enabled = enabled, threshold = threshold }
-                        saveConfig()
-                    end,
-                    iconTemplate,
-                    rarityName
-                )
-
-                card.Parent = scroll
-            end
-
-        elseif name == "Ore Rarities" then
-            for _, rName in ipairs(OreRarityList) do
-                local rule = Config.oreRarities[rName] or { enabled = false, threshold = 0 }
-
-                local card = createRarityCard(
-                    rName,
-                    rule.enabled,
-                    function(enabled)
-                        -- no quantity: always treat rarity threshold as 0, just enable/disable
-                        Config.oreRarities[rName] = { enabled = enabled, threshold = 0 }
-                        saveConfig()
-                    end,
-                    rName
-                )
-
-                card.Parent = scroll
-            end
-
-        elseif name == "Essence" then
-            for _, essName in ipairs(EssenceNamesList) do
-                local rule = Config.essence[essName] or { enabled = false, threshold = 0 }
-                local rarityName = EssenceRarityMap[essName]
-                -- ADDED: Look up image ID
-                local imageId = EssenceImageIds[essName]
-
-                local card = createItemCard(
-                    essName,
-                    rule.enabled,
-                    rule.threshold or 0,
-                    function(enabled, threshold)
-                        Config.essence[essName] = { enabled = enabled, threshold = threshold }
-                        saveConfig()
-                    end,
-                    nil,        -- no viewport
-                    rarityName,
-                    imageId     -- pass image ID
-                )
-
-                card.Parent = scroll
-            end
-
-        elseif name == "Essence Rarities" then
-            for _, rName in ipairs(EssenceRarityList) do
-                local rule = Config.essenceRarities[rName] or { enabled = false, threshold = 0 }
-
-                local card = createRarityCard(
-                    rName,
-                    rule.enabled,
-                    function(enabled)
-                        Config.essenceRarities[rName] = { enabled = enabled, threshold = 0 }
-                        saveConfig()
-                    end,
-                    rName
-                )
-
-                card.Parent = scroll
-            end
-
-        elseif name == "Runes" then
-            for _, runeName in ipairs(RuneValues) do
-                local rule = Config.runes[runeName] or { enabled = false, threshold = 0 }
-                local imageId = RuneImageIds[runeName]
-
-                local card = createItemCard(
-                    runeName,
-                    rule.enabled,
-                    rule.threshold or 0,
-                    function(enabled, threshold)
-                        Config.runes[runeName] = { enabled = enabled, threshold = threshold }
-                        saveConfig()
-                    end,
-                    nil,             -- no viewport
-                    "Rare",          -- treat as Rare for colour
-                    imageId          -- iconImageId
-                )
-
-                card.Parent = scroll
-            end
+        if name == "Rune Traits" then
+            currentCellHeight = 130
+        else
+            currentCellHeight = 55
         end
+        updateGridLayout()
 
-        -- recalc scroll / grid layout after repopulating
-        task.defer(updateGridLayout)
+        -- keep search text, just re-apply filter
+        populateTab()
     end
 
     local function makeTabButton(name)
@@ -991,16 +1640,23 @@ local function createUI()
     makeTabButton("Essence")
     makeTabButton("Essence Rarities")
     makeTabButton("Runes")
+    makeTabButton("Rune Traits")
+
+    -- Search integration: update currentSearchText and repopulate current tab
+    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        currentSearchText = string.lower(searchBox.Text or "")
+        populateTab()
+    end)
 
     setTab("Ores")
 
     return gui
 end
 
--- Expose to main script (so a button can re-open it)
+-- Expose to main script
 getgenv().OpenAutoSellConfig = function()
     createUI()
 end
 
--- Auto-open when running this script standalone
+-- Auto-open when running standalone
 createUI()
