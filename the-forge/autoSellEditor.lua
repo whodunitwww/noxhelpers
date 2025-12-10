@@ -5,7 +5,7 @@
 --   • Legendary/Mythical Essence and Essence Icons supported.
 --   • "Rune Traits" tab with per-trait stat filters (Above/Below).
 --   • Rune trait config is saved under Config.runeTraits[traitId].
---   • Rune trait cards: no description, proper stat labels, stats fit in card.
+--   • Rune trait cards: stat labels pulled from real Shared.Data.Runes stats.
 --   • ADDED: Per-tab Search box (filters items in the current tab).
 
 -- CONFIG PATH
@@ -16,6 +16,8 @@ local Players            = game:GetService("Players")
 local HttpService        = game:GetService("HttpService")
 local CoreGui            = game:GetService("CoreGui")
 local UserInputService   = game:GetService("UserInputService")
+local ReplicatedStorage  = game:GetService("ReplicatedStorage")
+local Shared             = ReplicatedStorage:WaitForChild("Shared")
 
 local LocalPlayer        = Players.LocalPlayer
 
@@ -41,7 +43,7 @@ local OreRarityMap       = {
     ["Iron"]          = "Common",
     ["Tin"]           = "Uncommon",
     ["Silver"]        = "Uncommon",
-    ["Gold"]          = "Uncommon",
+    ["Gold"]          = "Common",
     ["Mushroomite"]   = "Rare",
     ["Platinum"]      = "Rare",
     ["Bananite"]      = "Uncommon",
@@ -159,9 +161,8 @@ local EssenceImageIds      = {
 }
 
 ----------------------------------------------------------------
--- RUNE TRAIT DEFINITIONS (from your dump)
+-- RUNE TRAIT DEFINITIONS (from your dump) – DISPLAY-ONLY
 ----------------------------------------------------------------
-
 local RuneTraitDefinitions = {
     {
         id = "Radioactive",
@@ -173,7 +174,7 @@ local RuneTraitDefinitions = {
         id = "Berserker",
         name = "Berserker",
         description =
-        "Boosts physical damage and movement speed by nil% for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.",
+            "Boosts physical damage and movement speed by nil% for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.",
         iconImageId = "99579458536104",
     },
     {
@@ -192,7 +193,7 @@ local RuneTraitDefinitions = {
         id = "Thorn",
         name = "Thorn",
         description =
-        "Reflect nil% physical damage taken. Maximum damage given limits at 5% max health of user. 0.05 seconds cooldown.",
+            "Reflect nil% physical damage taken. Maximum damage given limits at 5% max health of user. 0.05 seconds cooldown.",
         iconImageId = "126391228181883",
     },
     {
@@ -205,7 +206,7 @@ local RuneTraitDefinitions = {
         id = "DemonDevilsFinger",
         name = "Devil's Finger",
         description =
-        "When you dash, teleport with hellfire particles and 35% chance to create a hellfire circle deal AOE to the enemies inside dealing 45% damage of your weapon per second for 3 sec.",
+            "When you dash, teleport with hellfire particles and 35% chance to create a hellfire circle deal AOE to the enemies inside dealing 45% damage of your weapon per second for 3 sec.",
         iconImageId = "126391228181883",
     },
     {
@@ -230,7 +231,7 @@ local RuneTraitDefinitions = {
         id = "ToxicVeins",
         name = "Toxic Veins",
         description =
-        "Deals nil% poison damage around the character for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.",
+            "Deals nil% poison damage around the character for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.",
         iconImageId = "131438262369264",
     },
     {
@@ -243,7 +244,7 @@ local RuneTraitDefinitions = {
         id = "Explosion",
         name = "Explosion",
         description =
-        "Cause an explosion at location of victim, dealing nil% of weapon damage as AOE damage. nil% chance on hit.",
+            "Cause an explosion at location of victim, dealing nil% of weapon damage as AOE damage. nil% chance on hit.",
         iconImageId = "110063824255919",
     },
     {
@@ -334,7 +335,7 @@ local RuneTraitDefinitions = {
         id = "BadSmell",
         name = "Bad Smell",
         description =
-        "Deals nil% poison damage around the character for nil seconds, fearing enemies. Has nil seconds cooldown. Activates when health is below 35%.",
+            "Deals nil% poison damage around the character for nil seconds, fearing enemies. Has nil seconds cooldown. Activates when health is below 35%.",
         iconImageId = "133381322224239",
     },
     {
@@ -423,51 +424,110 @@ local RuneTraitDefinitions = {
     },
 }
 
+----------------------------------------------------------------
+-- OPTIONAL FRIENDLIER LABEL OVERRIDES (by trait + index OR statName)
+-- These are *cosmetic* only; ordering/stat count comes from Runes module.
+----------------------------------------------------------------
 local RuneTraitParamLabels = {
-    Radioactive = { "AoE % Max HP" },
-    Berserker = { "Buff % (DMG+MS)", "Buff Duration (s)", "Cooldown (s)" },
-    Poison = { "Poison % / sec", "Duration (s)", "Proc Chance %" },
-    FlatHealthRegen = { "HP / sec" },
-    Thorn = { "Reflect % Damage" },
-    AttackSpeedBoost = { "Attack Speed %" },
-    JumpBoost = { "Jump Height %" },
-    ShadowPhantomStep = { "Immortality Chance %" },
-    ToxicVeins = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
-    MoveSpeed = { "Move Speed %" },
-    Explosion = { "Explosion DMG %", "Proc Chance %" },
-    MinePower = { "Mine Damage %" },
+    Radioactive         = { "AoE % Max HP" },
+    Berserker           = { "Buff % (DMG+MS)", "Buff Duration (s)", "Cooldown (s)" },
+    Poison              = { "Poison % / sec", "Duration (s)", "Proc Chance %" },
+    FlatHealthRegen     = { "HP / sec" },
+    Thorn               = { "Reflect % Damage" },
+    AttackSpeedBoost    = { "Attack Speed %" },
+    JumpBoost           = { "Jump Height %" },
+    ShadowPhantomStep   = { "Immortality Chance %" },
+    ToxicVeins          = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
+    MoveSpeed           = { "Move Speed %" },
+    Explosion           = { "Explosion DMG %", "Proc Chance %" },
+    MinePower           = { "Mine Damage %" },
     NegativeHealthBoost = { "Max HP Penalty %" },
-    Fire = { "Burn % / sec", "Duration (s)", "Proc Chance %" },
-    DashIFrame = { "Dash I-Frame %" },
-    Shield = { "Damage Reduction %", "Proc Chance %" },
+    Fire                = { "Burn % / sec", "Duration (s)", "Proc Chance %" },
+    DashIFrame          = { "Dash I-Frame %" },
+    Shield              = { "Damage Reduction %", "Proc Chance %" },
     NegativeStaminaBoost = { "Stamina Penalty %" },
-    MineSpeed = { "Mining Speed %" },
-    CriticalChance = { "Crit Chance %" },
-    LuckBoost = { "Luck %" },
-    Snow = { "Slow Amount %", "Duration (s)", "Proc Chance %" },
-    ExtraMineDrop = { "Extra Drop Chance %", "Extra Ores Count" },
-    BadSmell = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
-    StaminaBoost = { "Stamina %" },
-    DashDistance = { "Dash Distance %" },
-    DashCooldown = { "Dash CD Reduction %" },
-    CriticalDamage = { "Crit Damage %" },
-    XPBoost = { "XP Gain %" },
-    HealthBoost = { "Max HP %" },
-    StunDamage = { "Stun Damage %" },
-    NegativeMoveSpeed = { "Move Speed Penalty %" },
-    DemonBackfire = { "Burn Proc Chance %" },
-    DamageBoost = { "Physical Damage %" },
-    ZombieAbsorb = { "Absorb Chance %" },
-    LifeSteal = { "Life Steal %" },
-    Ice = { "Freeze Duration (s)", "Proc Chance %", "Cooldown (s)" },
+    MineSpeed           = { "Mining Speed %" },
+    CriticalChance      = { "Crit Chance %" },
+    LuckBoost           = { "Luck %" },
+    Snow                = { "Slow Amount %", "Duration (s)", "Proc Chance %" },
+    ExtraMineDrop       = { "Extra Drop Chance %", "Extra Ores Count" },
+    BadSmell            = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
+    StaminaBoost        = { "Stamina %" },
+    DashDistance        = { "Dash Distance %" },
+    DashCooldown        = { "Dash CD Reduction %" },
+    CriticalDamage      = { "Crit Damage %" },
+    XPBoost             = { "XP Gain %" },
+    HealthBoost         = { "Max HP %" },
+    StunDamage          = { "Stun Damage %" },
+    NegativeMoveSpeed   = { "Move Speed Penalty %" },
+    DemonBackfire       = { "Burn Proc Chance %" },
+    DamageBoost         = { "Physical Damage %" },
+    ZombieAbsorb        = { "Absorb Chance %" },
+    LifeSteal           = { "Life Steal %" },
+    Ice                 = { "Freeze Duration (s)", "Proc Chance %", "Cooldown (s)" },
 }
 
+----------------------------------------------------------------
+-- RUNE TRAIT STAT ORDER FROM REAL GAME DATA
+-- This makes the editor 1:1 with runtime getNumericStats.
+----------------------------------------------------------------
+local RuneTraitStatOrder = {}  -- [traitId] = { statName1, statName2, ... }
+
+local function initRuneTraitStatOrder()
+    local ok, Runes = pcall(function()
+        return require(Shared:WaitForChild("Data"):WaitForChild("Runes"))
+    end)
+    if not ok or not Runes or type(Runes) ~= "table" then
+        warn("[AutoSellEditor] Failed to require Shared.Data.Runes; Rune trait labels will be generic.")
+        return
+    end
+
+    local pool = Runes.TraitPool or {}
+    for traitId, traitData in pairs(pool) do
+        local stats = traitData.Stats
+        if type(stats) == "table" then
+            local keys = {}
+            for statName, _ in pairs(stats) do
+                if statName ~= "Stackable" and statName ~= "UseLowest" then
+                    table.insert(keys, statName)
+                end
+            end
+            table.sort(keys) -- must match getNumericStats alphabetical ordering
+            if #keys > 0 then
+                RuneTraitStatOrder[traitId] = keys
+            end
+        end
+    end
+end
+
+pcall(initRuneTraitStatOrder)
+
+----------------------------------------------------------------
+-- Small helpers
+----------------------------------------------------------------
 local function countNilPlaceholders(desc)
     local count = 0
     for _ in string.gmatch(desc or "", "nil") do
         count += 1
     end
     return count
+end
+
+local function prettifyStatName(statName)
+    if not statName or statName == "" then
+        return nil
+    end
+
+    -- replace underscores with spaces
+    local s = statName:gsub("_", " ")
+
+    -- insert spaces before capitals (DamageBoost -> Damage Boost)
+    s = s:gsub("(%l)(%u)", "%1 %2")
+
+    -- upper-case first letter
+    s = s:sub(1, 1):upper() .. s:sub(2)
+
+    return s
 end
 
 ----------------------------------------------------------------
@@ -551,7 +611,7 @@ local function initOreIcons()
                 if oreFrame:IsA("Frame") then
                     local main = oreFrame:FindFirstChild("Main")
                     local vf   = main and
-                    (main:FindFirstChildOfClass("ViewportFrame") or main:FindFirstChild("ViewportFrame"))
+                        (main:FindFirstChildOfClass("ViewportFrame") or main:FindFirstChild("ViewportFrame"))
                     if vf and vf:IsA("ViewportFrame") then
                         OreIconSources[oreFrame.Name] = vf
                     end
@@ -805,7 +865,7 @@ local function createUI()
     cfStroke.Transparency            = 0.35
     cfStroke.Parent                  = contentFrame
 
-    -- Header row: now JUST the search bar (no label)
+    -- Header row: just the search bar
     local headerRow                  = Instance.new("Frame")
     headerRow.Size                   = UDim2.new(1, -8, 0, 28)
     headerRow.Position               = UDim2.new(0, 4, 0, 4)
@@ -826,7 +886,7 @@ local function createUI()
     searchBox.TextXAlignment         = Enum.TextXAlignment.Left
     searchBox.ClearTextOnFocus       = false
     searchBox.ZIndex                 = 4
-    searchBox.Text                   = "" -- prevent "TextBox"
+    searchBox.Text                   = ""
     searchBox.Parent                 = headerRow
 
     local sbCorner                   = Instance.new("UICorner")
@@ -994,7 +1054,7 @@ local function createUI()
         stroke.Thickness = 1
         stroke.Transparency = 0.35
         stroke.Color = rarityName and (RarityColors[rarityName] or Color3.fromRGB(70, 70, 90)) or
-        Color3.fromRGB(70, 70, 90)
+            Color3.fromRGB(70, 70, 90)
         stroke.Parent = card
 
         local grad = Instance.new("UIGradient")
@@ -1044,7 +1104,6 @@ local function createUI()
         local icon
 
         if iconTemplate then
-            -- ORE PATH: clone the in-game ViewportFrame and ensure it has a Camera.
             icon = iconTemplate:Clone()
             icon.Size = UDim2.fromScale(1, 1)
             icon.Position = UDim2.new(0, 0, 0, 0)
@@ -1070,7 +1129,6 @@ local function createUI()
 
             icon.CurrentCamera = cam
         elseif iconImageId then
-            -- Essence / Rune sprite path
             icon = Instance.new("ImageLabel")
             icon.Size = UDim2.fromScale(1, 1)
             icon.Position = UDim2.new(0, 0, 0, 0)
@@ -1160,7 +1218,7 @@ local function createUI()
         stroke.Thickness = 1
         stroke.Transparency = 0.35
         stroke.Color = rarityName and (RarityColors[rarityName] or Color3.fromRGB(70, 70, 90)) or
-        Color3.fromRGB(70, 70, 90)
+            Color3.fromRGB(70, 70, 90)
         stroke.Parent = card
 
         local grad = Instance.new("UIGradient")
@@ -1211,11 +1269,17 @@ local function createUI()
     end
 
     ----------------------------------------------------------------
-    -- TRAIT CARD
+    -- TRAIT CARD (UPDATED: uses real stat names / ordering)
     ----------------------------------------------------------------
     local function createTraitCard(traitDef, rule, onChanged)
-        local desc = traitDef.description or ""
-        local paramCount = countNilPlaceholders(desc)
+        local traitId    = traitDef.id
+        local statOrder  = RuneTraitStatOrder[traitId] or {}
+        local paramCount = #statOrder
+
+        -- fallback: if we somehow didn't get stats from the game, fall back to "nil" count
+        if paramCount == 0 then
+            paramCount = countNilPlaceholders(traitDef.description or "")
+        end
 
         rule = rule or {}
         rule.enabled = rule.enabled == true
@@ -1346,10 +1410,11 @@ local function createUI()
             onChanged(enabledState, params)
         end
 
-        local paramLabels = RuneTraitParamLabels[traitDef.id]
+        local overrideLabels = RuneTraitParamLabels[traitId]
 
         for i = 1, paramCount do
             local p = params[i]
+            local statName = statOrder[i] -- may be nil if we fell back to nil-count
 
             local row = Instance.new("Frame")
             row.BackgroundTransparency = 1
@@ -1360,13 +1425,27 @@ local function createUI()
             local label = Instance.new("TextLabel")
             label.BackgroundTransparency = 1
             label.Position = UDim2.new(0, 0, 0, 0)
-            label.Size = UDim2.new(0, 110, 1, 0)
+            label.Size = UDim2.new(0, 140, 1, 0)
             label.Font = Enum.Font.Gotham
             label.TextSize = 11
             label.TextXAlignment = Enum.TextXAlignment.Left
             label.TextYAlignment = Enum.TextYAlignment.Center
             label.TextColor3 = Color3.fromRGB(180, 180, 200)
-            label.Text = (paramLabels and paramLabels[i]) or ("Stat " .. i)
+
+            local labelText
+
+            if statName and statName ~= "" then
+                labelText = statName
+            else
+                if type(overrideLabels) == "table" then
+                    labelText = overrideLabels[statName] or overrideLabels[i]
+                end
+                if not labelText then
+                    labelText = "Stat " .. i
+                end
+            end
+
+            label.Text = labelText
             label.ZIndex = 4
             label.Parent = row
 
@@ -1608,7 +1687,6 @@ local function createUI()
         end
         updateGridLayout()
 
-        -- keep search text, just re-apply filter
         populateTab()
     end
 
