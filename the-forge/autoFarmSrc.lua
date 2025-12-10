@@ -646,6 +646,18 @@ return function(ctx)
             and next(AF_Config.AltNameSet or {}) ~= nil
     end
 
+    local function rockLastHitWasAlt(model)
+        if not model then
+            return false
+        end
+        local lastHit = model:GetAttribute("LastHitPlayer")
+        if not lastHit then
+            return false
+        end
+        local altSet = AF_Config.AltNameSet or {}
+        return altSet[tostring(lastHit):lower()] == true
+    end
+
     local function getAltRockZone(model)
         local rocksFolder = Ores.getRocksFolder()
         if not rocksFolder or not model then
@@ -733,6 +745,7 @@ return function(ctx)
         end
 
         local helperAltActive = isHelperAltEnabled()
+        local mainAltActive   = isMainAltEnabled()
         local questOverrideActive = AF_Config.QuestPriorityOverrideEnabled and questTargets
 
         if questOverrideActive and questTargets.refresh then
@@ -774,8 +787,13 @@ return function(ctx)
                     end
 
                     if def.name == FARM_MODE_ORES and isRockLastHitByOther(model) then
-                        -- tagged by others; not available
-                        continue
+                        local allowAltRock = mainAltActive
+                            and rockLastHitWasAlt(model)
+                            and shouldHoldTargetForWhitelist(model)
+                        if not allowAltRock then
+                            -- tagged by others; not available
+                            continue
+                        end
                     end
 
                     local pos = def.getPos(model)
@@ -1049,27 +1067,32 @@ return function(ctx)
 
                 -- If an ore was tagged by someone else, ditch it immediately
                 if activeTarget and activeDef.name == FARM_MODE_ORES and isRockLastHitByOther(activeTarget) then
-                    if shouldHoldTargetForWhitelist(activeTarget) and not helperAltActive then
+                    local allowAltRock = mainAltActive
+                        and rockLastHitWasAlt(activeTarget)
+                        and shouldHoldTargetForWhitelist(activeTarget)
+                    if not allowAltRock then
+                        if shouldHoldTargetForWhitelist(activeTarget) and not helperAltActive then
+                            task.wait(0.1)
+                            return
+                        end
+
+                        blacklistTarget(activeTarget, 20)
+                        stopMoving()
+                        FarmState.attached     = false
+                        FarmState.detourActive = false
+
+                        if isDistracted then
+                            FarmState.tempMobTarget = nil
+                        else
+                            FarmState.currentTarget = nil
+                            if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
+                                Dashboard.setCurrentTarget(nil)
+                            end
+                        end
+
                         task.wait(0.1)
                         return
                     end
-
-                    blacklistTarget(activeTarget, 20)
-                    stopMoving()
-                    FarmState.attached     = false
-                    FarmState.detourActive = false
-
-                    if isDistracted then
-                        FarmState.tempMobTarget = nil
-                    else
-                        FarmState.currentTarget = nil
-                        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                            Dashboard.setCurrentTarget(nil)
-                        end
-                    end
-
-                    task.wait(0.1)
-                    return
                 end
 
                 if FarmState.mode == FARM_MODE_ORES and mainAltActive then
