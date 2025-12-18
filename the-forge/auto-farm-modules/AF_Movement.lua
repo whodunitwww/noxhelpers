@@ -156,11 +156,8 @@ return function(env)
 
         task.wait(0.1)
         
-        -- 1. Move to Cannon
         hrp.CFrame = CANNON_PATH.CFrame
-        task.wait(0.5) 
-
-        -- 2. Move to Target Destination
+        task.wait(0.48) 
         hrp.CFrame = targetCFrame
 
         -- 3. FORCED VELOCITY NEUTRALIZER
