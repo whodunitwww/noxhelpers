@@ -1326,7 +1326,7 @@ return function(ctx)
                 -- DETOUR LOGIC
                 if activeTarget and not FarmState.attached and not isDistracted then
                     local hrpPos = hrp.Position
-                    if (game.PlaceId == 129009554587176) and hrpPos.X < -160 then
+                    if (game.PlaceId == 129009554587176) and hrpPos.X < -180 then
                         if not FarmState.detourActive then
                             FarmState.detourActive = true
                             if not FarmState.detourNotified then
