@@ -1,5 +1,6 @@
 -- AF_Movement.lua
--- Manages AttachPanel configuration and movement towards targets (including detour logic)
+-- Manages AttachPanel configuration and movement towards targets
+-- Updated: Fixed "Rubber-banding" by enforcing position after Teleport
 return function(env)
     local AttachPanel  = env.AttachPanel
     local MoveToPos    = env.MoveToPos
@@ -10,22 +11,23 @@ return function(env)
     local References   = env.References or {}
     local Players      = Services.Players or game:GetService("Players")
 
+    -- 1. Configuration Defaults
+    if AF_Config.MovementMode == nil then
+        AF_Config.MovementMode = "Tween"
+    end
+
     -- Attach settings constants
     local ORE_ATTACH_MODE   = "Aligned"
     local ORE_ATTACH_Y_BASE = -8
     local ORE_ATTACH_HORIZ  = 0
-    local ORE_HIT_INTERVAL  = 0.15
-    local ORE_HIT_DIST      = 20
-
+    
     local MOB_ATTACH_MODE   = "Aligned"
     local MOB_ATTACH_Y_BASE = -7
     local MOB_ATTACH_HORIZ  = 0
-    local MOB_HIT_INTERVAL  = 0.15
-    local MOB_HIT_DIST      = 20
 
-    -- Detour path constants
+    -- Detour path constants (For Standard Mode)
     local DETOUR_ENABLED     = (game.PlaceId == 129009554587176)
-    local DETOUR_THRESHOLD_X = -120
+    local DETOUR_THRESHOLD_X = -160
     local DETOUR_POINTS = {
         Vector3.new(-259.431091, 21.436172, -129.926697),
         Vector3.new(-417.186188, 31.620274, -246.402084),
@@ -36,6 +38,26 @@ return function(env)
         Vector3.new(336.205627, 142.614944, -237.229599),
         Vector3.new(359.745148, 74.859268, -224.669601),
     }
+
+    -- Cannon Path (For Bypass Mode)
+    local function getCannonPart()
+        local land = workspace.Assets:FindFirstChild("Main Island [2]")
+        if land then
+            local subLand = land:FindFirstChild("Land [2]")
+            if subLand then
+                local children = subLand:GetChildren()
+                if children[21] and children[21]:FindFirstChild("CannonPart") then
+                    return children[21].CannonPart
+                end
+                for _, child in ipairs(children) do
+                    if child:FindFirstChild("CannonPart") then
+                        return child.CannonPart
+                    end
+                end
+            end
+        end
+        return nil
+    end
 
     local SavedAttach = nil
 
@@ -134,11 +156,16 @@ return function(env)
         realignAttach(target, overrideDef)
     end
 
+
+    ------------------------------------------------------------------------------------
+    -- MASTER MOVEMENT FUNCTION
+    ------------------------------------------------------------------------------------
     local function startMovingToTarget(target, overrideDef)
         if AttachPanel.DestroyAttach then pcall(AttachPanel.DestroyAttach) end
         stopMoving()
+        
         local hrp = getLocalHRP()
-        local def = overrideDef or nil  -- def is not heavily used in this version
+        local def = overrideDef or nil 
         if not hrp then return end
 
         local function getFinalPos()
@@ -149,6 +176,82 @@ return function(env)
             return root.Position + safeComputeOffset(root.CFrame, modeName)
         end
 
+        local function getFinalCFrame()
+            if not target or not target.Parent then return nil end
+            local root = (def and def.getRoot and def.getRoot(target)) or target:FindFirstChild("HumanoidRootPart") or target.PrimaryPart or target
+            if not root then return nil end
+            local modeName = overrideDef and overrideDef.name or FarmState.mode
+            return root.CFrame * CFrame.new(safeComputeOffset(root.CFrame, modeName))
+        end
+
+        --------------------------------------------------------------------------------
+        -- METHOD 1: TELEPORT (CANNON BYPASS)
+        --------------------------------------------------------------------------------
+        if AF_Config.MovementMode == "Teleport" then
+            local cannonPart = getCannonPart()
+            local targetCFrame = getFinalCFrame()
+
+            if cannonPart and targetCFrame then
+                local prompt = cannonPart:FindFirstChildOfClass("ProximityPrompt")
+                local active = true
+
+                -- 1. Start Spammer
+                task.spawn(function()
+                    while active do
+                        if prompt then fireproximityprompt(prompt) end
+                        task.wait(0.1)
+                    end
+                end)
+
+                -- 2. Move to Cannon & Wait for connection
+                local startWait = os.clock()
+                repeat
+                    -- Repeatedly force CFrame to ensure we stay at cannon to trigger prompt
+                    hrp.CFrame = cannonPart.CFrame
+                    hrp.AssemblyLinearVelocity = Vector3.zero
+                    task.wait()
+                until (hrp.Position - cannonPart.Position).Magnitude < 10 or (os.clock() - startWait > 2)
+                
+                -- 3. Interaction Buffer
+                task.wait(0.55) 
+
+                -- 4. Stop Spamming BEFORE we leave
+                active = false 
+                
+                -- 5. Force Unsiting (Crucial for snap-back fix)
+                local hum = hrp.Parent and hrp.Parent:FindFirstChild("Humanoid")
+                if hum then
+                    hum.Sit = false
+                end
+                
+                -- 6. Move to Target with ENFORCEMENT LOOP
+                hrp.Anchored = true 
+                
+                -- We loop here to constantly override server-side rubber banding
+                for i = 1, 12 do
+                    hrp.CFrame = targetCFrame
+                    hrp.AssemblyLinearVelocity = Vector3.zero
+                    hrp.AssemblyAngularVelocity = Vector3.zero
+                    
+                    -- Keep unsitting just in case
+                    if hum then hum.Sit = false end
+                    
+                    task.wait(0.05)
+                end
+                
+                hrp.Anchored = false 
+
+                -- 7. Finalize
+                attachToTarget(target, overrideDef)
+                return
+            else
+                -- Fallback to standard if cannon not found
+            end
+        end
+
+        --------------------------------------------------------------------------------
+        -- METHOD 2: STANDARD FLIGHT / TWEEN
+        --------------------------------------------------------------------------------
         local startPos = hrp.Position
         local finalPos = getFinalPos()
         if not finalPos then return end
@@ -156,11 +259,14 @@ return function(env)
         FarmState.lastMovePos = startPos
         FarmState.lastMoveTime = os.clock()
 
-        local useDetour = DETOUR_ENABLED and (startPos.X < DETOUR_THRESHOLD_X)
+        -- Only use detour if we are NOT in Teleport mode (prevents detour when falling back)
+        local useDetour = (AF_Config.MovementMode ~= "Teleport") 
+                          and DETOUR_ENABLED 
+                          and (startPos.X < DETOUR_THRESHOLD_X)
+        
         if not useDetour then
             local waypoints = { finalPos }
             if AF_Config.AvoidPlayers then
-                -- Compute path around nearby player (if any)
                 local ab = finalPos - startPos
                 if ab.Magnitude >= 5 then
                     local hitPlayerPos = nil
@@ -172,13 +278,7 @@ return function(env)
                             local phrp = char and char:FindFirstChild("HumanoidRootPart")
                             if phrp then
                                 local p = phrp.Position
-                                local ap = p - startPos
-                                local t = 0
-                                local abDot = ab:Dot(ab)
-                                if abDot > 0 then
-                                    t = math.clamp(ap:Dot(ab) / abDot, 0, 1)
-                                end
-                                local closestPoint = startPos + ab * t
+                                local closestPoint = startPos + ab * math.clamp((p - startPos):Dot(ab) / ab:Dot(ab), 0, 1)
                                 local dist = (p - closestPoint).Magnitude
                                 if dist <= AF_Config.PlayerAvoidRadius and dist < closestHitDist then
                                     closestHitDist = dist
@@ -189,14 +289,9 @@ return function(env)
                     end
                     if hitPlayerPos then
                         local sideDir = ab:Cross(Vector3.yAxis)
-                        if sideDir.Magnitude < 1e-3 then 
-                            sideDir = Vector3.new(1, 0, 0) 
-                        else 
-                            sideDir = sideDir.Unit 
-                        end
+                        if sideDir.Magnitude < 1e-3 then sideDir = Vector3.new(1, 0, 0) else sideDir = sideDir.Unit end
                         local offsetDist = AF_Config.PlayerAvoidRadius + 8
-                        local mid = hitPlayerPos + sideDir * offsetDist
-                        mid = Vector3.new(mid.X, startPos.Y, mid.Z)
+                        local mid = Vector3.new((hitPlayerPos + sideDir * offsetDist).X, startPos.Y, (hitPlayerPos + sideDir * offsetDist).Z)
                         waypoints = { mid, finalPos }
                     end
                 end
@@ -209,10 +304,7 @@ return function(env)
                 local currentCleanup = nil
                 local function globalCleanup()
                     active = false
-                    if currentCleanup then
-                        pcall(currentCleanup)
-                        currentCleanup = nil
-                    end
+                    if currentCleanup then pcall(currentCleanup) currentCleanup = nil end
                 end
                 FarmState.moveCleanup = globalCleanup
                 task.spawn(function()
@@ -222,15 +314,8 @@ return function(env)
                         local wpStart = os.clock()
                         while active do
                             local h = getLocalHRP()
-                            if not h then
-                                if currentCleanup then pcall(currentCleanup) end
-                                return
-                            end
-                            if (h.Position - waypoint).Magnitude <= 3 then
-                                if currentCleanup then pcall(currentCleanup) end
-                                break
-                            end
-                            if (os.clock() - wpStart) > 5 then
+                            if not h then if currentCleanup then pcall(currentCleanup) end return end
+                            if (h.Position - waypoint).Magnitude <= 3 or (os.clock() - wpStart) > 5 then
                                 if currentCleanup then pcall(currentCleanup) end
                                 break
                             end
@@ -239,20 +324,16 @@ return function(env)
                     end
                     if active then FarmState.moveCleanup = nil end
                 end)
-                -- No direct return here, allow function to proceed to end in non-detour case
             end
             return
         end
 
-        -- Detour path logic (if useDetour == true)
+        -- Detour path logic
         local active = true
         local currentCleanup = nil
         local function globalCleanup()
             active = false
-            if currentCleanup then
-                pcall(currentCleanup)
-                currentCleanup = nil
-            end
+            if currentCleanup then pcall(currentCleanup) currentCleanup = nil end
         end
         FarmState.moveCleanup = globalCleanup
         task.spawn(function()
@@ -262,15 +343,8 @@ return function(env)
                 local wpStart = os.clock()
                 while active do
                     local h = getLocalHRP()
-                    if not h then
-                        if currentCleanup then pcall(currentCleanup) end
-                        return
-                    end
-                    if (h.Position - waypoint).Magnitude <= 3 then
-                        if currentCleanup then pcall(currentCleanup) end
-                        break
-                    end
-                    if (os.clock() - wpStart) > 8 then
+                    if not h then if currentCleanup then pcall(currentCleanup) end return end
+                    if (h.Position - waypoint).Magnitude <= 3 or (os.clock() - wpStart) > 8 then
                         if currentCleanup then pcall(currentCleanup) end
                         break
                     end
@@ -279,10 +353,7 @@ return function(env)
             end
             if not active then return end
             local fp = getFinalPos()
-            if not fp then
-                globalCleanup()
-                return
-            end
+            if not fp then globalCleanup() return end
             currentCleanup = MoveToPos(fp, AF_Config.FarmSpeed, function() return getFinalPos() end)
         end)
     end
