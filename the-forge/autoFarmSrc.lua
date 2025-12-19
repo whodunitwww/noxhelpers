@@ -50,6 +50,7 @@ return function(ctx)
         AltNameSet                   = {},
         QuestPriorityOverrideEnabled = false,
         QuestAutoCompleteEnabled     = false,
+        MovementMode                 = "Teleport",
     }
 
     local FarmState            = {
@@ -1864,6 +1865,15 @@ return function(ctx)
 
     FarmGroup:AddDivider()
 
+    FarmGroup:AddDropdown("AF_MovementMode", {
+        Text     = "Movement Method",
+        Values   = { "Tween", "Teleport" },
+        Default  = "Teleport",
+        Callback = function(value)
+            AF_Config.MovementMode = value
+        end,
+    })
+
     FarmGroup:AddToggle("AF_Enabled", {
         Text     = "Auto Farm",
         Default  = false,
@@ -1933,7 +1943,7 @@ return function(ctx)
     ----------------------------------------------------------------
     local QuestGroup = AutoTab:AddLeftGroupbox("Auto Quest", "scroll")
 
-    QuestGroup:AddLabel("This is partially done. Will be finished tommorow.", true)
+    QuestGroup:AddLabel("This is partially done.", true)
 
     QuestGroup:AddToggle("AF_QuestPriorityOverride", {
         Text     = "Quest Priority Override",
@@ -1959,7 +1969,7 @@ return function(ctx)
     })
 
     QuestGroup:AddToggle("AF_QuestAutoStart", {
-        Text     = "Quest Autocomplete [soon]",
+        Text     = "Quest AutoStart [soon]",
         Default  = AF_Config.QuestAutoCompleteEnabled,
         Callback = function(state)
             if state then
