@@ -27,7 +27,7 @@ return function(env)
 
     -- Detour path constants (For Standard Mode)
     local DETOUR_ENABLED     = (game.PlaceId == 129009554587176)
-    local DETOUR_THRESHOLD_X = -160
+    local DETOUR_THRESHOLD_X = -180
     local DETOUR_POINTS = {
         Vector3.new(-259.431091, 21.436172, -129.926697),
         Vector3.new(-417.186188, 31.620274, -246.402084),
