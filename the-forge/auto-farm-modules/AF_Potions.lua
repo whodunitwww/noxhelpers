@@ -1,15 +1,15 @@
 -- AF_Potions.lua
--- Manages auto-using potions and auto-restocking with Cannon Bypass
+-- Manages auto-using potions and auto-restocking
 return function(env)
-    local Services        = env.Services
-    local Options         = env.Options
-    local Toggles         = env.Toggles
-    local FarmState       = env.FarmState
-    local PurchaseRF      = env.PurchaseRF
+    local Services     = env.Services
+    local Options      = env.Options
+    local Toggles      = env.Toggles
+    local FarmState    = env.FarmState
+    local PurchaseRF   = env.PurchaseRF
     local ToolActivatedRF = env.ToolActivatedRF
-    local notify          = env.notify
-    local AttachPanel     = env.AttachPanel
-    local stopMoving      = env.stopMoving
+    local notify       = env.notify
+    local AttachPanel  = env.AttachPanel
+    local stopMoving   = env.stopMoving
 
     local Players = Services.Players or game:GetService("Players")
 
@@ -21,26 +21,6 @@ return function(env)
         ["Luck Potion I"]   = "LuckPotion1",
         ["Miner Potion I"]  = "MinerPotion1",
     }
-
-    -- Helper to find the cannon (Same logic as Movement module)
-    local function getCannonPart()
-        local land = workspace.Assets:FindFirstChild("Main Island [2]")
-        if land then
-            local subLand = land:FindFirstChild("Land [2]")
-            if subLand then
-                local children = subLand:GetChildren()
-                if children[21] and children[21]:FindFirstChild("CannonPart") then
-                    return children[21].CannonPart
-                end
-                for _, child in ipairs(children) do
-                    if child:FindFirstChild("CannonPart") then
-                        return child.CannonPart
-                    end
-                end
-            end
-        end
-        return nil
-    end
 
     local function getPotionCount(displayName)
         local player = Players.LocalPlayer
@@ -80,67 +60,24 @@ return function(env)
         local player = Players.LocalPlayer
         local char = player and player.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
-        local hum  = char and char:FindFirstChild("Humanoid")
         if not root then return end
 
         FarmState.restocking = true
-        
-        -- 1. Clean up existing farming states
+        -- Detach/stop movement
         stopMoving()
         if AttachPanel.DestroyAttach then pcall(AttachPanel.DestroyAttach) end
         FarmState.attached = false
         FarmState.currentTarget = nil
 
-        -- 2. Execute Cannon Bypass Logic
-        local cannonPart = getCannonPart()
-        
-        if cannonPart then
-            local prompt = cannonPart:FindFirstChildOfClass("ProximityPrompt")
-            local active = true
+        -- Kill momentum instead of full freeze
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
 
-            -- A. Background Spammer
-            task.spawn(function()
-                while active do
-                    if prompt then fireproximityprompt(prompt) end
-                    task.wait(0.1)
-                end
-            end)
+        -- Teleport to shop location
+        root.CFrame = RESTOCK_CFRAME
+        task.wait(0.15)  -- small wait for replication
 
-            -- B. Teleport to Cannon & Wait for connection
-            local startWait = os.clock()
-            repeat
-                root.CFrame = cannonPart.CFrame
-                root.AssemblyLinearVelocity = Vector3.zero
-                task.wait()
-            until (root.Position - cannonPart.Position).Magnitude < 10 or (os.clock() - startWait > 2)
-            
-            -- C. Interaction Buffer
-            task.wait(0.55)
-
-            -- D. Stop Spamming
-            active = false
-
-            -- E. Force Un-sit (Prevent snapback)
-            if hum then hum.Sit = false end
-
-            -- F. Move to Shop (Velocity Kill Loop)
-            root.Anchored = true
-            for i = 1, 15 do
-                root.CFrame = RESTOCK_CFRAME
-                root.AssemblyLinearVelocity = Vector3.zero
-                root.AssemblyAngularVelocity = Vector3.zero
-                if hum then hum.Sit = false end
-                task.wait(0.05)
-            end
-            root.Anchored = false
-        else
-            -- Fallback if no cannon found
-            root.AssemblyLinearVelocity = Vector3.zero
-            root.CFrame = RESTOCK_CFRAME
-            task.wait(0.5)
-        end
-
-        -- 3. Purchase potions up to 10 each
+        -- Purchase potions up to 10 each
         for displayName, isOn in pairs(selected) do
             if isOn then
                 local current = getPotionCount(displayName)
@@ -183,32 +120,26 @@ return function(env)
                 if not (Toggles.AutoPotions_Enable and Toggles.AutoPotions_Enable.Value) then
                     continue
                 end
-                
                 -- Check auto-restock
                 if Toggles.AutoPotions_AutoRestock.Value and needsRestock(2) then
-                    -- Only restock if we aren't already doing it
-                    if not FarmState.restocking then
-                        pcall(function() restockPotions(false) end)
-                        task.wait(1)  -- wait for inventory update
-                    end
+                    FarmState.restocking = true
+                    pcall(function() restockPotions(false) end)
+                    task.wait(1)  -- wait for inventory update
+                    FarmState.restocking = false
                 end
-                
                 -- Use potions at interval
                 local interval = Options.AutoPotions_Interval.Value
                 if os.clock() - lastUse < interval then continue end
                 lastUse = os.clock()
-                
                 local selected = Options.AutoPotions_List.Value
                 local player = Players.LocalPlayer
                 if player and player.Character then
                     local char = player.Character
                     local hum = char:FindFirstChild("Humanoid")
                     local backpack = player:FindFirstChild("Backpack")
-                    
-                    if hum and backpack and not FarmState.restocking then
+                    if hum and backpack then
                         -- Save currently equipped tool
                         local previouslyEquipped = char:FindFirstChildOfClass("Tool")
-                        
                         for displayName, isOn in pairs(selected) do
                             if isOn then
                                 local toolId = PotionDisplayToToolId[displayName]
@@ -216,7 +147,6 @@ return function(env)
                                 if not tool and toolId then
                                     tool = backpack:FindFirstChild(toolId) or char:FindFirstChild(toolId)
                                 end
-                                
                                 if tool then
                                     hum:EquipTool(tool)
                                     task.wait(0.3)
@@ -231,7 +161,6 @@ return function(env)
                                 end
                             end
                         end
-                        
                         -- Restore previous tool
                         if previouslyEquipped and previouslyEquipped.Parent == backpack then
                             hum:EquipTool(previouslyEquipped)
