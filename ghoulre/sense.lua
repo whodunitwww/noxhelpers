@@ -731,9 +731,18 @@ function EspInterface.Unload()
 	EspInterface._hasLoaded = false;
 end
 
--- game specific functions
 function EspInterface.getWeapon(player)
-	return "Unknown";
+    local entities = workspace:FindFirstChild("Entities")
+    local char = entities and entities:FindFirstChild(player.Name)
+    
+    if char then
+        local typeVal = char:FindFirstChild("Type")
+        if typeVal and typeVal:IsA("StringValue") then
+            return typeVal.Value
+        end
+    end
+    
+    return "None"
 end
 
 function EspInterface.isFriendly(player)
