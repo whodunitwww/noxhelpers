@@ -1,42 +1,74 @@
 -- AF_Priority.lua
 -- Handles default priorities and config file loading for ores and enemies
 return function(env)
-    local HttpService = env.HttpService
-    local notify      = env.notify
+    local HttpService             = env.HttpService
+    local notify                  = env.notify
 
-    local PRIORITY_CONFIG_VERSION = 1.1
+    local PRIORITY_CONFIG_VERSION = 2.0
 
-    local DefaultOrePriority = {
-        ["Crimson Crystal"] = 1,
-        ["Violet Crystal"]  = 1,
-        ["Cyan Crystal"]    = 1,
-        ["Earth Crystal"]   = 1,
-        ["Light Crystal"]   = 1,
-        ["Volcanic Rock"]   = 2,
-        ["Basalt Vein"]     = 3,
-        ["Basalt Core"]     = 4,
-        ["Basalt Rock"]     = 5,
-        ["Boulder"]         = 6,
-        ["Rock"]            = 6,
-        ["Pebble"]          = 6,
-        ["Lucky Block"]     = 6,
+    local DefaultOrePriority      = {
+        ["Crimson Crystal"]     = 1,
+        ["Violet Crystal"]      = 1,
+        ["Cyan Crystal"]        = 1,
+        ["Earth Crystal"]       = 1,
+        ["Light Crystal"]       = 1,
+        ["Floating Crystal"]    = 1,
+        ["Crimson Ice"]         = 1,
+        ["Large Ice Crystal"]   = 1,
+        ["Medium Ice Crystal"]  = 1,
+        ["Small Ice Crystal"]   = 1,
+        ["Volcanic Rock"]       = 2,
+        ["Lava Rock"]           = 2,
+        ["Basalt Vein"]         = 3,
+        ["Basalt Core"]         = 4,
+        ["Basalt Rock"]         = 5,
+        ["Basalt"]              = 5,
+        ["Boulder"]             = 6,
+        ["Rock"]                = 6,
+        ["Pebble"]              = 6,
+        ["Icy Boulder"]         = 6,
+        ["Icy Pebble"]          = 6,
+        ["Icy Rock"]            = 6,
+        ["Iceberg"]             = 6,
+        ["Heart Of The Island"] = 6,
+        ["Lucky Block"]         = 6,
     }
-    local PermOreList = {
+
+    local PermOreList             = {
         "Crimson Crystal",
+        "Violet Crystal",
         "Cyan Crystal",
         "Earth Crystal",
         "Light Crystal",
+        "Floating Crystal",
+        "Crimson Ice",
+        "Large Ice Crystal",
+        "Medium Ice Crystal",
+        "Small Ice Crystal",
         "Volcanic Rock",
+        "Lava Rock",
         "Basalt Vein",
         "Basalt Core",
     }
-    local DefaultEnemyPriority = {
+
+    local DefaultEnemyPriority    = {
+        ["Demonic Queen Spider"]    = 1,
         ["Blazing Slime"]           = 1,
+        ["Demonic Spider"]          = 2,
+        ["Crystal Golem"]           = 2,
         ["Blight Pyromancer"]       = 2,
         ["Elite Deathaxe Skeleton"] = 2,
         ["Reaper"]                  = 3,
+        ["Elite Orc"]               = 3,
+        ["Yeti"]                    = 3,
+        ["Diamond Spider"]          = 3,
+        ["Prismarine Spider"]       = 3,
+        ["Crystal Spider"]          = 3,
         ["Elite Rogue Skeleton"]    = 4,
+        ["Golem"]                   = 4,
+        ["Mini Demonic Spider"]     = 4,
         ["Deathaxe Skeleton"]       = 5,
+        ["Common Orc"]              = 5,
         ["Axe Skeleton"]            = 6,
         ["Skeleton Rogue"]          = 7,
         ["Bomber"]                  = 8,
@@ -44,6 +76,7 @@ return function(env)
         ["MinerZombie"]             = 9,
         ["EliteZombie"]             = 9,
         ["Zombie"]                  = 9,
+        ["Zombie3"]                 = 9,
         ["Delver Zombie"]           = 9,
         ["Brute Zombie"]            = 9,
     }
@@ -101,8 +134,8 @@ return function(env)
                 if fileVersion < PRIORITY_CONFIG_VERSION then
                     applyDefaultPriorities()
                     writeDefaultPriorityConfig()
-                    notify("Priority config outdated (v" .. fileVersion 
-                           .. " vs v" .. PRIORITY_CONFIG_VERSION .. "). Resetting.", 5)
+                    notify("Priority config outdated (v" .. fileVersion
+                        .. " vs v" .. PRIORITY_CONFIG_VERSION .. "). Resetting.", 5)
                     return
                 end
                 if type(result.Ores) == "table" then
