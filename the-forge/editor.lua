@@ -22,29 +22,52 @@ local BaseFolder           = "Cerberus"
 local ForgeFolder          = BaseFolder .. "/The Forge"
 local PriorityConfigFile   = ForgeFolder .. "/PriorityConfig.json"
 
-local DefaultOrePriority   = {
-    ["Crimson Crystal"] = 1,
-    ["Violet Crystal"]  = 1,
-    ["Cyan Crystal"]    = 1,
-    ["Earth Crystal"]   = 1,
-    ["Light Crystal"]   = 1,
-    ["Volcanic Rock"]   = 2,
-    ["Basalt Vein"]     = 3,
-    ["Basalt Core"]     = 4,
-    ["Basalt Rock"]     = 5,
-    ["Boulder"]         = 6,
-    ["Rock"]            = 6,
-    ["Pebble"]          = 6,
-    ["Lucky Block"]     = 6,
+local DefaultOrePriority = {
+    ["Crimson Crystal"]   = 1,
+    ["Violet Crystal"]    = 1,
+    ["Cyan Crystal"]      = 1,
+    ["Earth Crystal"]     = 1,
+    ["Light Crystal"]     = 1,
+    ["Floating Crystal"]  = 1,
+    ["Crimson Ice"]       = 1,
+    ["Large Ice Crystal"] = 1,
+    ["Medium Ice Crystal"]= 1,
+    ["Small Ice Crystal"] = 1,
+    ["Volcanic Rock"]     = 2,
+    ["Lava Rock"]         = 2,
+    ["Basalt Vein"]       = 3,
+    ["Basalt Core"]       = 4,
+    ["Basalt Rock"]       = 5,
+    ["Basalt"]            = 5,
+    ["Boulder"]           = 6,
+    ["Rock"]              = 6,
+    ["Pebble"]            = 6,
+    ["Icy Boulder"]       = 6,
+    ["Icy Pebble"]        = 6,
+    ["Icy Rock"]          = 6,
+    ["Iceberg"]           = 6,
+    ["Heart Of The Island"] = 6,
+    ["Lucky Block"]       = 6,
 }
 
 local DefaultEnemyPriority = {
+    ["Demonic Queen Spider"]    = 1,
     ["Blazing Slime"]           = 1,
+    ["Demonic Spider"]          = 2,
+    ["Crystal Golem"]           = 2,
     ["Blight Pyromancer"]       = 2,
     ["Elite Deathaxe Skeleton"] = 2,
     ["Reaper"]                  = 3,
+    ["Elite Orc"]               = 3,
+    ["Yeti"]                    = 3,
+    ["Diamond Spider"]          = 3,
+    ["Prismarine Spider"]       = 3,
+    ["Crystal Spider"]          = 3,
     ["Elite Rogue Skeleton"]    = 4,
+    ["Golem"]                   = 4,
+    ["Mini Demonic Spider"]     = 4,
     ["Deathaxe Skeleton"]       = 5,
+    ["Common Orc"]              = 5,
     ["Axe Skeleton"]            = 6,
     ["Skeleton Rogue"]          = 7,
     ["Bomber"]                  = 8,
@@ -52,9 +75,13 @@ local DefaultEnemyPriority = {
     ["MinerZombie"]             = 9,
     ["EliteZombie"]             = 9,
     ["Zombie"]                  = 9,
+    ["Zombie3"]                 = 9,
     ["Delver Zombie"]           = 9,
     ["Brute Zombie"]            = 9,
 }
+
+return DefaultMobPriority
+
 
 -- // Helpers
 local function ensureFolders()
