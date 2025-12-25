@@ -80,9 +80,6 @@ local DefaultEnemyPriority = {
     ["Brute Zombie"]            = 9,
 }
 
-return DefaultMobPriority
-
-
 -- // Helpers
 local function ensureFolders()
     if not isfolder(BaseFolder) then
