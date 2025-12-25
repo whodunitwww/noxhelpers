@@ -50,6 +50,7 @@ return function(ctx)
         AltNameSet                   = {},
         QuestPriorityOverrideEnabled = false,
         QuestAutoCompleteEnabled     = false,
+        QuestTargetFilter            = {},
         MovementMode                 = "Teleport",
     }
 
@@ -245,6 +246,7 @@ return function(ctx)
     local AUTO_QUEST_REPEAT_INTERVAL = 60
 
     local RunCommandRemote           = nil
+    local QuestServiceRemote         = nil
     local autoQuestMissingWarn       = false
     local AutoQuestState             = {
         running         = false,
@@ -281,26 +283,109 @@ return function(ctx)
             end
         end
 
-        -- Resolve hierarchy
-        local shared     = safeGetChild(storage, "Shared")
-        local packages   = safeGetChild(shared, "Packages")
-        local knitFolder = safeGetChild(packages, "Knit")
-        local services   = safeGetChild(knitFolder, "Services")
+        local function findServicesFolder()
+            local shared     = safeGetChild(storage, "Shared")
+            local packages   = safeGetChild(shared, "Packages") or safeGetChild(storage, "Packages")
+            local knitFolder = safeGetChild(packages, "Knit")
+            local services   = safeGetChild(knitFolder, "Services") or safeGetChild(packages, "Services")
+            if services then
+                return services
+            end
+            return safeGetChild(shared, "Services")
+        end
+
+        local services   = findServicesFolder()
         local dialogue   = safeGetChild(services, "DialogueService")
         local rf         = safeGetChild(dialogue, "RF")
         local runCommand = safeGetChild(rf, "RunCommand")
 
         if not runCommand then
-            warn(
-            "[Cerberus] DialogueService.RF.RunCommand not found; autosell Dialogue commands will be disabled until it exists.")
+            for _, inst in ipairs(storage:GetDescendants()) do
+                if inst:IsA("RemoteFunction") and inst.Name == "RunCommand" then
+                    runCommand = inst
+                    break
+                end
+            end
         end
-
 
         if runCommand then
             RunCommandRemote = runCommand
         end
 
         return RunCommandRemote
+    end
+
+    local function resolveQuestService()
+        if QuestServiceRemote then
+            return QuestServiceRemote
+        end
+
+        local storage = Services.ReplicatedStorage or game:GetService("ReplicatedStorage")
+        if not storage then
+            return nil
+        end
+
+        local function safeGetChild(parent, name, timeout)
+            if not parent then return nil end
+
+            local child = parent:FindFirstChild(name)
+            if child then return child end
+
+            timeout = timeout or 10
+            local ok, result = pcall(function()
+                return parent:WaitForChild(name, timeout)
+            end)
+
+            if ok then
+                return result
+            else
+                return nil
+            end
+        end
+
+        local shared     = safeGetChild(storage, "Shared")
+        local packages   = safeGetChild(shared, "Packages") or safeGetChild(storage, "Packages")
+        local knitHolder = safeGetChild(packages, "Knit") or safeGetChild(shared, "Knit") or safeGetChild(storage, "Knit")
+        local knitModule = knitHolder
+        if knitModule and knitModule:IsA("Folder") then
+            knitModule = safeGetChild(knitModule, "Knit")
+        end
+        if not knitModule or not knitModule:IsA("ModuleScript") then
+            return nil
+        end
+
+        local okKnit, Knit = pcall(require, knitModule)
+        if not okKnit or type(Knit) ~= "table" or type(Knit.GetService) ~= "function" then
+            return nil
+        end
+
+        local okService, service = pcall(Knit.GetService, Knit, "QuestService")
+        if okService and service then
+            QuestServiceRemote = service
+        end
+        return QuestServiceRemote
+    end
+
+    local function tryQuestServiceFinish(service, questId)
+        if not service or not questId then
+            return false
+        end
+        local methods = {
+            "CompleteQuest",
+            "FinishQuest",
+            "TurnInQuest",
+            "ClaimQuest",
+        }
+        for _, methodName in ipairs(methods) do
+            local fn = service[methodName]
+            if type(fn) == "function" then
+                local ok = pcall(fn, service, questId)
+                if ok then
+                    return true
+                end
+            end
+        end
+        return false
     end
 
     local function collectQuestListFrames()
@@ -364,23 +449,64 @@ return function(ctx)
 
     local function runAutoQuestLoop()
         while AutoQuestState.running do
+            local questData = questTargets and questTargets.getQuestData and questTargets.getQuestData()
+            local questIds = questTargets and questTargets.getActiveQuestIds and questTargets.getActiveQuestIds()
+            local questService = resolveQuestService()
             local remote = resolveRunCommandRemote()
-            if not remote then
-                if not autoQuestMissingWarn then
-                    warn("[AutoFarm] Cannot find RunCommand RF for quest autocomplete.")
-                    autoQuestMissingWarn = true
+
+            if questData and questIds and questTargets and questTargets.isQuestCompleted then
+                if not questService and not remote then
+                    if not autoQuestMissingWarn then
+                        warn("[AutoFarm] Cannot find QuestService or RunCommand for quest autocomplete.")
+                        autoQuestMissingWarn = true
+                    end
+                else
+                    autoQuestMissingWarn = false
+                    local now = os.clock()
+                    for _, questId in ipairs(questIds) do
+                        if questTargets.isQuestCompleted(questId) then
+                            local key = "QuestFinish:" .. questId
+                            local lastTime = AutoQuestState.lastCommandTime[key]
+                            if not lastTime or (now - lastTime) >= AUTO_QUEST_REPEAT_INTERVAL then
+                                local finished = false
+                                if questService then
+                                    finished = tryQuestServiceFinish(questService, questId)
+                                end
+                                if not finished and remote then
+                                    local command = "Finish" .. questId
+                                    finished = invokeQuestCommand(command, remote)
+                                    if not finished and questTargets.getQuestSlot then
+                                        local slot = questTargets.getQuestSlot(questId)
+                                        if slot then
+                                            finished = invokeQuestCommand("FinishQuest" .. tostring(slot), remote)
+                                        end
+                                    end
+                                end
+                                if finished then
+                                    AutoQuestState.lastCommandTime[key] = now
+                                end
+                            end
+                        end
+                    end
                 end
             else
-                autoQuestMissingWarn = false
-                local now = os.clock()
-                local frames = collectQuestListFrames()
-                for _, frame in ipairs(frames) do
-                    local command = buildQuestFinishCommand(frame.Name)
-                    if command then
-                        local lastTime = AutoQuestState.lastCommandTime[command]
-                        if not lastTime or (now - lastTime) >= AUTO_QUEST_REPEAT_INTERVAL then
-                            if invokeQuestCommand(command, remote) then
-                                AutoQuestState.lastCommandTime[command] = now
+                if not remote then
+                    if not autoQuestMissingWarn then
+                        warn("[AutoFarm] Cannot find RunCommand RF for quest autocomplete.")
+                        autoQuestMissingWarn = true
+                    end
+                else
+                    autoQuestMissingWarn = false
+                    local now = os.clock()
+                    local frames = collectQuestListFrames()
+                    for _, frame in ipairs(frames) do
+                        local command = buildQuestFinishCommand(frame.Name)
+                        if command then
+                            local lastTime = AutoQuestState.lastCommandTime[command]
+                            if not lastTime or (now - lastTime) >= AUTO_QUEST_REPEAT_INTERVAL then
+                                if invokeQuestCommand(command, remote) then
+                                    AutoQuestState.lastCommandTime[command] = now
+                                end
                             end
                         end
                     end
@@ -1588,7 +1714,7 @@ return function(ctx)
     ----------------------------------------------------------------
     -- Whitelist & Mode UI
     ----------------------------------------------------------------
-    local ModeDropdown, OreTypeDropdown, ZoneDropdown, AppliesToDropdown
+    local ModeDropdown, OreTypeDropdown, ZoneDropdown, AppliesToDropdown, QuestTargetsDropdown
 
     local function refreshAvailableTargets()
         local def = ModeDefs[FarmState.mode]
@@ -1629,6 +1755,12 @@ return function(ctx)
     local function refreshZoneDropdown()
         if ZoneDropdown then
             ZoneDropdown:SetValues(Ores.scanZones())
+        end
+    end
+
+    local function refreshQuestTargetsDropdown()
+        if QuestTargetsDropdown and questTargets and questTargets.getQuestNames then
+            QuestTargetsDropdown:SetValues(questTargets.getQuestNames())
         end
     end
 
@@ -1943,8 +2075,6 @@ return function(ctx)
     ----------------------------------------------------------------
     local QuestGroup = AutoTab:AddLeftGroupbox("Auto Quest", "scroll")
 
-    QuestGroup:AddLabel("This is partially done.", true)
-
     QuestGroup:AddToggle("AF_QuestPriorityOverride", {
         Text     = "Quest Priority Override",
         Default  = AF_Config.QuestPriorityOverrideEnabled,
@@ -1953,6 +2083,29 @@ return function(ctx)
             AF_Config.QuestPriorityOverrideEnabled = state
         end,
     })
+
+    QuestTargetsDropdown = QuestGroup:AddDropdown("AF_QuestTargetFilter", {
+        Text     = "Quest Target Filter",
+        Values   = {},
+        Default  = {},
+        Multi    = true,
+        Tooltip  = "Only prioritize targets from selected quests.",
+        Callback = function(selectedTable)
+            AF_Config.QuestTargetFilter = {}
+            for name, sel in pairs(selectedTable) do
+                if sel then
+                    AF_Config.QuestTargetFilter[name] = true
+                end
+            end
+            if questTargets and questTargets.setQuestFilter then
+                questTargets.setQuestFilter(AF_Config.QuestTargetFilter)
+            end
+        end,
+    })
+
+    QuestGroup:AddButton("Refresh Quest List", function()
+        refreshQuestTargetsDropdown()
+    end)
 
     QuestGroup:AddToggle("AF_QuestAutoComplete", {
         Text     = "Quest Autocomplete",
@@ -1968,16 +2121,6 @@ return function(ctx)
         end,
     })
 
-    QuestGroup:AddToggle("AF_QuestAutoStart", {
-        Text     = "Quest AutoStart [soon]",
-        Default  = AF_Config.QuestAutoCompleteEnabled,
-        Callback = function(state)
-            if state then
-                Library:Notify("Coming next update.", 3)
-            end
-        end,
-    })
-
     if AF_Config.QuestAutoCompleteEnabled then
         startAutoQuestLoop()
     end
@@ -1986,6 +2129,10 @@ return function(ctx)
     Avoidance.refreshHazards()
     refreshOreTypesDropdown()
     refreshZoneDropdown()
+    refreshQuestTargetsDropdown()
+    if questTargets and questTargets.setQuestFilter then
+        questTargets.setQuestFilter(AF_Config.QuestTargetFilter)
+    end
 
     TrackingGroupbox:AddToggle("AF_ProximityTracker", {
         Text     = "Progress Tracker",
