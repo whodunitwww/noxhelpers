@@ -301,63 +301,37 @@ return function(ctx)
         end
     })
     
-    -- == PLAYER SPY == --
+-- == PLAYER SPY == --
     local SpyGroup = Tabs.Misc:AddRightGroupbox("Player Spy", "eye")
 
     local SpyLabels = {}
     local SpyTarget = nil
+    
+    -- Configuration
+    local BasicKeys = { "RC Cells", "Race", "Rank", "Type" } -- "Type" is Weapon
+    local ExtraKeys = { "Stance", "Cash" } 
 
-    -- 1. List of ValueObjects (Removed FirstName/Clan since we merge them manually)
-    local SpyStatKeys = {
-        "Cash",
-        "Currency",
-        "Race",
-        "Rank",
-        "Stance",
-        "Type" -- This is the Weapon
-    }
+    -- 1. Sorting & Filter Options
+    local SortMode = "RC Cells"
 
+    local SpySortDropdown = SpyGroup:AddDropdown("Spy_SortDropdown", {
+        Values = { "RC Cells", "Rank" },
+        Default = "RC Cells",
+        Multi = false,
+        Text = "Sort Players By",
+    })
+
+    local SpyBasicToggle = SpyGroup:AddToggle("Spy_BasicToggle", {
+        Text = "Basic Mode",
+        Default = true,
+    })
+
+    -- 2. Target Dropdown
     local SpyDropdown = SpyGroup:AddDropdown("Spy_TargetDropdown", {
         Values = {},
         Default = nil,
         Multi = false,
         Text = "Select Player",
-    })
-
-    SpyGroup:AddButton({
-        Text = "Refresh Players",
-        Func = function()
-            local t = {}
-            for _, pl in ipairs(Services.Players:GetPlayers()) do
-                table.insert(t, pl.Name)
-            end
-            SpyDropdown:SetValues(t)
-        end
-    })
-
-    SpyGroup:AddDivider()
-
-    -- SPECIAL MERGED NAME LABEL AT TOP
-    local NameLabel = SpyGroup:AddLabel({
-        Text = "Name: ...",
-        DoesWrap = true
-    })
-
-    -- Create Labels for other Stats
-    for _, key in ipairs(SpyStatKeys) do
-        local labelName = (key == "Type") and "Weapon" or key
-        SpyLabels[key] = SpyGroup:AddLabel({
-            Text = labelName .. ": ...",
-            DoesWrap = true
-        })
-    end
-
-    SpyGroup:AddDivider()
-    SpyGroup:AddLabel("== Equipment ==")
-    
-    local EquipmentLabel = SpyGroup:AddLabel({
-        Text = "None",
-        DoesWrap = true
     })
 
     -- 3. Logic Functions
@@ -366,76 +340,211 @@ return function(ctx)
         return entities and entities:FindFirstChild(plrName)
     end
 
+    local function GetStatValue(plrName, statName)
+        local entity = GetEntity(plrName)
+        if not entity then return -1 end 
+
+        if statName == "RC Cells" then
+            return entity:GetAttribute("RCCells") or -1
+        elseif statName == "Rank" then
+            local rObj = entity:FindFirstChild("Rank")
+            return rObj and tostring(rObj.Value) or "ZZZ" 
+        end
+        return 0
+    end
+
+    local function RefreshPlayerList()
+        local players = Services.Players:GetPlayers()
+        local sortList = {}
+
+        for _, pl in ipairs(players) do
+            local val = GetStatValue(pl.Name, SortMode)
+            table.insert(sortList, { Name = pl.Name, Value = val })
+        end
+
+        table.sort(sortList, function(a, b)
+            if SortMode == "RC Cells" then
+                return (tonumber(a.Value) or 0) > (tonumber(b.Value) or 0)
+            else
+                return tostring(a.Value) < tostring(b.Value)
+            end
+        end)
+
+        local finalNames = {}
+        for _, item in ipairs(sortList) do
+            table.insert(finalNames, item.Name)
+        end
+        
+        SpyDropdown:SetValues(finalNames)
+    end
+
+    SpyGroup:AddButton({
+        Text = "Refresh Players",
+        Func = RefreshPlayerList
+    })
+
+    SpyGroup:AddButton({
+        Text = "Show Inventory",
+        Func = function()
+            if not SpyTarget then 
+                Library:Notify({ Title = "Inventory", Description = "No player selected", Time = 3 })
+                return 
+            end
+
+            local targetPlr = Services.Players:FindFirstChild(SpyTarget)
+            if not targetPlr then
+                Library:Notify({ Title = "Inventory", Description = "Player left the server", Time = 3 })
+                return
+            end
+
+            local invList = {}
+            if targetPlr.Character then
+                local equipped = targetPlr.Character:FindFirstChildOfClass("Tool")
+                if equipped then
+                    table.insert(invList, "[Equipped] " .. equipped.Name)
+                end
+            end
+            if targetPlr.Backpack then
+                for _, tool in ipairs(targetPlr.Backpack:GetChildren()) do
+                    if tool:IsA("Tool") then
+                        table.insert(invList, tool.Name)
+                    end
+                end
+            end
+
+            local content = #invList > 0 and table.concat(invList, ", ") or "Empty Inventory"
+            Library:Notify({
+                Title = targetPlr.Name .. "'s Inventory",
+                Description = content,
+                Time = 8
+            })
+        end
+    })
+
+    SpyGroup:AddDivider()
+
+    -- == UI LABELS == --
+    local NameLabel = SpyGroup:AddLabel({ Text = "Name: ...", DoesWrap = true })
+
+    local function CreateSpyLabels(keyList)
+        for _, key in ipairs(keyList) do
+            local labelName = (key == "Type") and "Weapon" or key
+            SpyLabels[key] = SpyGroup:AddLabel({
+                Text = labelName .. ": ...",
+                DoesWrap = true
+            })
+        end
+    end
+
+    CreateSpyLabels(BasicKeys)
+    CreateSpyLabels(ExtraKeys)
+
+    -- Divider for Equipment
+    local EquipDivider = SpyGroup:AddDivider()
+    local EquipmentHeader = SpyGroup:AddLabel("== Equipment ==")
+    local EquipmentLabel = SpyGroup:AddLabel({ Text = "None", DoesWrap = true })
+
+    -- 4. Main Update Logic
+    local function UpdateVisibility()
+        local isBasic = SpyBasicToggle.Value
+        
+        -- SAFE Loop for Labels (Checks if 'obj' exists first)
+        for _, key in ipairs(ExtraKeys) do
+            local obj = SpyLabels[key]
+            if obj and obj.SetVisible then
+                obj:SetVisible(not isBasic)
+            end
+        end
+        
+        -- SAFE Checks for Dividers/Headers
+        if EquipDivider and EquipDivider.SetVisible then 
+            EquipDivider:SetVisible(not isBasic) 
+        end
+        if EquipmentHeader and EquipmentHeader.SetVisible then 
+            EquipmentHeader:SetVisible(not isBasic) 
+        end
+        if EquipmentLabel and EquipmentLabel.SetVisible then 
+            EquipmentLabel:SetVisible(not isBasic) 
+        end
+    end
+
     local function UpdateSpy()
+        UpdateVisibility()
+
         if not SpyTarget then return end
 
         local entity = GetEntity(SpyTarget)
         
         if entity then
-            -- A. Handle Merged Name (FirstName + Clan)
+            -- Name
             local fNameObj = entity:FindFirstChild("FirstName")
             local clanObj = entity:FindFirstChild("Clan")
-            
             local fName = fNameObj and tostring(fNameObj.Value) or "???"
             local clan = clanObj and tostring(clanObj.Value) or ""
-            
             NameLabel:SetText("Name: " .. fName .. " " .. clan)
 
-            -- B. Update Other Stats
-            for _, key in ipairs(SpyStatKeys) do
+            -- Basic Stats
+            for _, key in ipairs(BasicKeys) do
                 local label = SpyLabels[key]
                 local labelTitle = (key == "Type") and "Weapon" or key
                 
-                local valObj = entity:FindFirstChild(key)
-                if valObj then
-                    label:SetText(labelTitle .. ": " .. tostring(valObj.Value))
+                if key == "RC Cells" then
+                    local rcVal = entity:GetAttribute("RCCells")
+                    if rcVal then
+                        label:SetText("RC Cells: " .. math.floor(rcVal + 0.5))
+                    else
+                        label:SetText("RC Cells: N/A")
+                    end
                 else
-                    label:SetText(labelTitle .. ": N/A")
+                    local valObj = entity:FindFirstChild(key)
+                    label:SetText(labelTitle .. ": " .. (valObj and tostring(valObj.Value) or "N/A"))
                 end
             end
 
-            -- C. Update Equipment
-            local equipFolder = entity:FindFirstChild("Equipment")
-            if equipFolder then
-                local equipList = {}
-                
-                -- Iterate through folders like "Arm", "Torso" etc.
-                for _, slot in ipairs(equipFolder:GetChildren()) do
-                    local foundItem = "Empty"
-                    
-                    for _, item in ipairs(slot:GetChildren()) do
-                        foundItem = item.Name
-                        break 
-                    end
-                    
-                    if foundItem ~= "Empty" then
-                        table.insert(equipList, "[" .. slot.Name .. "] " .. foundItem)
+            -- Extra Stats
+            if not SpyBasicToggle.Value then
+                for _, key in ipairs(ExtraKeys) do
+                    local label = SpyLabels[key]
+                    local valObj = entity:FindFirstChild(key)
+                    if label then
+                        label:SetText(key .. ": " .. (valObj and tostring(valObj.Value) or "N/A"))
                     end
                 end
 
-                if #equipList > 0 then
-                    EquipmentLabel:SetText(table.concat(equipList, "\n"))
+                local equipFolder = entity:FindFirstChild("Equipment")
+                if equipFolder then
+                    local equipList = {}
+                    for _, slot in ipairs(equipFolder:GetChildren()) do
+                        local foundItem = "Empty"
+                        for _, item in ipairs(slot:GetChildren()) do
+                            foundItem = item.Name; break 
+                        end
+                        if foundItem ~= "Empty" then
+                            table.insert(equipList, "[" .. slot.Name .. "] " .. foundItem)
+                        end
+                    end
+                    EquipmentLabel:SetText(#equipList > 0 and table.concat(equipList, "\n") or "No Equipment")
                 else
                     EquipmentLabel:SetText("No Equipment")
                 end
-            else
-                EquipmentLabel:SetText("No Equipment")
             end
-
         else
-            -- Entity not found reset
             NameLabel:SetText("Name: Entity Not Found")
-            for _, key in ipairs(SpyStatKeys) do
-                local labelName = (key == "Type") and "Weapon" or key
-                SpyLabels[key]:SetText(labelName .. ": ...")
-            end
-            EquipmentLabel:SetText("...")
         end
     end
 
-    -- 4. Connections
+    -- 5. Connections
     SpyDropdown:OnChanged(function(val)
         SpyTarget = val
+        UpdateSpy()
+    end)
+
+    SpySortDropdown:OnChanged(function(val)
+        SortMode = val
+        RefreshPlayerList()
+    end)
+    
+    SpyBasicToggle:OnChanged(function()
         UpdateSpy()
     end)
 
@@ -448,11 +557,8 @@ return function(ctx)
         end
     end)
 
-    local initialList = {}
-    for _, pl in ipairs(Services.Players:GetPlayers()) do
-        table.insert(initialList, pl.Name)
-    end
-    SpyDropdown:SetValues(initialList)
+    RefreshPlayerList()
+    UpdateVisibility()
 
     -- == CONSOLE  == --
     local ConsoleGroup = Tabs.Misc:AddRightGroupbox("Console", "code")
