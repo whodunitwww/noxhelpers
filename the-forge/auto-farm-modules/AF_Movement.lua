@@ -59,6 +59,13 @@ return function(env)
         return nil
     end
 
+    local function getGaiserCannonPart()
+        local assets = workspace:FindFirstChild("Assets")
+        local gaiser = assets and assets:FindFirstChild("Gaiser")
+        local cannon = gaiser and gaiser:FindFirstChild("CannonPart")
+        return cannon
+    end
+
     local SavedAttach = nil
 
     local function saveAttachSettings()
@@ -188,8 +195,33 @@ return function(env)
         -- METHOD 1: TELEPORT (CANNON BYPASS)
         --------------------------------------------------------------------------------
         if AF_Config.MovementMode == "Teleport" then
-            local cannonPart = getCannonPart()
             local targetCFrame = getFinalCFrame()
+
+            if game.PlaceId == 131884594917121 then
+                local cannonPart = getGaiserCannonPart()
+                if cannonPart and targetCFrame then
+                    local prompt = cannonPart:FindFirstChildOfClass("ProximityPrompt")
+
+                    hrp.CFrame = cannonPart.CFrame
+                    hrp.AssemblyLinearVelocity = Vector3.zero
+                    hrp.AssemblyAngularVelocity = Vector3.zero
+                    task.wait(0.2)
+
+                    if prompt and fireproximityprompt then
+                        fireproximityprompt(prompt)
+                    end
+
+                    task.wait(0.1)
+                    hrp.CFrame = targetCFrame
+                    hrp.AssemblyLinearVelocity = Vector3.zero
+                    hrp.AssemblyAngularVelocity = Vector3.zero
+
+                    attachToTarget(target, overrideDef)
+                    return
+                end
+            end
+
+            local cannonPart = getCannonPart()
 
             if cannonPart and targetCFrame then
                 local prompt = cannonPart:FindFirstChildOfClass("ProximityPrompt")
