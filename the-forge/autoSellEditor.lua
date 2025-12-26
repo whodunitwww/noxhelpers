@@ -191,6 +191,7 @@ local RuneImageIds         = {
     ["Rage Mark"]   = "74377849245058",
     ["Miner Shard"] = "110898589664978",
     ["Flame Spark"] = "73865699740150",
+    ["Frost Speck"] = "435345",
     ["Blast Chip"]  = "85050444076173",
     ["Drain Edge"]  = "89173473574831",
     ["Venom Crumb"] = "77052262266995",
