@@ -13,7 +13,7 @@ return function(env)
 
     local Players = Services.Players or game:GetService("Players")
 
-    local RESTOCK_CFRAME = CFrame.new(-94.434898, 20.585484, -34.270695)
+    local RESTOCK_CFRAME_FALLBACK = CFrame.new(-94.434898, 20.585484, -34.270695)
     local PotionDisplayToToolId = {
         ["Damage Potion I"] = "AttackDamagePotion1",
         ["Speed Potion I"]  = "MovementSpeedPotion1",
@@ -47,6 +47,82 @@ return function(env)
         return 0
     end
 
+    local function normalizeName(name)
+        return tostring(name or ""):lower():gsub("[^%w]", "")
+    end
+
+    local function getInstanceCFrame(inst)
+        if not inst then
+            return nil
+        end
+        if inst:IsA("BasePart") then
+            return inst.CFrame
+        end
+        if inst:IsA("Model") then
+            if inst.PrimaryPart then
+                return inst.PrimaryPart.CFrame
+            end
+            local basePart = inst:FindFirstChildWhichIsA("BasePart")
+            if basePart then
+                return basePart.CFrame
+            end
+            if inst.GetPivot then
+                return inst:GetPivot()
+            end
+        end
+        return nil
+    end
+
+    local function findPotionModel(displayName, toolId)
+        local proximity = workspace:FindFirstChild("Proximity")
+        if not proximity then
+            return nil
+        end
+
+        local exact = proximity:FindFirstChild(displayName, true)
+            or (toolId and proximity:FindFirstChild(toolId, true))
+        if exact then
+            return exact
+        end
+
+        local needle = normalizeName(displayName)
+        local toolNeedle = normalizeName(toolId or "")
+        local best, bestScore = nil, -math.huge
+        for _, inst in ipairs(proximity:GetDescendants()) do
+            if inst:IsA("Model") or inst:IsA("BasePart") then
+                local instName = normalizeName(inst.Name)
+                local score = 0
+                if instName == needle or instName == toolNeedle then
+                    score = score + 10
+                elseif needle ~= "" and instName:find(needle, 1, true) then
+                    score = score + 5
+                elseif toolNeedle ~= "" and instName:find(toolNeedle, 1, true) then
+                    score = score + 4
+                end
+                if instName:find("potion", 1, true) then
+                    score = score + 1
+                end
+                if score > bestScore then
+                    bestScore = score
+                    best = inst
+                end
+            end
+        end
+        if bestScore > 0 then
+            return best
+        end
+        return nil
+    end
+
+    local function resolveRestockCFrameForPotion(displayName, toolId)
+        local target = findPotionModel(displayName, toolId)
+        local cf = getInstanceCFrame(target)
+        if cf then
+            return cf
+        end
+        return RESTOCK_CFRAME_FALLBACK
+    end
+
     local function restockPotions(doFreeze)
         local selected = Options.AutoPotions_List.Value
         local didSomething = false
@@ -73,17 +149,15 @@ return function(env)
         root.AssemblyLinearVelocity = Vector3.zero
         root.AssemblyAngularVelocity = Vector3.zero
 
-        -- Teleport to shop location
-        root.CFrame = RESTOCK_CFRAME
-        task.wait(0.15)  -- small wait for replication
-
         -- Purchase potions up to 10 each
         for displayName, isOn in pairs(selected) do
             if isOn then
                 local current = getPotionCount(displayName)
                 local needed = 10 - current
                 local toolId = PotionDisplayToToolId[displayName]
-                if needed > 0 and toolId then
+                if needed > 5 and toolId then
+                    root.CFrame = resolveRestockCFrameForPotion(displayName, toolId)
+                    task.wait(0.2)  -- small wait for replication
                     pcall(function()
                         PurchaseRF:InvokeServer(toolId, needed)
                     end)
