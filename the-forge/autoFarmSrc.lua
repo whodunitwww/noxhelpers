@@ -43,7 +43,6 @@ return function(ctx)
         TargetBlacklist              = {},
         ExtraYOffset                 = 0,
         FarmSpeed                    = 80,
-        MaxTargetHeight              = 100,
         AltFarmEnabled               = false,
         AltFarmMode                  = ALT_FARM_MODE_MAIN,
         AltNames                     = {},
@@ -927,11 +926,6 @@ return function(ctx)
                     if pos then
                         local skip = false
 
-                        -- height clamp
-                        if pos.Y > AF_Config.MaxTargetHeight then
-                            skip = true
-                        end
-
                         -- lava/hazard
                         if not skip then
                             local root = def.getRoot(model)
@@ -1298,42 +1292,6 @@ return function(ctx)
 
                 if hrp.Anchored then
                     hrp.Anchored = false
-                end
-
-                -- Height Check
-                if pos and pos.Y > AF_Config.MaxTargetHeight then
-                    if whitelistHoldTarget then
-                        task.wait(0.15)
-                        return
-                    end
-
-                    notify("Target too high! Ditching.", 2)
-                    blacklistTarget(activeTarget, 20)
-                    stopMoving()
-                    FarmState.currentTarget = nil
-                    if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                        Dashboard.setCurrentTarget(nil)
-                    end
-                    FarmState.attached     = false
-                    FarmState.detourActive = false
-
-                    if not isDistracted then
-                        local newTarget = chooseNearestTarget()
-                        if newTarget then
-                            FarmState.currentTarget    = newTarget
-                            FarmState.attached         = false
-                            FarmState.detourActive     = false
-                            FarmState.lastTargetRef    = newTarget
-                            FarmState.lastTargetHealth = 0
-                            FarmState.stuckStartTime   = os.clock()
-                            startMovingToTarget(newTarget, activeDef)
-                        end
-                    else
-                        FarmState.tempMobTarget = nil
-                    end
-
-                    task.wait(0.15)
-                    return
                 end
 
                 -- DYNAMIC PLAYER AVOIDANCE
@@ -1903,19 +1861,6 @@ return function(ctx)
         Callback = function(value)
             local v = tonumber(value) or AF_Config.FarmSpeed
             AF_Config.FarmSpeed = math.clamp(v, 5, 120)
-        end,
-    })
-
-    FarmGroup:AddSlider("AF_MaxTargetHeight", {
-        Text     = "Max Target Height",
-        Min      = 0,
-        Max      = 120,
-        Default  = AF_Config.MaxTargetHeight,
-        Rounding = 0,
-        Suffix   = " studs",
-        Callback = function(value)
-            local v = tonumber(value) or AF_Config.MaxTargetHeight
-            AF_Config.MaxTargetHeight = math.clamp(v, 0, 100)
         end,
     })
 
