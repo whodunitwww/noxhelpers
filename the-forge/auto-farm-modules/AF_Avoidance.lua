@@ -35,6 +35,16 @@ return function(env)
     -- INTERNAL STATE
     ----------------------------------------------------------------
     local Hazards = {}  -- { { part = BasePart, cframe = CFrame, halfSize = Vector3 } }
+    local RedCaveMin = Vector3.new(
+        math.min(360.7152099609375, 771.6004638671875),
+        math.min(10.97214126586914, 79.01676177978516),
+        math.min(111.72977447509766, -149.13143920898438)
+    )
+    local RedCaveMax = Vector3.new(
+        math.max(360.7152099609375, 771.6004638671875),
+        math.max(10.97214126586914, 79.01676177978516),
+        math.max(111.72977447509766, -149.13143920898438)
+    )
 
     ----------------------------------------------------------------
     -- HAZARD SCANNING
@@ -99,7 +109,20 @@ return function(env)
     -- HAZARD QUERIES
     ----------------------------------------------------------------
 
+    local function isPointInRedCave(pos)
+        if not pos then
+            return false
+        end
+        return pos.X >= RedCaveMin.X and pos.X <= RedCaveMax.X
+            and pos.Y >= RedCaveMin.Y and pos.Y <= RedCaveMax.Y
+            and pos.Z >= RedCaveMin.Z and pos.Z <= RedCaveMax.Z
+    end
+
     local function isPointInHazard(pos)
+        if AF_Config.AvoidRedCave and isPointInRedCave(pos) then
+            return true
+        end
+
         if not AF_Config.AvoidLava then
             return false
         end
