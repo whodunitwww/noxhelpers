@@ -28,6 +28,7 @@ return function(ctx)
     ----------------------------------------------------------------
     local AF_Config            = {
         AvoidLava                    = false,
+        AvoidRedCave                = false,
         AvoidPlayers                 = false,
         DamageDitchEnabled           = false,
         DamageDitchThreshold         = 100,
@@ -1874,6 +1875,14 @@ return function(ctx)
             if AF_Config.AvoidLava then
                 Avoidance.refreshHazards()
             end
+        end,
+    })
+
+    FarmGroup:AddToggle("AF_AvoidRedCave", {
+        Text     = "Avoid Red Cave",
+        Default  = false,
+        Callback = function(state)
+            AF_Config.AvoidRedCave = state and true or false
         end,
     })
 
