@@ -163,6 +163,35 @@ return function(env)
         realignAttach(target, overrideDef)
     end
 
+    local function stabilizeTeleportAttach(target, overrideDef, targetCFrame)
+        if not target then return end
+        local hrp = getLocalHRP()
+        if not hrp then return end
+        local hum = hrp.Parent and hrp.Parent:FindFirstChild("Humanoid")
+        task.spawn(function()
+            local stableCount = 0
+            for _ = 1, 3 do
+                if targetCFrame then
+                    local dist = (hrp.Position - targetCFrame.Position).Magnitude
+                    if dist > 2 then
+                        hrp.CFrame = targetCFrame
+                        hrp.AssemblyLinearVelocity = Vector3.zero
+                        hrp.AssemblyAngularVelocity = Vector3.zero
+                        if hum then hum.Sit = false end
+                        stableCount = 0
+                    else
+                        stableCount = stableCount + 1
+                    end
+                end
+                realignAttach(target, overrideDef)
+                if stableCount >= 1 then
+                    break
+                end
+                task.wait(0.03)
+            end
+        end)
+    end
+
 
     ------------------------------------------------------------------------------------
     -- MASTER MOVEMENT FUNCTION
@@ -217,6 +246,7 @@ return function(env)
                     hrp.AssemblyAngularVelocity = Vector3.zero
 
                     attachToTarget(target, overrideDef)
+                    stabilizeTeleportAttach(target, overrideDef, targetCFrame)
                     return
                 end
             end
@@ -275,6 +305,7 @@ return function(env)
 
                 -- 7. Finalize
                 attachToTarget(target, overrideDef)
+                stabilizeTeleportAttach(target, overrideDef, targetCFrame)
                 return
             else
                 -- Fallback to standard if cannon not found
