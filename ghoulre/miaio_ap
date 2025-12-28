@@ -1,0 +1,568 @@
+{
+    "109083782619351": {
+        "startSec": 0.4,
+        "name": "Jason V2 X",
+        "repeats": [],
+        "priority": "roll",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "128101625557631": {
+        "startSec": 0.2,
+        "name": "Jason LMB 5",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "98385414593823": {
+        "startSec": 0.2023121387283237,
+        "name": "DEX Reverse Tide",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "137684196851746": {
+        "startSec": 0.18,
+        "name": "Fist LMB 5",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "139358065129445": {
+        "startSec": 0.2,
+        "name": "Jason LMB 4",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "113219432678875": {
+        "enabled": true,
+        "startSec": 0.8,
+        "name": "DEX Phantom Drop",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "76927396984144": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "GINKUI LMB 1",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "122371661060085": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE BOW LMB 3",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "74834246969439": {
+        "startSec": 0.05,
+        "name": "Jason V2 C M2",
+        "repeats": [
+            1
+        ],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "103629114814061": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE BOW LMB 2",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "77453243901864": {
+        "startSec": 0.15,
+        "name": "Jason V2 Crit",
+        "repeats": [
+            0.65
+        ],
+        "rollOnFail": false,
+        "hold": 0.2
+    },
+    "80560734051179": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE LMB 4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "83183690291105": {
+        "startSec": 0.2,
+        "name": "Jason LMB 3",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "87277155207058": {
+        "startSec": 0.05,
+        "name": "MASTERY Debilitating Slash",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "124819625937751": {
+        "enabled": true,
+        "startSec": 0.08,
+        "name": "SOLACE X",
+        "hold": 0.2,
+        "repeats": [
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3
+        ],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "87070202310860": {
+        "enabled": true,
+        "startSec": 0.63,
+        "name": "SOLACE BOW Crit",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "91668992403483": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "STRENGTH Warrior's Pride",
+        "repeats": [
+            0.9,
+            1.85
+        ],
+        "hold": 0.2,
+        "rollOnFail": false
+    },
+    "87735609876920": {
+        "startSec": 0.2,
+        "name": "BASIC Uppercut",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "116175888742894": {
+        "startSec": 0.4,
+        "name": "MASTERY Suppression",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "78143990224156": {
+        "startSec": 0.2,
+        "name": "MASTERY Wounded",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "109123230222277": {
+        "startSec": 0.18,
+        "name": "Fist LMB 3",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "91672430450727": {
+        "enabled": true,
+        "startSec": 1.25,
+        "name": "GINKUI Z M2",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "roll",
+        "rollOnFail": false
+    },
+    "125273732099482": {
+        "startSec": 0.33,
+        "name": "DEX Lunge",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "78854925472750": {
+        "startSec": 0.2,
+        "name": "Jason LMB 1",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "139792635036817": {
+        "enabled": true,
+        "startSec": 0.36,
+        "name": "SOLACE C M2",
+        "hold": 0.1,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "115889394262154": {
+        "enabled": true,
+        "startSec": 0,
+        "name": "DEX Triple Step M2, needs to be dodged, needs fixing",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": true,
+        "hold": 0.202
+    },
+    "75168761580156": {
+        "enabled": true,
+        "startSec": 0.45,
+        "name": "DEX Dragon kick",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "138176350933335": {
+        "startSec": 0.1,
+        "name": "DEX Piercing Heel",
+        "repeats": [
+            0.2
+        ],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "126930390220804": {
+        "startSec": 0.3,
+        "name": "STRENGTH Soaring Blow",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "94205575550862": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "GINKUI LMB 2",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "100695225844315": {
+        "startSec": 0.2,
+        "name": "Jason V2 Z Full Charge",
+        "repeats": [
+            0.5,
+            0.9
+        ],
+        "rollOnFail": false,
+        "hold": 0.15
+    },
+    "125415359989914": {
+        "enabled": true,
+        "startSec": 0.5,
+        "name": "SOLACE Z",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "99762577752557": {
+        "startSec": 0.3,
+        "name": "STRENGTH Leg sweep",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "84586700252767": {
+        "startSec": 0.3,
+        "name": "MASTERY Suppression M2",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "74706986010083": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "UNIVERSAL LMB 5",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "84032491629355": {
+        "startSec": 0.4,
+        "name": "STRENGTH Axe kick",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "121092258344696": {
+        "startSec": 0.8,
+        "name": "MASTERY Debilitating Slash M2",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "131385671108953": {
+        "startSec": 0.37,
+        "name": "BASIC Air R",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "131051682278134": {
+        "startSec": 0.18,
+        "name": "Fist LMB 2",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "127566287157805": {
+        "startSec": 0.4,
+        "name": "Fist CRIT",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "106731070269238": {
+        "enabled": true,
+        "startSec": 0.12,
+        "name": "GINKUI C",
+        "hold": 0.202,
+        "repeats": [
+            0.3,
+            0.6
+        ],
+        "priority": "parry",
+        "rollOnFail": true
+    },
+    "137309504999398": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "SOLACE LMB 3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "89588139226485": {
+        "startSec": 0.18,
+        "name": "Fist LMB 4",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "102333760180664": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "BASIC Sword running attack",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "113175465376972": {
+        "startSec": 0,
+        "name": "DEX Cyclone Bruiser",
+        "repeats": [
+            0.7
+        ],
+        "rollOnFail": true,
+        "hold": 0.202
+    },
+    "101751895166225": {
+        "startSec": 0.3,
+        "name": "JV2 Z tap variant",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "76639298017828": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "GINKUI LMB 4",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "96875568331308": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "SOLACE BOW LMB 1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "76399640175696": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE C",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "102642995643169": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "GINKUI Z",
+        "hold": 0.25,
+        "repeats": [
+            0.2,
+            0.3,
+            0.4,
+            0.5
+        ],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "127462812873675": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "GINKUI X",
+        "hold": 0.25,
+        "repeats": [
+            0.3,
+            0.6,
+            0.9,
+            1.2
+        ],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "94851661153324": {
+        "startSec": 1,
+        "name": "DEX Mirage Breaker",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "132546734612246": {
+        "startSec": 0.3,
+        "name": "STRENGTH Gut punch",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "84687276916489": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE BOW LMB 5",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "125123147660993": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "GINKUI Crit",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "139753135160439": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "GINKUI Crit M2, blood droplets need fixing",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "125985327613003": {
+        "startSec": 0.2,
+        "name": "Jason LMB 2",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "102683625069547": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "GINKUI LMB 3",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "107992919085814": {
+        "startSec": 0,
+        "name": "STRENGTH Dropping Spike",
+        "repeats": [],
+        "hold": 0,
+        "rollOnFail": false
+    },
+    "119570344423009": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "SOLACE LMB 1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "81458429848274": {
+        "startSec": 0.18,
+        "name": "Fist LMB 1",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "113848079779223": {
+        "startSec": 0.2023121387283237,
+        "name": "DEX Sudden Kick",
+        "repeats": [
+            1.2
+        ],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "73760371893091": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "SOLACE LMB 2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "129618429137267": {
+        "startSec": 0.2,
+        "name": "DEX Triple Step",
+        "repeats": [
+            0.45,
+            0.7
+        ],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "107193409342294": {
+        "startSec": 0.2,
+        "name": "BASIC Running attack",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "136330405034599": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE BOW LMB 4",
+        "hold": 0.202,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "84883984460361": {
+        "startSec": 0.3,
+        "name": "Jason V2 C",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    }
+}
