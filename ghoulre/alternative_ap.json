@@ -1,0 +1,2544 @@
+{
+    "129368863744217": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 129368863744217",
+        "repeats": [
+            0.4
+        ],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "128101625557631": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 128101625557631",
+        "repeats": [],
+        "hold": 0.23000000000000005,
+        "rollOnFail": true
+    },
+    "102546483231226": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 102546483231226",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "94049296655188": {
+        "distanceAdj": 0,
+        "startSec": 1.3,
+        "name": "Anim 94049296655188",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "78047711237192": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Anim 78047711237192",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "104337999454796": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 104337999454796",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "124496925241237": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 124496925241237",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "100558480169185": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 100558480169185",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "108197299905495": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 108197299905495",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "102642995643169": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 102642995643169",
+        "repeats": [
+            0.43899999999999997
+        ],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "128769681112635": {
+        "distanceAdj": 0,
+        "startSec": 1.75,
+        "name": "Anim 128769681112635",
+        "repeats": [
+            1.95,
+            2.15,
+            2.35,
+            2.55,
+            2.75,
+            2.95
+        ],
+        "hold": 2.25,
+        "rollOnFail": true
+    },
+    "103629114814061": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 103629114814061",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "105589945317363": {
+        "distanceAdj": 0,
+        "startSec": 0.86,
+        "name": "Anim 105589945317363",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "78213991536260": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 78213991536260",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "129441247864879": {
+        "distanceAdj": 0,
+        "startSec": 0.16,
+        "name": "Anim 129441247864879",
+        "repeats": [],
+        "hold": 0.49,
+        "rollOnFail": true
+    },
+    "128839194087258": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 128839194087258",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "111230499786651": {
+        "distanceAdj": 0,
+        "startSec": 0.17,
+        "name": "Anim 111230499786651",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "134903538230160": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 134903538230160",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "137780787423425": {
+        "distanceAdj": 0,
+        "startSec": 0.33,
+        "name": "Anim 137780787423425",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "135872625391687": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 135872625391687",
+        "repeats": [
+            0.432
+        ],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "75375865302458": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 75375865302458",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "88694211921073": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 88694211921073",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "102372557046570": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 102372557046570",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "116706902543424": {
+        "distanceAdj": 0,
+        "startSec": 0.43,
+        "name": "Anim 116706902543424",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "127462812873675": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Anim 127462812873675",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "124960892283230": {
+        "distanceAdj": 0,
+        "startSec": 0.16,
+        "name": "Anim 124960892283230",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "76272752426300": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 76272752426300",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "120459951639400": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 120459951639400",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "95150289594302": {
+        "distanceAdj": 0,
+        "startSec": 0.27,
+        "name": "Anim 95150289594302",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "78854925472750": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 78854925472750",
+        "repeats": [],
+        "hold": 0.23000000000000005,
+        "rollOnFail": true
+    },
+    "96651052503322": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 96651052503322",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "96389761265228": {
+        "distanceAdj": 0,
+        "startSec": 0.33,
+        "name": "Anim 96389761265228",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "92415288342537": {
+        "distanceAdj": 0,
+        "startSec": 0.16,
+        "name": "Anim 92415288342537",
+        "repeats": [],
+        "hold": 0.49,
+        "rollOnFail": true
+    },
+    "136400690344027": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 136400690344027",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "111909089248577": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 111909089248577",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "98283641519215": {
+        "distanceAdj": 0,
+        "startSec": 0.67,
+        "name": "Anim 98283641519215",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "124343869615532": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 124343869615532",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "80201031269662": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 80201031269662",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "135652259836955": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 135652259836955",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "82130174183873": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 82130174183873",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "125001482194702": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 125001482194702",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "115340718314209": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 115340718314209",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "122049582999621": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 122049582999621",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "77317789467088": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 77317789467088",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "124184099417502": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 124184099417502",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "105442988085026": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 105442988085026",
+        "repeats": [
+            0.4
+        ],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "72678012629652": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 72678012629652",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "138603645472753": {
+        "distanceAdj": 0,
+        "startSec": 0.29,
+        "name": "Anim 138603645472753",
+        "repeats": [],
+        "hold": 0.38999999999999998,
+        "rollOnFail": true
+    },
+    "101726485168893": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 101726485168893",
+        "repeats": [],
+        "hold": 0.4,
+        "rollOnFail": true
+    },
+    "99915059516084": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 99915059516084",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "82184472713821": {
+        "distanceAdj": 0,
+        "startSec": 2,
+        "name": "Anim 82184472713821",
+        "repeats": [],
+        "hold": 0.2999999999999998,
+        "rollOnFail": true
+    },
+    "97138435604112": {
+        "distanceAdj": 0,
+        "startSec": 0.16,
+        "name": "Anim 97138435604112",
+        "repeats": [],
+        "hold": 0.49,
+        "rollOnFail": true
+    },
+    "109153497237538": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 109153497237538",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "79981588130961": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 79981588130961",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "72026342966670": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 72026342966670",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "99963342174936": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 99963342174936",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "131740708909971": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Anim 131740708909971",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "125123147660993": {
+        "distanceAdj": 0,
+        "startSec": 0.14,
+        "name": "Anim 125123147660993",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "99511332362280": {
+        "distanceAdj": 0,
+        "startSec": 0.73,
+        "name": "Anim 99511332362280",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "120354402053029": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 120354402053029",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "81458429848274": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 81458429848274",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "86208887161745": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 86208887161745",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "132904283786634": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 132904283786634",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "90222174246856": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 90222174246856",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "129495651539604": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 129495651539604",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "101613783270135": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 101613783270135",
+        "repeats": [
+            0.401
+        ],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "120591268956676": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 120591268956676",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "106867803794428": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 106867803794428",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "78887381717473": {
+        "distanceAdj": 0,
+        "startSec": 0.41,
+        "name": "Anim 78887381717473",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "139400282938724": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 139400282938724",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "79913467941771": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Anim 79913467941771",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "133200348314646": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 133200348314646",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "75362717367704": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 75362717367704",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "98178166706006": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 98178166706006",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "134809434589356": {
+        "distanceAdj": 0,
+        "startSec": 0.45,
+        "name": "Anim 134809434589356",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "117434170736698": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 117434170736698",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "106535138040115": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 106535138040115",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "130277667485774": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 130277667485774",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "118816187211996": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 118816187211996",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "101714150006632": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 101714150006632",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "135552671823399": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 135552671823399",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "136182618554502": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 136182618554502",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "130077418131222": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 130077418131222",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "103255608932910": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 103255608932910",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "98771209216846": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 98771209216846",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "125273732099482": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 125273732099482",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "135750505225960": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 135750505225960",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "138484499722859": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 138484499722859",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "105107078372382": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 105107078372382",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "111637306541526": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 111637306541526",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "124766932801835": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 124766932801835",
+        "repeats": [
+            0.2
+        ],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "102535173492586": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 102535173492586",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "100434572913975": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 100434572913975",
+        "repeats": [],
+        "hold": 0.15,
+        "rollOnFail": true
+    },
+    "94205575550862": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 94205575550862",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "125415359989914": {
+        "distanceAdj": 0,
+        "startSec": 0.66,
+        "name": "Anim 125415359989914",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "99762577752557": {
+        "distanceAdj": 0,
+        "startSec": 0.16,
+        "name": "Anim 99762577752557",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "86232832931002": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 86232832931002",
+        "repeats": [],
+        "hold": 0.48999999999999996,
+        "rollOnFail": true
+    },
+    "87004016130630": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 87004016130630",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "130560592953206": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 130560592953206",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "135900749451957": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 135900749451957",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "76399640175696": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 76399640175696",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "121109139209671": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 121109139209671",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "86370715406171": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 86370715406171",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "138545708561292": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Anim 138545708561292",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "90460084897725": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Anim 90460084897725",
+        "repeats": [
+            0.803
+        ],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "76467866872093": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 76467866872093",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "94300503125812": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 94300503125812",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "115126886859402": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 115126886859402",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "111882127396652": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 111882127396652",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "91554414015826": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Anim 91554414015826",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "126923665753961": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 126923665753961",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "131074884814797": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 131074884814797",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "116301245600177": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 116301245600177",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "98960600377850": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 98960600377850",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "102683625069547": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 102683625069547",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "86086892466510": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 86086892466510",
+        "repeats": [],
+        "hold": 0.49,
+        "rollOnFail": true
+    },
+    "72464788731730": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 72464788731730",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "75082454798619": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 75082454798619",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "127376055093534": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 127376055093534",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "110368664835385": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Anim 110368664835385",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "119562797224144": {
+        "distanceAdj": 0,
+        "startSec": 0.9,
+        "name": "Anim 119562797224144",
+        "repeats": [
+            1.764,
+            2.628
+        ],
+        "hold": 0.4,
+        "rollOnFail": true
+    },
+    "84286984142876": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 84286984142876",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "98357517858626": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 98357517858626",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "112950532323350": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 112950532323350",
+        "repeats": [],
+        "hold": 0.29000000000000006,
+        "rollOnFail": true
+    },
+    "110920960051584": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 110920960051584",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "97110277579383": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Anim 97110277579383",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "114558724693893": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 114558724693893",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "128625727833366": {
+        "distanceAdj": 0,
+        "startSec": 0.45,
+        "name": "Anim 128625727833366",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "122371661060085": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 122371661060085",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "110738231926426": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 110738231926426",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "136761323860583": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 136761323860583",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "116238600074144": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 116238600074144",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "137309504999398": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 137309504999398",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "106519942311504": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 106519942311504",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "123728918222864": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 123728918222864",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "96875568331308": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 96875568331308",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "124861357738478": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 124861357738478",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "125049330153289": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 125049330153289",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "115413666205678": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 115413666205678",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "99157378634706": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 99157378634706",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "124926828571060": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 124926828571060",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "109123230222277": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 109123230222277",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "124747961486333": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 124747961486333",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "73200908069196": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 73200908069196",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "136330405034599": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 136330405034599",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "90521401898889": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 90521401898889",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "74877124260548": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 74877124260548",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "131297557817293": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 131297557817293",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "108012620140199": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 108012620140199",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "79780873512551": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 79780873512551",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "74422320699083": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 74422320699083",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "78797347094985": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 78797347094985",
+        "repeats": [],
+        "hold": 0.48999999999999996,
+        "rollOnFail": true
+    },
+    "107500740429380": {
+        "distanceAdj": 0,
+        "startSec": 0.55,
+        "name": "Anim 107500740429380",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "82068830027727": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 82068830027727",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "123196114390104": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 123196114390104",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "85614011160854": {
+        "distanceAdj": 0,
+        "startSec": 1.6,
+        "name": "Anim 85614011160854",
+        "repeats": [],
+        "hold": 0.6000000000000001,
+        "rollOnFail": true
+    },
+    "134488256445396": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 134488256445396",
+        "repeats": [],
+        "hold": 0.48999999999999996,
+        "rollOnFail": true
+    },
+    "78297239425049": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 78297239425049",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "134132208906469": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 134132208906469",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "134071135239015": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 134071135239015",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "74706986010083": {
+        "distanceAdj": 0,
+        "startSec": 0.16,
+        "name": "Anim 74706986010083",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "138044545828371": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 138044545828371",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "109500654652931": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 109500654652931",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "70738136253672": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 70738136253672",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "134101600310736": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 134101600310736",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "122661360698160": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 122661360698160",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "101523256677778": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 101523256677778",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "91066171406248": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 91066171406248",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "91532107165998": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 91532107165998",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "137072596301637": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 137072596301637",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "126074016457313": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 126074016457313",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "114579951667352": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 114579951667352",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "136225630152817": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 136225630152817",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "109184942183064": {
+        "distanceAdj": 0,
+        "startSec": 0.43,
+        "name": "Anim 109184942183064",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "112387369480518": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 112387369480518",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "88509112744612": {
+        "distanceAdj": 0,
+        "startSec": 0.76,
+        "name": "Anim 88509112744612",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "98841389059878": {
+        "distanceAdj": 0,
+        "startSec": 1,
+        "name": "Anim 98841389059878",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "90597596100338": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 90597596100338",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "119570344423009": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 119570344423009",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "122454882730691": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 122454882730691",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "103463736964630": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 103463736964630",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "138228123826571": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 138228123826571",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "115299391673163": {
+        "distanceAdj": 0,
+        "startSec": 0.67,
+        "name": "Anim 115299391673163",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "77659049501128": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 77659049501128",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "91417655657970": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 91417655657970",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "76639298017828": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 76639298017828",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "120819611310918": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 120819611310918",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "133676778221315": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 133676778221315",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "75078726065204": {
+        "distanceAdj": 0,
+        "startSec": 0.45,
+        "name": "Anim 75078726065204",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "139299396702735": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Anim 139299396702735",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "123818970722547": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 123818970722547",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "131161290739036": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 131161290739036",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "84024525589689": {
+        "distanceAdj": 0,
+        "startSec": 0.88,
+        "name": "Anim 84024525589689",
+        "repeats": [],
+        "hold": 0.2599999999999999,
+        "rollOnFail": true
+    },
+    "81633765878584": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 81633765878584",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "102453919149515": {
+        "distanceAdj": 0,
+        "startSec": 0.55,
+        "name": "Anim 102453919149515",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "92937790229658": {
+        "distanceAdj": 0,
+        "startSec": 0.55,
+        "name": "Anim 92937790229658",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "140176432457093": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 140176432457093",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "125756826659861": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 125756826659861",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "123559289828864": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 123559289828864",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "93419864791125": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 93419864791125",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "76927396984144": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 76927396984144",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "77165655925697": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 77165655925697",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "73909511758220": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 73909511758220",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "108646132311038": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 108646132311038",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "123123044774364": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 123123044774364",
+        "repeats": [],
+        "hold": 0.48999999999999996,
+        "rollOnFail": true
+    },
+    "98385414593823": {
+        "distanceAdj": 0,
+        "startSec": 0.17,
+        "name": "Anim 98385414593823",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "128106238874291": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 128106238874291",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "119912107937230": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 119912107937230",
+        "repeats": [],
+        "hold": 0.49,
+        "rollOnFail": true
+    },
+    "119065419146950": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 119065419146950",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "134047638406873": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 134047638406873",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "103983986351361": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 103983986351361",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "126141375680416": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 126141375680416",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "87492498431491": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 87492498431491",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "83183690291105": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 83183690291105",
+        "repeats": [],
+        "hold": 0.23000000000000005,
+        "rollOnFail": true
+    },
+    "105184330766070": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 105184330766070",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "131696285162463": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Anim 131696285162463",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "90448243904946": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 90448243904946",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "130405818992714": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 130405818992714",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "93902031289683": {
+        "distanceAdj": 0,
+        "startSec": 0.16,
+        "name": "Anim 93902031289683",
+        "repeats": [],
+        "hold": 0.49,
+        "rollOnFail": true
+    },
+    "87277155207058": {
+        "distanceAdj": 0,
+        "startSec": 0.11,
+        "name": "Anim 87277155207058",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "104346885061572": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 104346885061572",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "134872805405567": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 134872805405567",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "116952479079386": {
+        "distanceAdj": 0,
+        "startSec": 0.63,
+        "name": "Anim 116952479079386",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "134741686910618": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 134741686910618",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "106731070269238": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 106731070269238",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "87070202310860": {
+        "distanceAdj": 0,
+        "startSec": 0.65,
+        "name": "Anim 87070202310860",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "135309318514442": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 135309318514442",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "110164563494809": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Anim 110164563494809",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "140472353306379": {
+        "distanceAdj": 0,
+        "startSec": 0.63,
+        "name": "Anim 140472353306379",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "87735609876920": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 87735609876920",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "107868355016077": {
+        "distanceAdj": 0,
+        "startSec": 1.84,
+        "name": "Anim 107868355016077",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "83022911727660": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 83022911727660",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "89588139226485": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 89588139226485",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "103561209301954": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 103561209301954",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "97870196303383": {
+        "distanceAdj": 0,
+        "startSec": 1.15,
+        "name": "Anim 97870196303383",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "92214982692498": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 92214982692498",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "120703912197833": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 120703912197833",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "102288540818350": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 102288540818350",
+        "repeats": [],
+        "hold": 0.49000000000000007,
+        "rollOnFail": true
+    },
+    "125084555032360": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 125084555032360",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "109285759428857": {
+        "distanceAdj": 0,
+        "startSec": 0.52,
+        "name": "Anim 109285759428857",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "113848079779223": {
+        "distanceAdj": 0,
+        "startSec": 0.14,
+        "name": "Anim 113848079779223",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "77200481731064": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 77200481731064",
+        "repeats": [],
+        "hold": 0.15000000000000003,
+        "rollOnFail": true
+    },
+    "113483328429065": {
+        "distanceAdj": 0,
+        "startSec": 0.39,
+        "name": "Anim 113483328429065",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "87764692704657": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 87764692704657",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "118233181584094": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 118233181584094",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "115882469124985": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 115882469124985",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "106257688932263": {
+        "distanceAdj": 0,
+        "startSec": 0.65,
+        "name": "Anim 106257688932263",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "124819625937751": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 124819625937751",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "108307424389592": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 108307424389592",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "73163780581936": {
+        "distanceAdj": 0,
+        "startSec": 1.72,
+        "name": "Anim 73163780581936",
+        "repeats": [
+            3.2199999999999999
+        ],
+        "hold": 0.53,
+        "rollOnFail": true
+    },
+    "124170657036313": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 124170657036313",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "98932916989863": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 98932916989863",
+        "repeats": [
+            0.766
+        ],
+        "hold": 0.23000000000000005,
+        "rollOnFail": true
+    },
+    "95010299561530": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 95010299561530",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "135835813606350": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 135835813606350",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "103430086615689": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 103430086615689",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "92796333738710": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 92796333738710",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "77780360064182": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 77780360064182",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "114773679703806": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 114773679703806",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "110240097445732": {
+        "distanceAdj": 0,
+        "startSec": 0.17,
+        "name": "Anim 110240097445732",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "125810707684008": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 125810707684008",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "130687440100798": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "Anim 130687440100798",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "125985327613003": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 125985327613003",
+        "repeats": [],
+        "hold": 0.23000000000000005,
+        "rollOnFail": true
+    },
+    "126930390220804": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 126930390220804",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "84687276916489": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 84687276916489",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "110583793495632": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Anim 110583793495632",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "113373203557133": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 113373203557133",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "123392788492194": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Anim 123392788492194",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "126485913058460": {
+        "distanceAdj": 0,
+        "startSec": 0.45,
+        "name": "Anim 126485913058460",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "107752838734051": {
+        "distanceAdj": 0,
+        "startSec": 0.8,
+        "name": "Anim 107752838734051",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "97888761442444": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 97888761442444",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "71491979500146": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 71491979500146",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "104802848622022": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 104802848622022",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "130254051363204": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 130254051363204",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "136449717558100": {
+        "distanceAdj": 0,
+        "startSec": 0.14,
+        "name": "Anim 136449717558100",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "87087952781021": {
+        "distanceAdj": 0,
+        "startSec": 0.55,
+        "name": "Anim 87087952781021",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "107287988363428": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 107287988363428",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "119850347232500": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 119850347232500",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "137684196851746": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 137684196851746",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "96240580568749": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 96240580568749",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "102242322759462": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 102242322759462",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "134473609101433": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 134473609101433",
+        "repeats": [
+            0.41
+        ],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "131051682278134": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 131051682278134",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "101521677894258": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 101521677894258",
+        "repeats": [],
+        "hold": 0.15000000000000003,
+        "rollOnFail": true
+    },
+    "127566287157805": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Anim 127566287157805",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "89513092915984": {
+        "distanceAdj": 0,
+        "startSec": 2,
+        "name": "Anim 89513092915984",
+        "repeats": [],
+        "hold": 0.3700000000000001,
+        "rollOnFail": true
+    },
+    "129436447203162": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 129436447203162",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "80560734051179": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 80560734051179",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "131725694254635": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 131725694254635",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "106306160427852": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 106306160427852",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "112467136433884": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 112467136433884",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "121050000257819": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "Anim 121050000257819",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "97485727762508": {
+        "distanceAdj": 0,
+        "startSec": 0.52,
+        "name": "Anim 97485727762508",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "108984564775659": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 108984564775659",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "81343624564970": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 81343624564970",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "95223978004602": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 95223978004602",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "135205073126877": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 135205073126877",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "107364098903611": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 107364098903611",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "98582715122328": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 98582715122328",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "84043093107309": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 84043093107309",
+        "repeats": [],
+        "hold": 0.29000000000000006,
+        "rollOnFail": true
+    },
+    "132546734612246": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 132546734612246",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "127813492491875": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 127813492491875",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "89816763320681": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 89816763320681",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "114126220009836": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 114126220009836",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "117496754196287": {
+        "distanceAdj": 0,
+        "startSec": 0.32,
+        "name": "Anim 117496754196287",
+        "repeats": [],
+        "hold": 0.39999999999999999,
+        "rollOnFail": true
+    },
+    "88929119667129": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 88929119667129",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "129618429137267": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 129618429137267",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "106461888875800": {
+        "distanceAdj": 0,
+        "startSec": 0.16,
+        "name": "Anim 106461888875800",
+        "repeats": [],
+        "hold": 0.49,
+        "rollOnFail": true
+    },
+    "108458212372937": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 108458212372937",
+        "repeats": [],
+        "hold": 0.48999999999999996,
+        "rollOnFail": true
+    },
+    "139358065129445": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 139358065129445",
+        "repeats": [],
+        "hold": 0.23000000000000005,
+        "rollOnFail": true
+    },
+    "73760371893091": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 73760371893091",
+        "repeats": [],
+        "hold": 0.3,
+        "rollOnFail": true
+    },
+    "120664443221590": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 120664443221590",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "118696475800411": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 118696475800411",
+        "repeats": [],
+        "hold": 0.30000000000000007,
+        "rollOnFail": true
+    },
+    "131385671108953": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 131385671108953",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    },
+    "114986752830080": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 114986752830080",
+        "repeats": [],
+        "hold": 0.29999999999999996,
+        "rollOnFail": true
+    }
+}
