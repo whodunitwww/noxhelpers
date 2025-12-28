@@ -1,6 +1,6 @@
 -- AutoParryConfigTool.lua
 -- Cerberus AutoParry Config Builder GUI (timeline tracks, hover info, ignore, parry chains)
--- Updated with: Multi-Hit, Counter Attacks, Distance Adjustment, Copy ID
+-- Updated with: Multi-Hit, Counter Attacks, Distance Adjustment, Priority, Enabled, Damage Analysis
 
 -- ==== SERVICES / ENV ==== --
 local Players             = game:GetService("Players")
@@ -31,8 +31,16 @@ return function(opts)
 
     -- caller can override these; if they pass {}, that is used as-is
     local AP_Config_Default = opts.DefaultConfig or {
-        ["17030773401"] = { name = "Zombie Attack", startSec = 0.42, hold = 0.30, rollOnFail = true, repeats = {}, counter = nil },
-        ["9876543210"]  = { name = "Lunge",         startSec = 0.41, hold = 0.30, rollOnFail = false },
+        ["17030773401"] = { 
+            name = "Zombie Attack", 
+            startSec = 0.42, 
+            hold = 0.30, 
+            rollOnFail = true, 
+            repeats = {}, 
+            counter = nil,
+            priority = "parry",
+            enabled = true 
+        },
     }
 
     local AP_ConfigExtra_Default = opts.DefaultExtra or {
@@ -44,7 +52,11 @@ return function(opts)
     local AP_ConfigExtra     = {}
     local SeenAnimations     = {}   -- [animId] = { lastSeenTime, count, lastSourceName }
     local IgnoredAnimIds     = {}   -- [animId] = true
-    local ParryChainIds      = {}   -- [animId] = short chain id for last schedule
+    
+    -- [NEW] Event History for Damage Calculation
+    -- List of { type = "anim"|"damage", time = number, animId = string (optional), label = string }
+    local GlobalEventHistory = {} 
+
     local window             -- forward declare for timeline hook
 
     local function ensureDir(path)
@@ -302,7 +314,7 @@ return function(opts)
 
     scanExistingHumanoids()
 
-    -- ==== DAMAGE-TAKEN EVENTS (for timeline) ==== --
+    -- ==== DAMAGE-TAKEN EVENTS (for timeline & analysis) ==== --
 
     local lastHealth = nil
 
@@ -317,13 +329,22 @@ return function(opts)
         hum.HealthChanged:Connect(function(hp)
             if lastHealth and hp < lastHealth then
                 local delta = lastHealth - hp
+                local now = os.clock()
+                
+                -- Log to global history
+                table.insert(GlobalEventHistory, {
+                    type = "damage",
+                    time = now,
+                    label = string.format("-%d HP", delta)
+                })
+
                 if window and window._timeline then
                     window._timeline:AddEvent({
                         type       = "damage",
                         label      = string.format("-%d HP", delta),
                         info       = string.format("HP: %.0f", hp),
                         sourceName = "Self",
-                        time       = os.clock(),
+                        time       = now,
                     })
                 end
             end
@@ -338,12 +359,47 @@ return function(opts)
         hookLocalHumanoid()
     end
 
+    -- ==== DAMAGE ANALYSIS HELPER ==== --
+    local function getClosestDamageDelta(targetAnimId)
+        local animTimes = {}
+        local damageTimes = {}
+        
+        -- Filter history
+        for _, ev in ipairs(GlobalEventHistory) do
+            if ev.type == "anim" and ev.animId == tostring(targetAnimId) then
+                table.insert(animTimes, ev.time)
+            elseif ev.type == "damage" then
+                table.insert(damageTimes, ev.time)
+            end
+        end
+
+        if #animTimes == 0 or #damageTimes == 0 then return nil end
+
+        local closestDelta = nil
+        local minAbsDiff = math.huge
+
+        for _, tA in ipairs(animTimes) do
+            for _, tD in ipairs(damageTimes) do
+                local diff = tD - tA -- Positive if damage happened AFTER anim
+                local absDiff = math.abs(diff)
+                
+                -- Check if this is the closest pair found so far
+                if absDiff < minAbsDiff then
+                    minAbsDiff = absDiff
+                    closestDelta = diff
+                end
+            end
+        end
+
+        return closestDelta
+    end
+
     -- ==== BUILD GUI ==== --
 
     window = AutoParryUI.CreateWindow({
         Title        = "AutoParry Config Builder",
         Size         = Vector2.new(900, 520),
-        IconImageId  = "rbxassetid://136497541793809", -- Cerberus icon (square)
+        IconImageId  = "rbxassetid://136497541793809", 
     })
 
     --------------------------------------------------------
@@ -421,8 +477,8 @@ return function(opts)
     popupShade.Parent = popupGui
 
     local popupFrame = Instance.new("Frame")
-    popupFrame.Size = UDim2.fromOffset(420, 420) -- Increased size to fit new fields
-    popupFrame.Position = UDim2.new(0.5, -210, 0.5, -210)
+    popupFrame.Size = UDim2.fromOffset(450, 480) -- Increased size to fit new fields
+    popupFrame.Position = UDim2.new(0.5, -225, 0.5, -240)
     popupFrame.BackgroundColor3 = Color3.fromRGB(18, 22, 22)
     popupFrame.BorderColor3 = Color3.fromRGB(60, 80, 80)
     popupFrame.Visible = false
@@ -469,7 +525,7 @@ return function(opts)
         end
     end
 
-    local function popupLabel(text, height)
+    local function popupLabel(text, height, color)
         local lbl = Instance.new("TextLabel")
         lbl.BackgroundTransparency = 1
         lbl.Size = UDim2.new(1, 0, 0, height or 18)
@@ -477,7 +533,7 @@ return function(opts)
         lbl.Font = Enum.Font.Code
         lbl.TextSize = 14
         lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.TextColor3 = Color3.fromRGB(200, 210, 210)
+        lbl.TextColor3 = color or Color3.fromRGB(200, 210, 210)
         lbl.ZIndex = 500003
         lbl.Parent = popupBody
         return lbl
@@ -521,6 +577,27 @@ return function(opts)
             if callback then callback() end
         end)
         return btn
+    end
+
+    local function popupBoolToggle(labelText, currentValue, callback)
+        popupLabel(labelText)
+        local btn = Instance.new("TextButton")
+        btn.BackgroundColor3 = currentValue and Color3.fromRGB(40, 80, 50) or Color3.fromRGB(80, 40, 40)
+        btn.BorderColor3 = Color3.fromRGB(70, 90, 90)
+        btn.Size = UDim2.new(1, 0, 0, 22)
+        btn.Text = tostring(currentValue)
+        btn.Font = Enum.Font.Code
+        btn.TextSize = 14
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.ZIndex = 500003
+        btn.Parent = popupBody
+        btn.MouseButton1Click:Connect(function()
+            local newVal = not currentValue
+            currentValue = newVal
+            btn.Text = tostring(newVal)
+            btn.BackgroundColor3 = newVal and Color3.fromRGB(40, 80, 50) or Color3.fromRGB(80, 40, 40)
+            if callback then callback(newVal) end
+        end)
     end
 
     popupShade.MouseButton1Click:Connect(function()
@@ -569,7 +646,7 @@ return function(opts)
         popupTitle.Text = displayName
         popupLabel("Anim ID: " .. tostring(animId))
 
-        -- ==== [ADDED] COPY ID BUTTON ==== --
+        -- ==== COPY ID BUTTON ==== --
         local copyBtn
         copyBtn = popupButton("Copy Animation ID", function()
             local idStr = tostring(animId)
@@ -592,7 +669,18 @@ return function(opts)
                 end)
             end
         end)
-        -- ================================= --
+
+        -- ==== DAMAGE ANALYZER ==== --
+        local damageDelta = getClosestDamageDelta(animId)
+        if damageDelta then
+            local ms = damageDelta * 1000
+            local sign = (ms > 0) and "+" or ""
+            local color = (math.abs(ms) < 500) and Color3.fromRGB(255, 100, 100) or Color3.fromRGB(150, 150, 200)
+            popupLabel("CLOSEST DAMAGE: " .. sign .. string.format("%.0f ms", ms), 20, color)
+        else
+            popupLabel("CLOSEST DAMAGE: No damage recorded near this anim.", 18, Color3.fromRGB(100, 100, 100))
+        end
+        -- ========================= --
 
         if seen then
             popupLabel(string.format(
@@ -615,7 +703,9 @@ return function(opts)
                     hold       = tonumber(AP_ConfigExtra.defaultHoldSec)    or 0.35,
                     rollOnFail = (AP_ConfigExtra.defaultRollOnFail == true),
                     repeats    = {},
-                    counter    = nil
+                    counter    = nil,
+                    priority   = "parry",
+                    enabled    = true
                 }
                 saveConfigs()
                 if refreshLiveList then refreshLiveList() end
@@ -626,6 +716,12 @@ return function(opts)
             end)
         else
             popupLabel("Config entry (live edit):", 18)
+
+            -- Enabled Toggle
+            popupBoolToggle("Enabled", (cfg.enabled ~= false), function(val)
+                cfg.enabled = val
+                saveConfigs()
+            end)
 
             popupInputRow("Name", cfg.name or displayName, function(text)
                 cfg.name = (text ~= "" and text) or displayName
@@ -640,8 +736,14 @@ return function(opts)
                     saveConfigs()
                 end
             end)
+            
+            -- Priority
+            popupInputRow("Priority (parry / roll)", tostring(cfg.priority or "parry"), function(text)
+                cfg.priority = text:lower()
+                saveConfigs()
+            end)
 
-            -- ==== NEW: Distance Adjustment ==== --
+            -- Distance Adjustment
             popupInputRow("Distance Adj. (sec/100 studs)", tostring(cfg.distanceAdj or 0), function(text)
                 local v = tonumber(text)
                 if v then
@@ -658,7 +760,7 @@ return function(opts)
                 end
             end)
 
-            -- ==== NEW: Repeats (Multi Hit) ==== --
+            -- Repeats
             local repStr = table.concat(cfg.repeats or {}, ", ")
             popupInputRow("Repeat Timings (e.g. 0.2, 0.5)", repStr, function(text)
                 local newReps = {}
@@ -670,9 +772,8 @@ return function(opts)
                 saveConfigs()
             end)
 
-            -- ==== NEW: Counter Attacks ==== --
+            -- Counter Attacks
             popupLabel("--- Counter Attack ---", 18)
-            
             local cType = (cfg.counter and cfg.counter.type) or ""
             local cDelay = (cfg.counter and cfg.counter.delay) or 0.4
             
@@ -694,44 +795,11 @@ return function(opts)
                     saveConfigs() 
                 end
             end)
-            -- ================================ --
 
-            -- custom bool row with revert-on-invalid
-            popupLabel("Roll on fail (true/false)")
-            local rollBox = Instance.new("TextBox")
-            rollBox.BackgroundColor3 = Color3.fromRGB(26, 30, 30)
-            rollBox.BorderColor3     = Color3.fromRGB(70, 90, 90)
-            rollBox.Size             = UDim2.new(1, 0, 0, 22)
-            local function currentBoolString()
-                return tostring(cfg.rollOnFail and true or false)
-            end
-            rollBox.Text             = currentBoolString()
-            rollBox.Font             = Enum.Font.Code
-            rollBox.TextSize         = 14
-            rollBox.TextXAlignment   = Enum.TextXAlignment.Left
-            rollBox.TextColor3       = Color3.fromRGB(230, 240, 235)
-            rollBox.ZIndex           = 52
-            rollBox.Parent           = popupBody
-
-            rollBox.FocusLost:Connect(function(enter)
-                if not enter then
-                    -- just update to whatever config currently has
-                    rollBox.Text = currentBoolString()
-                    return
-                end
-                local low = string.lower(tostring(rollBox.Text))
-                if low == "true" or low == "1" or low == "yes" then
-                    cfg.rollOnFail = true
-                    saveConfigs()
-                    rollBox.Text = "true"
-                elseif low == "false" or low == "0" or low == "no" then
-                    cfg.rollOnFail = false
-                    saveConfigs()
-                    rollBox.Text = "false"
-                else
-                    -- invalid input: revert
-                    rollBox.Text = currentBoolString()
-                end
+            -- Roll On Fail
+            popupBoolToggle("Roll on fail", (cfg.rollOnFail == true), function(val)
+                cfg.rollOnFail = val
+                saveConfigs()
             end)
 
             popupButton("Remove from config", function()
@@ -745,7 +813,7 @@ return function(opts)
             end)
         end
 
-        -- ignore / unignore control (always present)
+        -- ignore / unignore control
         popupButton(isIgnored and "Unignore this animation" or "Ignore this animation", function()
             if IgnoredAnimIds[animId] then
                 IgnoredAnimIds[animId] = nil
@@ -1022,6 +1090,14 @@ return function(opts)
 
         local inCfg    = AP_Config[animId] ~= nil
         local animName = resolveAnimName(animId, track)
+
+        -- Log to global history for analysis
+        table.insert(GlobalEventHistory, {
+            type = "anim",
+            time = os.clock(),
+            animId = animId,
+            label = animName
+        })
 
         if window and window._timeline then
             window._timeline:AddEvent({
