@@ -1,0 +1,4369 @@
+{
+    "118924333638893": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "skill3 cast"
+    },
+    "119850347232500": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.43,
+        "name": "GrabInit"
+    },
+    "78047711237192": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "KajiriSlamDown"
+    },
+    "81823547351174": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "skill1 cast"
+    },
+    "125127055135454": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Shicha2"
+    },
+    "78483043922288": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "4"
+    },
+    "100558480169185": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 100558480169185",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.3
+    },
+    "113483328429065": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "C"
+    },
+    "103629114814061": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE BOW LMB 2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "105589945317363": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.33,
+        "name": "kajiri Z"
+    },
+    "134969645280314": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.17,
+        "name": "JdogHit - 3"
+    },
+    "111230499786651": {
+        "distanceAdj": 0,
+        "startSec": 0.17,
+        "name": "Anim 111230499786651",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "134903538230160": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Disorient"
+    },
+    "137780787423425": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Jason Z"
+    },
+    "138484657618379": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.85,
+        "name": "ZMovePlr"
+    },
+    "135872625391687": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "UkakuShardShootGroun"
+    },
+    "81847794501615": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "Nishiki Z"
+    },
+    "100156113281578": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.6,
+        "name": "skill2 cast"
+    },
+    "95223978004602": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "C Init"
+    },
+    "131696285162463": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Punic puncture"
+    },
+    "95150289594302": {
+        "distanceAdj": 0,
+        "startSec": 0.27,
+        "name": "Anim 95150289594302",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "135114811245269": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "Kurona X cast"
+    },
+    "96389761265228": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Demon Z"
+    },
+    "74476808169846": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.08,
+        "name": "tatara1"
+    },
+    "136400690344027": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Scorpion C2"
+    },
+    "76298165986986": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.8,
+        "name": "Crit"
+    },
+    "104463070615470": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "spear1"
+    },
+    "98283641519215": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.7,
+        "name": "Crit"
+    },
+    "112697833450520": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "Crit"
+    },
+    "135652259836955": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "yomo1"
+    },
+    "135530502434129": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "Kurona Z cast"
+    },
+    "100191558480841": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "4"
+    },
+    "100108530622112": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "tatara5"
+    },
+    "122114884655214": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "m1 3"
+    },
+    "131910414352589": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "R2"
+    },
+    "119527696165308": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "yukiv2 crit cast"
+    },
+    "122049582999621": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 122049582999621",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "124184099417502": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "katana2"
+    },
+    "105442988085026": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.29,
+        "name": "NikoBarrage"
+    },
+    "138603645472753": {
+        "distanceAdj": 0,
+        "startSec": 0.29,
+        "name": "Anim 138603645472753",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.38999999999999998
+    },
+    "114424436263982": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "hinami5"
+    },
+    "139919975605872": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "Calm3"
+    },
+    "97138435604112": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "nutcracker light 4"
+    },
+    "109153497237538": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "3"
+    },
+    "128736067362487": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "Nishiki X"
+    },
+    "114790391954408": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "hinami3"
+    },
+    "104722560930205": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "shield1"
+    },
+    "92559206426916": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "Imported Animation Clip"
+    },
+    "124170657036313": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.35,
+        "name": "BiggerSlam"
+    },
+    "120354402053029": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "scorpV2 m1-2"
+    },
+    "81458429848274": {
+        "startSec": 0.18,
+        "name": "Fist LMB 1",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "132904283786634": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "katana3"
+    },
+    "136449717558100": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": " 2 handed flouris re"
+    },
+    "118774460645493": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Z Move"
+    },
+    "72798299659280": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.65,
+        "name": "skill3 action"
+    },
+    "101613783270135": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "kuai skill2"
+    },
+    "106867803794428": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "kuai1"
+    },
+    "139400282938724": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "cleave3"
+    },
+    "110240097445732": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "IXA crit1"
+    },
+    "125931598281917": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "Skill3"
+    },
+    "95010299561530": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 95010299561530",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "102121546231536": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.23,
+        "name": "yomov2crit"
+    },
+    "98178166706006": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "M1 1"
+    },
+    "71855162512195": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "Skill1"
+    },
+    "113980459737564": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 1.15,
+        "name": "Skill 3"
+    },
+    "99254874111919": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Noro V2 M1_5"
+    },
+    "115253803957489": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "M3"
+    },
+    "76212297226977": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.08,
+        "name": "Noro V1 M1_1"
+    },
+    "106505011285566": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "kagune 3"
+    },
+    "118816187211996": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Narukami - 1"
+    },
+    "129126721746103": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Tatara v2 C cast"
+    },
+    "91905183076845": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "kurona1"
+    },
+    "120020227327971": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Imported Animation Clip"
+    },
+    "103255608932910": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.19,
+        "startSec": 0.08,
+        "name": "lessowl4"
+    },
+    "134639338336004": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "arima3"
+    },
+    "125273732099482": {
+        "startSec": 0.33,
+        "name": "DEX Lunge",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "92943080125846": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Skill 2"
+    },
+    "108597895691635": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Nishiki crit"
+    },
+    "91778889048315": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.6,
+        "name": "Strike"
+    },
+    "101751895166225": {
+        "startSec": 0.3,
+        "name": "JV2 Z tap variant",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "114986752830080": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "hit2"
+    },
+    "111637306541526": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 111637306541526",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "84487644688034": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "4a"
+    },
+    "102535173492586": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Narukami - 3"
+    },
+    "100434572913975": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "kuai2"
+    },
+    "86293094696257": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "####"
+    },
+    "87246252041045": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "hit5"
+    },
+    "103983671889052": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "Hinami X"
+    },
+    "76399640175696": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE C",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "127801198650810": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "Tatara X cast"
+    },
+    "76467866872093": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "IxaRangeCrit"
+    },
+    "112735256988079": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "z skill"
+    },
+    "108307424389592": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "kuai5"
+    },
+    "91554414015826": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "Grinder"
+    },
+    "90675128292011": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "4"
+    },
+    "131074884814797": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "scorpV2 m1-4"
+    },
+    "105495357971239": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "arima2"
+    },
+    "130405818992714": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 130405818992714",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "113816047037124": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "Kurona C fall"
+    },
+    "96471996759631": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "5"
+    },
+    "86536208700676": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "douv2  dash move"
+    },
+    "75082454798619": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "User Taciturnity Downslash"
+    },
+    "127376055093534": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "User Taciturnity Attempt"
+    },
+    "78407625576237": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.55,
+        "name": "naru crit"
+    },
+    "110368664835385": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Anim 110368664835385",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "119562797224144": {
+        "distanceAdj": 0,
+        "startSec": 0.9,
+        "name": "Anim 119562797224144",
+        "repeats": [
+            1.764,
+            2.628
+        ],
+        "rollOnFail": true,
+        "hold": 0.4
+    },
+    "112950532323350": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 112950532323350",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29000000000000006
+    },
+    "110920960051584": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "aus x"
+    },
+    "97110277579383": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "hit5"
+    },
+    "128625727833366": {
+        "distanceAdj": 0,
+        "startSec": 0.45,
+        "name": "Anim 128625727833366",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.3
+    },
+    "116093431616256": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "X Move"
+    },
+    "122371661060085": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE BOW LMB 3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "110738231926426": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.13,
+        "name": "chishe5"
+    },
+    "136761323860583": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 136761323860583",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "116238600074144": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "kajiri2"
+    },
+    "137309504999398": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "SOLACE LMB 3",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "124557297937019": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Hinami Z re rework"
+    },
+    "106519942311504": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "hit2"
+    },
+    "87277155207058": {
+        "startSec": 0.05,
+        "name": "MASTERY Debilitating Slash",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "120986873376194": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Automatic Save"
+    },
+    "124861357738478": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 124861357738478",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "139299396702735": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "hit2"
+    },
+    "86916659589852": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "arima1"
+    },
+    "115413666205678": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "IXA1"
+    },
+    "99157378634706": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "Z Spin Slash"
+    },
+    "124926828571060": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 124926828571060",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "125752021896733": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "jason2"
+    },
+    "124747961486333": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Dagger Crit"
+    },
+    "73200908069196": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "3"
+    },
+    "136330405034599": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE BOW LMB 4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "76256108008272": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "Kurona crit"
+    },
+    "131297557817293": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15028901734104048,
+        "startSec": 0.09,
+        "name": "lessowl3"
+    },
+    "108012620140199": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "scorpV2 m1-3"
+    },
+    "79780873512551": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "aus1"
+    },
+    "122232190589401": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.33,
+        "name": "Noro V1 Roar"
+    },
+    "74422320699083": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "new tail hit4"
+    },
+    "78797347094985": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 78797347094985",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.48999999999999996
+    },
+    "121056508765697": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "X Skill"
+    },
+    "82068830027727": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 82068830027727",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "123196114390104": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "5"
+    },
+    "134488256445396": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 134488256445396",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.48999999999999996
+    },
+    "106604864550431": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "kagune 2"
+    },
+    "134132208906469": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 134132208906469",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "130687440100798": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "IXA barrage cast"
+    },
+    "74706986010083": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "UNIVERSAL LMB 5",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "138044545828371": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "BarrageSkill"
+    },
+    "109500654652931": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "M1 4"
+    },
+    "114126220009836": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "spear2"
+    },
+    "95112578766555": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Yuki V2 X1"
+    },
+    "118446880650671": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.75,
+        "name": "CMovePlr"
+    },
+    "101523256677778": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "IXA3"
+    },
+    "113373203557133": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "ChisheX"
+    },
+    "98821211080909": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "ReworkNumber256"
+    },
+    "100943833698866": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "hit5"
+    },
+    "137072596301637": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "dou3"
+    },
+    "114579951667352": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 114579951667352",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "136225630152817": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "DashAttack"
+    },
+    "125890371919098": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.28,
+        "name": "M1"
+    },
+    "139530979015102": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "4"
+    },
+    "138228123826571": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "Sorteggio Lampo"
+    },
+    "112274617911382": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "kurona2"
+    },
+    "84883984460361": {
+        "startSec": 0.3,
+        "name": "Jason V2 C",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "87087952781021": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "serrated Z"
+    },
+    "75078726065204": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "Infiltration"
+    },
+    "81633765878584": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "yomo3"
+    },
+    "94585296319676": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.18,
+        "name": "sk2"
+    },
+    "119567609934046": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "kurona5"
+    },
+    "140176432457093": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 140176432457093",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "104193632382850": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "hinami4"
+    },
+    "76927396984144": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "GINKUI LMB 1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "77165655925697": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "4"
+    },
+    "139993959708671": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "jason4"
+    },
+    "103983986351361": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 103983986351361",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "139954890188682": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Noro V1 M1_4"
+    },
+    "83183690291105": {
+        "startSec": 0.2,
+        "name": "Jason LMB 3",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "89743736303858": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "C Hit"
+    },
+    "80346871030944": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Overheat Z1"
+    },
+    "107532205712495": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "hinami2"
+    },
+    "110295853822700": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.28,
+        "name": "M2"
+    },
+    "93902031289683": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "nutcracker light 2"
+    },
+    "134872805405567": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Kokaku Crit"
+    },
+    "117033713819488": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "m1 1"
+    },
+    "87070202310860": {
+        "enabled": true,
+        "startSec": 0.63,
+        "name": "SOLACE BOW Crit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "140472353306379": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.67,
+        "name": "Dash Skill"
+    },
+    "117771212630258": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.08,
+        "name": "nishiki3"
+    },
+    "129618429137267": {
+        "startSec": 0.2,
+        "name": "DEX Triple Step",
+        "repeats": [
+            0.45,
+            0.7
+        ],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "103561209301954": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "cleave2"
+    },
+    "83022911727660": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Eto crit"
+    },
+    "92214982692498": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "M1 3"
+    },
+    "120703912197833": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "5"
+    },
+    "109285759428857": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "ChisheZ"
+    },
+    "115882469124985": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.11,
+        "name": "spear3"
+    },
+    "106257688932263": {
+        "distanceAdj": 0,
+        "startSec": 0.65,
+        "name": "Anim 106257688932263",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "121690165844259": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Kurona C action"
+    },
+    "73163780581936": {
+        "distanceAdj": 0,
+        "startSec": 1.72,
+        "name": "Anim 73163780581936",
+        "repeats": [
+            3.2199999999999999
+        ],
+        "rollOnFail": true,
+        "hold": 0.53
+    },
+    "83497963716622": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "skill2"
+    },
+    "92796333738710": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 92796333738710",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.3
+    },
+    "77780360064182": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "M1 4"
+    },
+    "127076012876251": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Noro V1 Critical User"
+    },
+    "128288200583021": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "JdogHit - 4"
+    },
+    "109224647633849": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.36,
+        "name": "tatara v2 C action"
+    },
+    "126485913058460": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Daunting dance"
+    },
+    "107752838734051": {
+        "distanceAdj": 0,
+        "startSec": 0.8,
+        "name": "Anim 107752838734051",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "97888761442444": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "aus4"
+    },
+    "71491979500146": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "ser4"
+    },
+    "104802848622022": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "M1 3"
+    },
+    "84586700252767": {
+        "startSec": 0.3,
+        "name": "MASTERY Suppression M2",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "107287988363428": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 107287988363428",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "102242322759462": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.17,
+        "name": "uesr hit4"
+    },
+    "134473609101433": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "user FASTER crit"
+    },
+    "85374473317909": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "skill1 cast"
+    },
+    "127566287157805": {
+        "startSec": 0.4,
+        "name": "Fist CRIT",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "89513092915984": {
+        "distanceAdj": 0,
+        "startSec": 2,
+        "name": "Anim 89513092915984",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.3700000000000001
+    },
+    "140151698861152": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "5"
+    },
+    "112467136433884": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Z"
+    },
+    "121050000257819": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "beak3"
+    },
+    "107364098903611": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "hit4"
+    },
+    "132998073977747": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "5"
+    },
+    "85731406314619": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "Imported Animation Clip"
+    },
+    "127813492491875": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 127813492491875",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "80660577461021": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Skill1 Saiko V1"
+    },
+    "73760371893091": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "SOLACE LMB 2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "83210950678819": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "#########"
+    },
+    "129368863744217": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Kokaku Dash"
+    },
+    "120664443221590": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "spear4"
+    },
+    "102546483231226": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Maraud 2"
+    },
+    "94049296655188": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.85,
+        "name": "Splitting death"
+    },
+    "95789306651549": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "#########"
+    },
+    "92288554612341": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.55,
+        "name": "hinami crit"
+    },
+    "73188053010196": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "scorpv2 crit cast"
+    },
+    "117550760431415": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.17,
+        "name": "m1"
+    },
+    "129391517663928": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "Tatara Z"
+    },
+    "124496925241237": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "aus3"
+    },
+    "108197299905495": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "new tail hit1"
+    },
+    "71335341504453": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.16,
+        "startSec": 0.17,
+        "name": "JdogHit - 2"
+    },
+    "128769681112635": {
+        "distanceAdj": 0,
+        "startSec": 1.75,
+        "name": "Anim 128769681112635",
+        "repeats": [
+            1.95,
+            2.15,
+            2.35,
+            2.55,
+            2.75,
+            2.95
+        ],
+        "rollOnFail": true,
+        "hold": 2.25
+    },
+    "78213991536260": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "beak5"
+    },
+    "129441247864879": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "nutcracker light 3"
+    },
+    "128839194087258": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "IXA4"
+    },
+    "98841389059878": {
+        "distanceAdj": 0,
+        "startSec": 1,
+        "name": "Anim 98841389059878",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "75375865302458": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 75375865302458",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "85467164225058": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "sword4"
+    },
+    "102372557046570": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "M1 5"
+    },
+    "116706902543424": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.35,
+        "name": "Serrated C"
+    },
+    "108665178801618": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Shicha1"
+    },
+    "70467113681722": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "kagune 1"
+    },
+    "133772126041906": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Hinami C action"
+    },
+    "76272752426300": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "M1 2"
+    },
+    "120459951639400": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "beak2"
+    },
+    "82039423935881": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Z Skill"
+    },
+    "78854925472750": {
+        "startSec": 0.2,
+        "name": "Jason LMB 1",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "96651052503322": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 96651052503322",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.3
+    },
+    "72519041274149": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "####"
+    },
+    "92415288342537": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "nutcracker light 1"
+    },
+    "111909089248577": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 111909089248577",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "78460284685534": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.17,
+        "name": "JdogHit - 5"
+    },
+    "80045220727843": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.28,
+        "name": "IXA crit"
+    },
+    "80201031269662": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 80201031269662",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "112228610484983": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "Serrated v2 skill2"
+    },
+    "130254051363204": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "aus lunge attack"
+    },
+    "115340718314209": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 115340718314209",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.3
+    },
+    "84687276916489": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE BOW LMB 5",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "123392788492194": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Anim 123392788492194",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "101726485168893": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 101726485168893",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.4
+    },
+    "99915059516084": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "kuai skill1 cast"
+    },
+    "117496754196287": {
+        "distanceAdj": 0,
+        "startSec": 0.32,
+        "name": "Anim 117496754196287",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.39999999999999999
+    },
+    "79981588130961": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Barrage"
+    },
+    "128968439050740": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "IXA Z"
+    },
+    "110583793495632": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "KoukakuGrab"
+    },
+    "134177458585326": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.55,
+        "name": "Tatara v2 Z"
+    },
+    "99963342174936": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 99963342174936",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.3
+    },
+    "131740708909971": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "New C Attack"
+    },
+    "130935192288883": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Relenteless RushV4"
+    },
+    "108310725995566": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "X Skill"
+    },
+    "125810707684008": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "gaw"
+    },
+    "86208887161745": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.17,
+        "name": "uesr hit2"
+    },
+    "114919639636573": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "critical"
+    },
+    "90222174246856": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "2"
+    },
+    "109083782619351": {
+        "startSec": 0.4,
+        "name": "Jason V2 X",
+        "repeats": [],
+        "priority": "roll",
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "121339998382547": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "shield5"
+    },
+    "104662503368656": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "1"
+    },
+    "129495651539604": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "IXA2"
+    },
+    "139358065129445": {
+        "startSec": 0.2,
+        "name": "Jason LMB 4",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "78887381717473": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "IXA_Thrust"
+    },
+    "123099788465699": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "####"
+    },
+    "133200348314646": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "dou2"
+    },
+    "131164311515928": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "5"
+    },
+    "75362717367704": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "lessowl crit"
+    },
+    "134809434589356": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Kaen wannabe"
+    },
+    "71790033694498": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "Serrated v2 skill1"
+    },
+    "102875021232794": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Noro V2 M1_4"
+    },
+    "83173971266189": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "C Skill"
+    },
+    "135835813606350": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "cleave1"
+    },
+    "90524148205499": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "tatara2"
+    },
+    "91417655657970": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "aus2"
+    },
+    "100518651351311": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "2"
+    },
+    "101714150006632": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "Relentless ravage cast"
+    },
+    "111787805619609": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "m1 5"
+    },
+    "71773261520410": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 1,
+        "name": "sk1"
+    },
+    "72832638766630": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "m1 2"
+    },
+    "135552671823399": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "DoujimaSlam"
+    },
+    "136182618554502": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "4"
+    },
+    "130077418131222": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "KajiriScatter"
+    },
+    "81775282692043": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.08,
+        "name": "nishiki5"
+    },
+    "105184330766070": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Crusher"
+    },
+    "131442938695981": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "beaked v2 crit"
+    },
+    "115294061641691": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "arima4"
+    },
+    "139792635036817": {
+        "enabled": true,
+        "startSec": 0.36,
+        "name": "SOLACE C M2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.1
+    },
+    "75168761580156": {
+        "enabled": true,
+        "startSec": 0.45,
+        "name": "DEX Dragon kick",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "108984564775659": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "yomo4"
+    },
+    "105107078372382": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "spear crit"
+    },
+    "108646132311038": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "spear5"
+    },
+    "115257561645624": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Noro V2 Critical User"
+    },
+    "124766932801835": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Serrated X"
+    },
+    "118696475800411": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "uesr hit5"
+    },
+    "106425271118510": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Narukami X cast"
+    },
+    "94205575550862": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "GINKUI LMB 2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "127878009132771": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "5"
+    },
+    "125415359989914": {
+        "enabled": true,
+        "startSec": 0.5,
+        "name": "SOLACE Z",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "99762577752557": {
+        "startSec": 0.3,
+        "name": "STRENGTH Leg sweep",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "86232832931002": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "nutcracker skill1 p1"
+    },
+    "87004016130630": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "ser1"
+    },
+    "130560592953206": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "kuai crit"
+    },
+    "135900749451957": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "yomo2"
+    },
+    "131385671108953": {
+        "startSec": 0.37,
+        "name": "BASIC Air R",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "86370715406171": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Narukami - 4"
+    },
+    "125356670919319": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "m1 1"
+    },
+    "90460084897725": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.35,
+        "name": "DoujimaSpin"
+    },
+    "90597596100338": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 90597596100338",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "115126886859402": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "kajiri1"
+    },
+    "74212168479379": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "####"
+    },
+    "111882127396652": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 111882127396652",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "126923665753961": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Crit_1"
+    },
+    "108758788048228": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "3"
+    },
+    "100483961909371": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "####"
+    },
+    "98960600377850": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "crit"
+    },
+    "102683625069547": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "GINKUI LMB 3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "86086892466510": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "nutcracker skill2 p1"
+    },
+    "72464788731730": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "new tail hit3"
+    },
+    "139753135160439": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "GINKUI Crit M2, blood droplets need fixing",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "94851661153324": {
+        "startSec": 1,
+        "name": "DEX Mirage Breaker",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "86206576218059": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "1"
+    },
+    "70667320597389": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "hinami1"
+    },
+    "88887567878370": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "tatara crit"
+    },
+    "86146312560589": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "C"
+    },
+    "105728707511673": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "3"
+    },
+    "113175465376972": {
+        "startSec": 0,
+        "name": "DEX Cyclone Bruiser",
+        "repeats": [
+            0.7
+        ],
+        "hold": 0.202,
+        "rollOnFail": true
+    },
+    "91139296283591": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "Plasma Ground Burst"
+    },
+    "126029045405951": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Tatara C"
+    },
+    "84286984142876": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "CorsaRework"
+    },
+    "98357517858626": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.55,
+        "name": "Cleave crit"
+    },
+    "138176350933335": {
+        "startSec": 0.1,
+        "name": "DEX Piercing Heel",
+        "repeats": [
+            0.2
+        ],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "135750505225960": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 135750505225960",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "91672430450727": {
+        "enabled": true,
+        "startSec": 1.25,
+        "name": "GINKUI Z M2",
+        "repeats": [],
+        "priority": "roll",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "78143990224156": {
+        "startSec": 0.2,
+        "name": "MASTERY Wounded",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "99511332362280": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "MOVE1"
+    },
+    "81343624564970": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "1"
+    },
+    "74834246969439": {
+        "startSec": 0.05,
+        "name": "Jason V2 C M2",
+        "repeats": [
+            1
+        ],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "114558724693893": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "new tail hit2"
+    },
+    "113219432678875": {
+        "enabled": true,
+        "startSec": 0.8,
+        "name": "DEX Phantom Drop",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "124819625937751": {
+        "enabled": true,
+        "startSec": 0.08,
+        "name": "SOLACE X",
+        "repeats": [
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.2
+    },
+    "103430086615689": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "dou1"
+    },
+    "128225558499036": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "m1 2"
+    },
+    "139054968112034": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "1"
+    },
+    "87735609876920": {
+        "startSec": 0.2,
+        "name": "BASIC Uppercut",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "116952479079386": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "Z Skill"
+    },
+    "106370380659362": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "X judgement"
+    },
+    "139086739426590": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "jump strike1"
+    },
+    "123818970722547": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "X"
+    },
+    "102333760180664": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "BASIC Sword running attack",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "75292643761800": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "Calm5"
+    },
+    "102534431526280": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.14,
+        "name": "Skill1Activation"
+    },
+    "107003202275371": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "arima5"
+    },
+    "122209388478374": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Noro V1 Feast User"
+    },
+    "81012015438327": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Shicha3"
+    },
+    "102121388644772": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "m1 4"
+    },
+    "117824758967146": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "spear2"
+    },
+    "101775258669555": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.32,
+        "name": "WingSlap"
+    },
+    "139181141648397": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "4"
+    },
+    "123728918222864": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "serrated crit"
+    },
+    "107070912429001": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "Skill3"
+    },
+    "95666706381611": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.55,
+        "name": "tatara v2 crit"
+    },
+    "100477706909641": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "skill z feint"
+    },
+    "123727511642989": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Beaked v2 skill1"
+    },
+    "137616314316140": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "kurona3"
+    },
+    "125049330153289": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "ser3"
+    },
+    "107992919085814": {
+        "startSec": 0,
+        "name": "STRENGTH Dropping Spike",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0
+    },
+    "83232773804937": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Tatara v2 X shoot"
+    },
+    "72719950628740": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.08,
+        "name": "nishiki4"
+    },
+    "88769676978627": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "####"
+    },
+    "87764692704657": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Crit"
+    },
+    "71300661887319": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "#########"
+    },
+    "109123230222277": {
+        "startSec": 0.18,
+        "name": "Fist LMB 3",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "103668941891085": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Nishiki C"
+    },
+    "129838646358073": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 1.15,
+        "name": "Z"
+    },
+    "121109139209671": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "scorpV2 m1-1"
+    },
+    "76639298017828": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "GINKUI LMB 4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "90448243904946": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 90448243904946",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "130214291629606": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Noro V2 M1_3"
+    },
+    "90521401898889": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "kuai4"
+    },
+    "74877124260548": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "yomo crit re2"
+    },
+    "86520696250760": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "jason1"
+    },
+    "121746440756349": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.58,
+        "name": "nutcracker skill 3"
+    },
+    "137619265423164": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Shicha C cast"
+    },
+    "135309318514442": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "DemonYamadaX"
+    },
+    "105025163685810": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "2"
+    },
+    "115889394262154": {
+        "enabled": true,
+        "startSec": 0,
+        "name": "DEX Triple Step M2, needs to be dodged, needs fixing",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.202,
+        "rollOnFail": true
+    },
+    "135024148593300": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "IXA X"
+    },
+    "82642500378212": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.6,
+        "startSec": 0.2,
+        "name": "d"
+    },
+    "130277667485774": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 130277667485774",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.3
+    },
+    "87887548675431": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "C Skill"
+    },
+    "107500740429380": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.46,
+        "name": "ChisheC"
+    },
+    "109261766138092": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "Shicha Z"
+    },
+    "137895113211806": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "Shicha X"
+    },
+    "84271637509046": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "skill2withmarker"
+    },
+    "77398914569691": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.7,
+        "name": "Overheat Z3"
+    },
+    "127010872138675": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Imported Animation Clip"
+    },
+    "100344407851618": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "m2"
+    },
+    "89307852214578": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.55,
+        "name": "Serrated v2 skill3 cast"
+    },
+    "79913467941771": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.28,
+        "name": "Massacre"
+    },
+    "105180107860331": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "2"
+    },
+    "85614011160854": {
+        "distanceAdj": 0,
+        "startSec": 1.6,
+        "name": "Anim 85614011160854",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.6000000000000001
+    },
+    "135922159585894": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "skill2"
+    },
+    "78297239425049": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.13,
+        "name": "chishe2"
+    },
+    "83691818071163": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "EtoV2 Crit"
+    },
+    "86163858467809": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "kagune 4"
+    },
+    "86187711733321": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "###"
+    },
+    "72678012629652": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.37,
+        "name": "kuai skill3"
+    },
+    "130872155278190": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Z  Skill"
+    },
+    "129003302707709": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "2"
+    },
+    "134071135239015": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "kuai3"
+    },
+    "123084791240164": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "Noro V2 M1_2"
+    },
+    "106543246548601": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "LampreyUser"
+    },
+    "84888914033779": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "spear4"
+    },
+    "70837816696885": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "skill1"
+    },
+    "94484323145049": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "m4"
+    },
+    "77453243901864": {
+        "startSec": 0.15,
+        "name": "Jason V2 Crit",
+        "repeats": [
+            0.65
+        ],
+        "hold": 0.2,
+        "rollOnFail": false
+    },
+    "106775306544683": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "2"
+    },
+    "73383098189453": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Automatic Save"
+    },
+    "114394198383881": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "2"
+    },
+    "134101600310736": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "KajiriAttack"
+    },
+    "122661360698160": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 122661360698160",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "122576225066490": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.28,
+        "name": "m4"
+    },
+    "125756826659861": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.17,
+        "name": "uesr hit3"
+    },
+    "122058927995139": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "#########"
+    },
+    "96854702208827": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "jason5"
+    },
+    "102158544938828": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Narukami Z"
+    },
+    "119083279207398": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "overheat C cast"
+    },
+    "71420999059607": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.35,
+        "name": "Shicha crit"
+    },
+    "91532107165998": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "katana4"
+    },
+    "90442984429511": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.33,
+        "name": "crit2x"
+    },
+    "126074016457313": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.18,
+        "startSec": 0.08,
+        "name": "lessowl1"
+    },
+    "122819555320047": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.08,
+        "name": "nishiki1"
+    },
+    "134646776465233": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "3"
+    },
+    "123543445163800": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "Calm4"
+    },
+    "88694211921073": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.18,
+        "startSec": 0.1,
+        "name": "lessowl2"
+    },
+    "97485727762508": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "chishe crit"
+    },
+    "72659935381687": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "####"
+    },
+    "109184942183064": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.35,
+        "name": "dou crit"
+    },
+    "92648977102139": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "Noro V1 M1_2"
+    },
+    "88509112744612": {
+        "distanceAdj": 0,
+        "startSec": 0.76,
+        "name": "Anim 88509112744612",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "128101625557631": {
+        "startSec": 0.2,
+        "name": "Jason LMB 5",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "98312504474371": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "3"
+    },
+    "119570344423009": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "SOLACE LMB 1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "122454882730691": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.13,
+        "name": "Narukami - 2"
+    },
+    "103463736964630": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Half kill attempt"
+    },
+    "115299391673163": {
+        "distanceAdj": 0,
+        "startSec": 0.67,
+        "name": "Anim 115299391673163",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "98385414593823": {
+        "startSec": 0.2023121387283237,
+        "name": "DEX Reverse Tide",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "77659049501128": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "kajiri3"
+    },
+    "108769432958516": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "shield3"
+    },
+    "137684196851746": {
+        "startSec": 0.18,
+        "name": "Fist LMB 5",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "84922253817066": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "5"
+    },
+    "115935194502458": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "kagune 5"
+    },
+    "104337999454796": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "hit4"
+    },
+    "102642995643169": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "GINKUI Z",
+        "repeats": [
+            0.2,
+            0.3,
+            0.4,
+            0.5
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.25
+    },
+    "80560734051179": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "SOLACE LMB 4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "131161290739036": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "hit2"
+    },
+    "120819611310918": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Roaring thunder cast"
+    },
+    "103687126805661": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.03,
+        "name": "Dagger running attack"
+    },
+    "112387369480518": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "beak1"
+    },
+    "136533060945586": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "jason3"
+    },
+    "99807726895726": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "3"
+    },
+    "82989744322417": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "####"
+    },
+    "127462812873675": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "GINKUI X",
+        "repeats": [
+            0.3,
+            0.6,
+            0.9,
+            1.2
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.25
+    },
+    "124059164261714": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Shicha5"
+    },
+    "124960892283230": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.07,
+        "name": "universal fifth"
+    },
+    "135205073126877": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "M1 1"
+    },
+    "73909511758220": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 73909511758220",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "110164563494809": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "hit4"
+    },
+    "123123044774364": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 123123044774364",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.48999999999999996
+    },
+    "133929766213678": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.02,
+        "name": "Noro V1 Devour User"
+    },
+    "128106238874291": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "Maraud 1"
+    },
+    "119912107937230": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "owlx"
+    },
+    "121448140753859": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Noro V1 M1_5"
+    },
+    "134047638406873": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.13,
+        "name": "chishe3"
+    },
+    "130783290284678": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.165,
+        "name": "Desire Init"
+    },
+    "124343869615532": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "katana1"
+    },
+    "87492498431491": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 87492498431491",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "75970657905611": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "3"
+    },
+    "135839768689737": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "nishiki2"
+    },
+    "82130174183873": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "kajiri4"
+    },
+    "93457709307676": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "Automatic Save"
+    },
+    "101138797487568": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "sword2"
+    },
+    "135303723032689": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "M1 2"
+    },
+    "125001482194702": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "Kajirigrabidk"
+    },
+    "100695225844315": {
+        "startSec": 0.2,
+        "name": "Jason V2 Z Full Charge",
+        "repeats": [
+            0.5,
+            0.9
+        ],
+        "hold": 0.15,
+        "rollOnFail": false
+    },
+    "77317789467088": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "hit4"
+    },
+    "84438345872276": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "tatara4"
+    },
+    "126141375680416": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 126141375680416",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "106731070269238": {
+        "enabled": true,
+        "startSec": 0.12,
+        "name": "GINKUI C",
+        "repeats": [
+            0.3,
+            0.6
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "hold": 0.202
+    },
+    "82184472713821": {
+        "distanceAdj": 0,
+        "startSec": 2,
+        "name": "Anim 82184472713821",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.2999999999999998
+    },
+    "91668992403483": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "STRENGTH Warrior's Pride",
+        "repeats": [
+            0.9,
+            1.85
+        ],
+        "rollOnFail": false,
+        "hold": 0.2
+    },
+    "72026342966670": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 72026342966670",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "125123147660993": {
+        "enabled": true,
+        "startSec": 0.202,
+        "name": "GINKUI Crit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "102453919149515": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "crit"
+    },
+    "107868355016077": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 1.1,
+        "name": "C Skill2"
+    },
+    "116175888742894": {
+        "startSec": 0.4,
+        "name": "MASTERY Suppression",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "135442996725675": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "1"
+    },
+    "82259311185179": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "skill1end"
+    },
+    "97870196303383": {
+        "distanceAdj": 0,
+        "startSec": 1.15,
+        "name": "Anim 97870196303383",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.30000000000000007
+    },
+    "77513027791610": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "spear3"
+    },
+    "120591268956676": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "2"
+    },
+    "126453556030481": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "############"
+    },
+    "125084555032360": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "hit5"
+    },
+    "98582715122328": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "new tail hit5"
+    },
+    "113848079779223": {
+        "startSec": 0.2023121387283237,
+        "name": "DEX Sudden Kick",
+        "repeats": [
+            1.2
+        ],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "77200481731064": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "1"
+    },
+    "139055692093180": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.04,
+        "name": "skill 1"
+    },
+    "82528260253305": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Calm1"
+    },
+    "117434170736698": {
+        "distanceAdj": 0,
+        "rollOnFail": true,
+        "hold": 0.19,
+        "startSec": 0.08,
+        "name": "lessowl5"
+    },
+    "106535138040115": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.3,
+        "name": "Shredder2"
+    },
+    "111633774847428": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Z Move Miss"
+    },
+    "103934719133771": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "kurona4"
+    },
+    "111022978492411": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.55,
+        "name": "C Move"
+    },
+    "86526104440485": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.4,
+        "name": "Narukami X action"
+    },
+    "111843219064172": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.17,
+        "name": "JdogHit - 1"
+    },
+    "114250633109382": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "tatara3"
+    },
+    "98771209216846": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 98771209216846",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "90105278811432": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "3"
+    },
+    "125985327613003": {
+        "startSec": 0.2,
+        "name": "Jason LMB 2",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "139636612270661": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "Crit1"
+    },
+    "138484499722859": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "swift"
+    },
+    "134741686910618": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 134741686910618",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "119882630862689": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Serrated v2 crit"
+    },
+    "94946484791547": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.13,
+        "name": "Automatic Save"
+    },
+    "96688039185573": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "Claws X Move Whiff"
+    },
+    "78386126860643": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "X Move Miss"
+    },
+    "126930390220804": {
+        "startSec": 0.3,
+        "name": "STRENGTH Soaring Blow",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "101093312856347": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "1"
+    },
+    "138545708561292": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "X Skill"
+    },
+    "83748907427260": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Beaked v2 skill2 cast"
+    },
+    "121773250743693": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.08,
+        "name": "Noro V2 M1_1"
+    },
+    "107379745282989": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "4"
+    },
+    "94300503125812": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Narukami - 5"
+    },
+    "138168065858800": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Skill2 Saiko V1 player"
+    },
+    "116301245600177": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "beak4"
+    },
+    "118250904312310": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Noro V1 M1_3"
+    },
+    "116560311654983": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "2"
+    },
+    "139986278375552": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "#########"
+    },
+    "118233181584094": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.04,
+        "name": "IXA Thrust action"
+    },
+    "78994342814792": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.6,
+        "name": "Automatic Save"
+    },
+    "84032491629355": {
+        "startSec": 0.4,
+        "name": "STRENGTH Axe kick",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "83894242302290": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "m3"
+    },
+    "96240580568749": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.13,
+        "name": "chishe1"
+    },
+    "121092258344696": {
+        "startSec": 0.8,
+        "name": "MASTERY Debilitating Slash M2",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "119065419146950": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 119065419146950",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "131051682278134": {
+        "startSec": 0.18,
+        "name": "Fist LMB 2",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "101521677894258": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.5,
+        "name": "Critical"
+    },
+    "96875568331308": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "SOLACE BOW LMB 1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "125009591132881": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "spear5"
+    },
+    "129436447203162": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 129436447203162",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "126381011592027": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.15,
+        "name": "M1 5"
+    },
+    "131725694254635": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "ser2"
+    },
+    "106306160427852": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.13,
+        "name": "chishe4"
+    },
+    "108944058905120": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.12,
+        "name": "m1 3"
+    },
+    "83637601333131": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.13,
+        "name": "Fist running atack"
+    },
+    "70738136253672": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 70738136253672",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "91066171406248": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.1,
+        "name": "Lightning lunge"
+    },
+    "133676778221315": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "aus z cast"
+    },
+    "84024525589689": {
+        "distanceAdj": 0,
+        "startSec": 0.88,
+        "name": "Anim 84024525589689",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.2599999999999999
+    },
+    "89588139226485": {
+        "startSec": 0.18,
+        "name": "Fist LMB 4",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "123559289828864": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Anim 123559289828864",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29999999999999996
+    },
+    "93419864791125": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.34,
+        "name": "ReworkNumber256"
+    },
+    "92937790229658": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.46,
+        "name": "Crit"
+    },
+    "132546734612246": {
+        "startSec": 0.3,
+        "name": "STRENGTH Gut punch",
+        "repeats": [],
+        "rollOnFail": false,
+        "hold": 0.202
+    },
+    "104346885061572": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "dou4"
+    },
+    "89816763320681": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "RangeModeAttack"
+    },
+    "129165719671535": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.25,
+        "name": "Crit"
+    },
+    "140017849718031": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "Overheat Z2"
+    },
+    "88929119667129": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.05,
+        "name": "Beak Spin"
+    },
+    "134287260412530": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Shicha4"
+    },
+    "106461888875800": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.2,
+        "name": "nutcracker light 5"
+    },
+    "108458212372937": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Anim 108458212372937",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.48999999999999996
+    },
+    "84043093107309": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 84043093107309",
+        "repeats": [],
+        "rollOnFail": true,
+        "hold": 0.29000000000000006
+    },
+    "102288540818350": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.2,
+        "startSec": 0.15,
+        "name": "owlZ"
+    },
+    "98932916989863": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.35,
+        "name": "Z"
+    },
+    "107193409342294": {
+        "startSec": 0.2,
+        "name": "BASIC Running attack",
+        "repeats": [],
+        "hold": 0.202,
+        "rollOnFail": false
+    },
+    "114773679703806": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0.17,
+        "name": "uesr hit1"
+    },
+    "102445468244138": {
+        "distanceAdj": 0,
+        "rollOnFail": false,
+        "hold": 0.15,
+        "startSec": 0,
+        "name": "Calm2"
+    }
+}
