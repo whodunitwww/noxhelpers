@@ -18,6 +18,7 @@ return function(ctx)
     local HttpService          = Services.HttpService or game:GetService("HttpService")
     local VirtualInputManager  = Services.VirtualInputManager or game:GetService("VirtualInputManager")
     local Players              = game:GetService("Players")
+    local Workspace            = Services.Workspace or workspace
 
     local ALT_FARM_MODE_MAIN   = "Main Alt"
     local ALT_FARM_MODE_HELPER = "Helper Alt"
@@ -81,6 +82,20 @@ return function(ctx)
         lastAvoidMoveTime   = 0,
         lastAvoidNoticeTime = 0,
     }
+
+    local BossState            = {
+        enabled          = false,
+        spawnInProgress  = false,
+        bossTarget       = nil,
+        lastTimerText    = nil,
+        watchThread      = nil,
+        lastSpawnAttempt = 0,
+        spawnThread      = nil,
+        prevOffset       = nil,
+    }
+
+    local BOSS_READY_TEXT      = "30:00"
+    local BOSS_SPAWN_TIMEOUT   = 5
 
     ----------------------------------------------------------------
     -- MODULE LOADER (file -> GitHub fallback)
@@ -241,6 +256,277 @@ return function(ctx)
     local getMobRoot                 = Mobs.getMobRoot
     local findNearbyEnemy            = Mobs.findNearbyEnemy
     local questTargets               = QuestTargets
+
+    local PartyActivateRF            = nil
+
+    local function isBossModel(model)
+        return model
+            and model:IsA("Model")
+            and tostring(model.Name):match("^Golem%d+$")
+    end
+
+    local function findAliveGolem()
+        local living = (Workspace and Workspace:FindFirstChild("Living")) or workspace:FindFirstChild("Living")
+        if not living then
+            return nil
+        end
+
+        local hrp = getLocalHRP()
+        local best, bestDist
+        for _, model in ipairs(living:GetChildren()) do
+            if isBossModel(model) and isMobAlive(model) then
+                if not hrp then
+                    return model
+                end
+                local root = getMobRoot(model)
+                local dist = root and (root.Position - hrp.Position).Magnitude or math.huge
+                if not bestDist or dist < bestDist then
+                    bestDist = dist
+                    best     = model
+                end
+            end
+        end
+
+        return best
+    end
+
+    local function getBossTimerLabel()
+        local proximity   = Workspace and Workspace:FindFirstChild("Proximity")
+        local createParty = proximity and proximity:FindFirstChild("CreateParty")
+        local golem       = createParty and createParty:FindFirstChild("Golem")
+        local timer       = golem and golem:FindFirstChild("Timer")
+        local container   = timer and timer:FindFirstChild("Container")
+        local label       = container and container:FindFirstChild("Label")
+        return label
+    end
+
+    local function getBossPrompt()
+        local proximity   = Workspace and Workspace:FindFirstChild("Proximity")
+        local createParty = proximity and proximity:FindFirstChild("CreateParty")
+        return createParty and createParty:FindFirstChild("ProximityPrompt")
+    end
+
+    local function resolveBossActivateRF()
+        if PartyActivateRF and PartyActivateRF.Parent then
+            return PartyActivateRF
+        end
+
+        local ok, result = pcall(function()
+            return game:GetService("ReplicatedStorage")
+                :WaitForChild("Shared")
+                :WaitForChild("Packages")
+                :WaitForChild("Knit")
+                :WaitForChild("Services")
+                :WaitForChild("PartyService")
+                :WaitForChild("RF")
+                :WaitForChild("Activate")
+        end)
+
+        if ok then
+            PartyActivateRF = result
+        end
+
+        return PartyActivateRF
+    end
+
+    local function moveToBossPrompt(prompt)
+        local hrp = getLocalHRP()
+        if not hrp or not prompt then
+            return nil
+        end
+
+        local targetPart = prompt.Adornee
+        if not (targetPart and targetPart:IsA("BasePart")) then
+            local parent = prompt.Parent
+            if parent and parent:IsA("BasePart") then
+                targetPart = parent
+            end
+        end
+        if not targetPart then
+            return nil
+        end
+
+        stopMoving()
+        if AttachPanel.DestroyAttach then
+            pcall(AttachPanel.DestroyAttach)
+        end
+        FarmState.attached      = false
+        FarmState.tempMobTarget = nil
+
+        local targetPos = targetPart.Position + Vector3.new(0, 3, 0)
+        if AF_Config.MovementMode == "Teleport" then
+            hrp.CFrame = CFrame.new(targetPos)
+            hrp.AssemblyLinearVelocity = Vector3.zero
+            hrp.AssemblyAngularVelocity = Vector3.zero
+        else
+            FarmState.moveCleanup = MoveToPos(targetPos, AF_Config.FarmSpeed)
+        end
+
+        return targetPart
+    end
+
+    local function waitForBossPromptReach(targetPart, timeout)
+        local hrp = getLocalHRP()
+        if not hrp or not targetPart then
+            return false
+        end
+
+        local start = os.clock()
+        while os.clock() - start < (timeout or 4) do
+            if not BossState.enabled then
+                return false
+            end
+            local dist = (hrp.Position - targetPart.Position).Magnitude
+            if dist <= 8 then
+                return true
+            end
+            task.wait(0.05)
+        end
+
+        return false
+    end
+
+    local function attemptBossSpawn(reason)
+        if not BossState.enabled or BossState.spawnInProgress then
+            return
+        end
+
+        local existingBoss = findAliveGolem()
+        if existingBoss then
+            BossState.bossTarget = existingBoss
+            return
+        end
+
+        local now = os.clock()
+        if (now - (BossState.lastSpawnAttempt or 0)) < 2 then
+            return
+        end
+        BossState.lastSpawnAttempt = now
+        BossState.spawnInProgress  = true
+
+        BossState.spawnThread = task.spawn(function()
+            local ok, err = pcall(function()
+                if not BossState.enabled then
+                    return
+                end
+
+                stopMoving()
+                if AttachPanel.DestroyAttach then
+                    pcall(AttachPanel.DestroyAttach)
+                end
+                FarmState.currentTarget = nil
+                FarmState.tempMobTarget = nil
+                FarmState.attached      = false
+                FarmState.detourActive  = false
+
+                local prompt = getBossPrompt()
+                if not prompt then
+                    return
+                end
+
+                local targetPart = moveToBossPrompt(prompt)
+                if not targetPart then
+                    return
+                end
+
+                waitForBossPromptReach(targetPart, 5)
+                stopMoving()
+                if not BossState.enabled then
+                    return
+                end
+
+                task.wait(1)
+                if prompt and fireproximityprompt then
+                    pcall(fireproximityprompt, prompt)
+                end
+                if not BossState.enabled then
+                    return
+                end
+
+                task.wait(1)
+                local activateRF = resolveBossActivateRF()
+                if activateRF then
+                    pcall(function()
+                        activateRF:InvokeServer()
+                    end)
+                end
+
+                local start = os.clock()
+                while BossState.enabled and (os.clock() - start) < BOSS_SPAWN_TIMEOUT do
+                    local golem = findAliveGolem()
+                    if golem then
+                        BossState.bossTarget      = golem
+                        FarmState.currentTarget   = golem
+                        FarmState.attached        = false
+                        FarmState.tempMobTarget   = nil
+                        FarmState.lastTargetRef   = nil
+                        FarmState.lastTargetHealth = 0
+                        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
+                            Dashboard.setCurrentTarget(golem.Name)
+                        end
+                        return
+                    end
+                    task.wait(0.2)
+                end
+            end)
+
+            if not ok then
+                warn("[AutoFarm] Boss spawn error:", err)
+            end
+
+            BossState.spawnInProgress = false
+            BossState.spawnThread     = nil
+        end)
+    end
+
+    local function bossWatchLoop()
+        while BossState.enabled do
+            local label = getBossTimerLabel()
+            local text  = label and tostring(label.Text) or nil
+            if text and text ~= BossState.lastTimerText then
+                BossState.lastTimerText = text
+                if text == BOSS_READY_TEXT then
+                    attemptBossSpawn("timer")
+                end
+            end
+            task.wait(0.1)
+        end
+    end
+
+    local function startBossWatcher()
+        if BossState.watchThread then
+            return
+        end
+        BossState.lastTimerText = nil
+        BossState.watchThread   = task.spawn(bossWatchLoop)
+    end
+
+    local function stopBossWatcher()
+        BossState.watchThread = nil
+        BossState.lastTimerText = nil
+    end
+
+    local function applyBossOffset()
+        if BossState.prevOffset == nil then
+            BossState.prevOffset = AF_Config.ExtraYOffset
+        end
+        if AF_Config.ExtraYOffset ~= -8 then
+            AF_Config.ExtraYOffset = -8
+            if FarmState.enabled and FarmState.currentTarget and FarmState.attached then
+                Movement.realignAttach(FarmState.currentTarget)
+            end
+        end
+    end
+
+    local function restoreBossOffset()
+        if BossState.prevOffset ~= nil then
+            AF_Config.ExtraYOffset = BossState.prevOffset
+            BossState.prevOffset = nil
+            if FarmState.enabled and FarmState.currentTarget and FarmState.attached then
+                Movement.realignAttach(FarmState.currentTarget)
+            end
+        end
+    end
 
     local AUTO_QUEST_SCAN_INTERVAL   = 5
     local AUTO_QUEST_REPEAT_INTERVAL = 60
@@ -871,6 +1157,17 @@ return function(ctx)
             return nil
         end
 
+        if BossState.enabled and def.name == FARM_MODE_ENEMIES then
+            local boss = findAliveGolem()
+            if boss then
+                BossState.bossTarget = boss
+                if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
+                    Dashboard.setCurrentTarget(boss.Name)
+                end
+                return boss
+            end
+        end
+
         local helperAltActive = isHelperAltEnabled()
         local mainAltActive   = isMainAltEnabled()
         local questOverrideActive = AF_Config.QuestPriorityOverrideEnabled and questTargets
@@ -1102,6 +1399,41 @@ return function(ctx)
                     return
                 end
 
+                if BossState.spawnInProgress then
+                    task.wait(0.1)
+                    return
+                end
+
+                local bossTarget = nil
+                if BossState.enabled then
+                    local foundBoss = findAliveGolem()
+                    if foundBoss then
+                        BossState.bossTarget = foundBoss
+                    elseif BossState.bossTarget and not isMobAlive(BossState.bossTarget) then
+                        BossState.bossTarget = nil
+                    end
+
+                    bossTarget = BossState.bossTarget
+                    if bossTarget and FarmState.currentTarget ~= bossTarget then
+                        stopMoving()
+                        FarmState.currentTarget   = bossTarget
+                        FarmState.attached        = false
+                        FarmState.tempMobTarget   = nil
+                        FarmState.lastTargetRef   = nil
+                        FarmState.lastTargetHealth = 0
+                        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
+                            Dashboard.setCurrentTarget(bossTarget.Name)
+                        end
+                    end
+                end
+
+                local bossOverride = BossState.enabled and bossTarget and isMobAlive(bossTarget)
+                if bossOverride then
+                    applyBossOffset()
+                else
+                    restoreBossOffset()
+                end
+
                 -- DAMAGE DITCH LOGIC
                 local ditchLimit = hum.MaxHealth * (AF_Config.DamageDitchThreshold / 100)
                 local protectDamageDitchTarget = shouldHoldTargetForWhitelist(FarmState.currentTarget)
@@ -1132,7 +1464,9 @@ return function(ctx)
                     and AF_Config.DamageDitchEnabled
                     and humHealth < ditchLimit
 
-                if FarmState.mode == FARM_MODE_ORES and AF_Config.AttackNearbyMobs and not holdNearbyMobs then
+                if bossOverride then
+                    FarmState.tempMobTarget = nil
+                elseif FarmState.mode == FARM_MODE_ORES and AF_Config.AttackNearbyMobs and not holdNearbyMobs then
                     if FarmState.tempMobTarget then
                         if FarmState.tempMobTarget.Parent and isMobAlive(FarmState.tempMobTarget) then
                             local root = getMobRoot(FarmState.tempMobTarget)
@@ -1182,6 +1516,12 @@ return function(ctx)
                     activeDef    = ModeDefs[FarmState.mode]
                 end
 
+                if bossOverride then
+                    activeTarget = bossTarget
+                    activeDef    = ModeDefs[FARM_MODE_ENEMIES]
+                    isDistracted = false
+                end
+
                 if not activeDef then
                     task.wait(0.3)
                     return
@@ -1217,7 +1557,7 @@ return function(ctx)
                     end
                 end
 
-                if FarmState.mode == FARM_MODE_ORES and mainAltActive then
+                if not bossOverride and FarmState.mode == FARM_MODE_ORES and mainAltActive then
                     local altCandidate = findAltWhitelistRock(hrp)
                     if altCandidate
                         and (not activeTarget or (activeTarget ~= altCandidate and not shouldHoldTargetForWhitelist(activeTarget))) then
@@ -1372,6 +1712,7 @@ return function(ctx)
 
                 -- ORE DROP WHITELIST CHECK
                 if not isDistracted
+                    and not bossOverride
                     and FarmState.mode == FARM_MODE_ORES
                     and AF_Config.OreWhitelistEnabled
                     and activeTarget then
@@ -1839,8 +2180,8 @@ return function(ctx)
     ----------------------------------------------------------------
     FarmGroup:AddSlider("AF_OffsetAdjust", {
         Text     = "Extra Offset",
-        Min      = -5,
-        Max      = 15,
+        Min      = -15,
+        Max      = 20,
         Default  = AF_Config.ExtraYOffset,
         Rounding = 1,
         Suffix   = " studs",
@@ -1957,6 +2298,32 @@ return function(ctx)
         Default  = "Teleport",
         Callback = function(value)
             AF_Config.MovementMode = value
+        end,
+    })
+
+    FarmGroup:AddToggle("AF_DoBosses", {
+        Text     = "Do Bosses",
+        Default  = false,
+        Callback = function(state)
+            BossState.enabled = state and true or false
+            if state then
+                startBossWatcher()
+                attemptBossSpawn("toggle")
+            else
+                stopBossWatcher()
+                BossState.bossTarget      = nil
+                BossState.spawnInProgress = false
+                restoreBossOffset()
+                if FarmState.currentTarget and isBossModel(FarmState.currentTarget) then
+                    stopMoving()
+                    FarmState.currentTarget = nil
+                    FarmState.attached      = false
+                    FarmState.tempMobTarget = nil
+                    if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
+                        Dashboard.setCurrentTarget(nil)
+                    end
+                end
+            end
         end,
     })
 
@@ -2153,6 +2520,17 @@ return function(ctx)
         if Toggles.AF_Enabled then
             pcall(function()
                 Toggles.AF_Enabled:SetValue(false)
+            end)
+        end
+
+        BossState.enabled         = false
+        BossState.bossTarget      = nil
+        BossState.spawnInProgress = false
+        stopBossWatcher()
+        restoreBossOffset()
+        if Toggles.AF_DoBosses and Toggles.AF_DoBosses.SetValue then
+            pcall(function()
+                Toggles.AF_DoBosses:SetValue(false)
             end)
         end
 
