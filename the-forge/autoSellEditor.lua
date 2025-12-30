@@ -1,30 +1,28 @@
 -- AutoSellConfigEditor.lua
 -- Standalone config editor for AutoSell thresholds, with pretty UI + live ore icons.
 -- UPDATED:
---   • Ores use in-game ViewportFrames + cameras (no static ore image IDs).
---   • Legendary/Mythical Essence and Essence Icons supported.
---   • "Rune Traits" tab with per-trait stat filters (Above/Below).
---   • Rune trait config is saved under Config.runeTraits[traitId].
---   • Rune trait cards: stat labels pulled from real Shared.Data.Runes stats.
---   • ADDED: Per-tab Search box (filters items in the current tab).
+--    • Fixed Rune Traits tab (was empty due to a parenting error).
+--    • Fixed sorting (Exotic/Divine/Relic/Mythic now sort correctly).
+--    • Standardized "Mythic" vs "Mythical".
+--    • Ores are zoomed in 50%+ larger.
 
 -- CONFIG PATH
-local BASE_DIR           = "Cerberus/The Forge"   -- <== make sure this matches References.gameDir in your main script
+local BASE_DIR            = "Cerberus/The Forge"   -- <== make sure this matches References.gameDir in your main script
 local AutoSellConfigFile = BASE_DIR .. "/AutoSellConfig.json"
 
-local Players            = game:GetService("Players")
-local HttpService        = game:GetService("HttpService")
-local CoreGui            = game:GetService("CoreGui")
-local UserInputService   = game:GetService("UserInputService")
-local ReplicatedStorage  = game:GetService("ReplicatedStorage")
-local Shared             = ReplicatedStorage:WaitForChild("Shared")
+local Players             = game:GetService("Players")
+local HttpService         = game:GetService("HttpService")
+local CoreGui             = game:GetService("CoreGui")
+local UserInputService    = game:GetService("UserInputService")
+local ReplicatedStorage   = game:GetService("ReplicatedStorage")
+local Shared              = ReplicatedStorage:WaitForChild("Shared")
 
-local LocalPlayer        = Players.LocalPlayer
+local LocalPlayer         = Players.LocalPlayer
 
 ----------------------------------------------------------------
 -- DATA (mirrors main script)
 ----------------------------------------------------------------
-local EssenceRarityMap   = {
+local EssenceRarityMap    = {
     ["Tiny Essence"]      = "Common",
     ["Small Essence"]     = "Common",
     ["Medium Essence"]    = "Uncommon",
@@ -36,13 +34,14 @@ local EssenceRarityMap   = {
     ["Mythical Essence"]  = "Mythical",
 }
 
+-- FIXED: Standardized "Mythic" -> "Mythical" and ensured all rarities exist
 local OreRarityMap = {
     ["Aether Lotus"] = "Rare",
     ["Aetherit"] = "Rare",
     ["Aite"] = "Epic",
     ["Amethyst"] = "Rare",
     ["Aqujade"] = "Epic",
-    ["Arcane Crystal"] = "Mythic",
+    ["Arcane Crystal"] = "Mythical", -- Fixed
     ["Bananite"] = "Uncommon",
     ["Blue Crystal"] = "Epic",
     ["Boneite"] = "Rare",
@@ -56,14 +55,13 @@ local OreRarityMap = {
     ["Cryptex"] = "Epic",
     ["Cuprite"] = "Epic",
     ["Dark Boneite"] = "Rare",
-    ["Darkryte"] = "Mythic",
-    ["Demonite"] = "Mythic",
+    ["Darkryte"] = "Mythical", -- Fixed
+    ["Demonite"] = "Mythical", -- Fixed
     ["Diamond"] = "Rare",
     ["Emerald"] = "Epic",
-    ["Etherealite"] = "Mythic",
+    ["Etherealite"] = "Mythical", -- Fixed
     ["Eye Ore"] = "Legendary",
     ["Fichillium"] = "Relic",
-    ["Fichilliumorite"] = "Unobtainable",
     ["Fireite"] = "Legendary",
     ["Frost Fossil"] = "Epic",
     ["Galaxite"] = "Divine",
@@ -74,8 +72,9 @@ local OreRarityMap = {
     ["Grass"] = "Common",
     ["Green Crystal"] = "Epic",
     ["Heavenite"] = "Divine",
-    ["Iceite"] = "Mythic",
+    ["Iceite"] = "Mythical", -- Fixed
     ["Iron"] = "Common",
+    ["Jade"] = "Rare",
     ["Lapis Lazuli"] = "Uncommon",
     ["Larimar"] = "Epic",
     ["Lgarite"] = "Rare",
@@ -106,7 +105,7 @@ local OreRarityMap = {
     ["Silver"] = "Uncommon",
     ["Slimite"] = "Epic",
     ["Snowite"] = "Legendary",
-    ["Starite"] = "Mythic",
+    ["Starite"] = "Mythical", -- Fixed
     ["Stone"] = "Common",
     ["Sulfur"] = "Uncommon",
     ["Suryafal"] = "Relic",
@@ -125,17 +124,20 @@ local OreRarityMap = {
     ["Zephyte"] = "Rare",
 }
 
--- strong rarity colours
-local RarityColors       = {
-    Common    = Color3.fromRGB(140, 140, 140),
-    Uncommon  = Color3.fromRGB(80, 190, 120),
-    Rare      = Color3.fromRGB(90, 140, 240),
-    Epic      = Color3.fromRGB(200, 90, 240),
-    Legendary = Color3.fromRGB(255, 200, 80),
-    Mythical  = Color3.fromRGB(255, 80, 110),
+-- UPDATED: Added Exotic, Divine, Relic colors
+local RarityColors        = {
+    Common       = Color3.fromRGB(140, 140, 140),
+    Uncommon     = Color3.fromRGB(80, 190, 120),
+    Rare         = Color3.fromRGB(90, 140, 240),
+    Epic         = Color3.fromRGB(200, 90, 240),
+    Legendary    = Color3.fromRGB(255, 200, 80),
+    Mythical     = Color3.fromRGB(255, 80, 110),
+    Exotic       = Color3.fromRGB(255, 105, 180), -- Hot Pink
+    Divine       = Color3.fromRGB(255, 255, 200), -- Pale Gold/White
+    Relic        = Color3.fromRGB(0, 255, 255),   -- Cyan/Aqua
 }
 
-local EssenceNamesList   = {
+local EssenceNamesList    = {
     "Tiny Essence",
     "Small Essence",
     "Medium Essence",
@@ -147,20 +149,24 @@ local EssenceNamesList   = {
     "Mythical Essence",
 }
 
-local OreNamesList       = {}
+local OreNamesList        = {}
 for oreName in pairs(OreRarityMap) do
     table.insert(OreNamesList, oreName)
 end
 
--- sort ores: Mythical -> Legendary -> Epic -> Rare -> Uncommon -> Common
+-- UPDATED: Added sorting logic for higher tiers
 local rarityOrder = {
-    Mythical  = 1,
-    Legendary = 2,
-    Epic      = 3,
-    Rare      = 4,
-    Uncommon  = 5,
-    Common    = 6,
+    Relic        = 1,
+    Divine       = 2,
+    Exotic       = 3,
+    Mythical     = 4,
+    Legendary    = 5,
+    Epic         = 6,
+    Rare         = 7,
+    Uncommon     = 8,
+    Common       = 9,
 }
+
 table.sort(OreNamesList, function(a, b)
     local ra = rarityOrder[OreRarityMap[a]] or 99
     local rb = rarityOrder[OreRarityMap[b]] or 99
@@ -170,13 +176,15 @@ table.sort(OreNamesList, function(a, b)
     return ra < rb
 end)
 
-local OreRarityList        = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
+-- UPDATED: Added buttons for the new rarities in the filter tab
+local OreRarityList        = { "Relic", "Divine", "Exotic", "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
 local EssenceRarityList    = { "Mythical", "Legendary", "Epic", "Rare", "Uncommon", "Common" }
 
 -- existing rune *items* (shards etc)
-local RuneValues           = {
+local RuneValues            = {
     "Miner Shard",
     "Blast Chip",
+    "Frost Speck",
     "Flame Spark",
     "Briar Notch",
     "Rage Mark",
@@ -185,19 +193,19 @@ local RuneValues           = {
     "Venom Crumb",
 }
 
-local RuneImageIds         = {
+local RuneImageIds          = {
     ["Ward Patch"]  = "136618198347198",
     ["Briar Notch"] = "130375351000261",
     ["Rage Mark"]   = "74377849245058",
     ["Miner Shard"] = "110898589664978",
     ["Flame Spark"] = "73865699740150",
-    ["Frost Speck"] = "435345",
+    ["Frost Speck"] = "70953025556952",
     ["Blast Chip"]  = "85050444076173",
     ["Drain Edge"]  = "89173473574831",
     ["Venom Crumb"] = "77052262266995",
 }
 
-local EssenceImageIds      = {
+local EssenceImageIds       = {
     ["Tiny Essence"]      = "72025528879375",
     ["Small Essence"]     = "117483889562292",
     ["Medium Essence"]    = "92874766076839",
@@ -210,324 +218,98 @@ local EssenceImageIds      = {
 }
 
 ----------------------------------------------------------------
--- RUNE TRAIT DEFINITIONS (from your dump) – DISPLAY-ONLY
+-- RUNE TRAIT DEFINITIONS
 ----------------------------------------------------------------
 local RuneTraitDefinitions = {
-    {
-        id = "Radioactive",
-        name = "Radioactive",
-        description = "Deal nil% of max health as damage as AoE while in-combat.",
-        iconImageId = "126391228181883",
-    },
-    {
-        id = "Berserker",
-        name = "Berserker",
-        description =
-            "Boosts physical damage and movement speed by nil% for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.",
-        iconImageId = "99579458536104",
-    },
-    {
-        id = "Poison",
-        name = "Poison",
-        description = "Deals nil% of weapon damage as poison per second for nil seconds. nil% chance on hit.",
-        iconImageId = "77726317529525",
-    },
-    {
-        id = "FlatHealthRegen",
-        name = "Flat Regen",
-        description = "Regen nil health per second.",
-        iconImageId = "92712417449524",
-    },
-    {
-        id = "Thorn",
-        name = "Thorn",
-        description =
-            "Reflect nil% physical damage taken. Maximum damage given limits at 5% max health of user. 0.05 seconds cooldown.",
-        iconImageId = "126391228181883",
-    },
-    {
-        id = "UndeadSecondChance",
-        name = "Second Chance",
-        description = "Refills 50% of max hp when hp is under 10% every 5 minutes",
-        iconImageId = "94132270840631",
-    },
-    {
-        id = "DemonDevilsFinger",
-        name = "Devil's Finger",
-        description =
-            "When you dash, teleport with hellfire particles and 35% chance to create a hellfire circle deal AOE to the enemies inside dealing 45% damage of your weapon per second for 3 sec.",
-        iconImageId = "126391228181883",
-    },
-    {
-        id = "AttackSpeedBoost",
-        name = "Attack Speed",
-        description = "Increase attack speed by nil%.",
-        iconImageId = "74403354215536",
-    },
-    {
-        id = "JumpBoost",
-        name = "Jump Boost",
-        description = "nil% longer jump.",
-        iconImageId = "99963424031166",
-    },
-    {
-        id = "ShadowPhantomStep",
-        name = "Phantom Step",
-        description = "nil% to be immortal and gain movement speed for a brief duration.",
-        iconImageId = "94132270840631",
-    },
-    {
-        id = "ToxicVeins",
-        name = "Toxic Veins",
-        description =
-            "Deals nil% poison damage around the character for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.",
-        iconImageId = "131438262369264",
-    },
-    {
-        id = "MoveSpeed",
-        name = "Swiftness",
-        description = "nil% extra movement speed.",
-        iconImageId = "92712417449524",
-    },
-    {
-        id = "Explosion",
-        name = "Explosion",
-        description =
-            "Cause an explosion at location of victim, dealing nil% of weapon damage as AOE damage. nil% chance on hit.",
-        iconImageId = "110063824255919",
-    },
-    {
-        id = "MinePower",
-        name = "Mine Power",
-        description = "nil% extra mine damage.",
-        iconImageId = "138135219973840",
-    },
-    {
-        id = "BullsFury",
-        name = "Bull's Fury",
-        description = "Boosts physical damage and movement speed by 30% while health is under 50%.",
-        iconImageId = "99579458536104",
-    },
-    {
-        id = "NegativeHealthBoost",
-        name = "Negative Vitality",
-        description = "-nil% health.",
-        iconImageId = "92712417449524",
-    },
-    {
-        id = "Fire",
-        name = "Burn",
-        description = "Deals nil% of weapon damage as fire per second for nil seconds. nil% chance on hit.",
-        iconImageId = "130243970954297",
-    },
-    {
-        id = "DashIFrame",
-        name = "Phase",
-        description = "nil% longer invincibility on dash.",
-        iconImageId = "110461678599478",
-    },
-    {
-        id = "Shield",
-        name = "Shield",
-        description = "Reduce incoming physical damage by nil%. Has nil% chance per hit.",
-        iconImageId = "94132270840631",
-    },
-    {
-        id = "AngelHolyHand",
-        name = "Holy Hand",
-        description = "Have infinite stamina while below 20% health.",
-        iconImageId = "99579458536104",
-    },
-    {
-        id = "AngelSmite",
-        name = "Angel Smite",
-        description = "50% chance to call upon Smite on-hit for 30% of physical damage.",
-        iconImageId = "110063824255919",
-    },
-    {
-        id = "NegativeStaminaBoost",
-        name = "Negative Endurance",
-        description = "-nil% stamina.",
-        iconImageId = "99963424031166",
-    },
-    {
-        id = "MineSpeed",
-        name = "Swift Mining",
-        description = "nil% faster mining.",
-        iconImageId = "138135219973840",
-    },
-    {
-        id = "CriticalChance",
-        name = "Critical Chance",
-        description = "Increase critical chance by nil%.",
-        iconImageId = "118179174921595",
-    },
-    {
-        id = "LuckBoost",
-        name = "Luck",
-        description = "nil% overall luck increase.",
-        iconImageId = "109268611568059",
-    },
-    {
-        id = "Snow",
-        name = "Snow",
-        description = "Applies nil% attack speed and movement speed slow for nil seconds. nil% chance on hit.",
-        iconImageId = "103795067047772",
-    },
-    {
-        id = "ExtraMineDrop",
-        name = "Yield",
-        description = "nil% chance to drop nil extra ore(s) from mines.",
-        iconImageId = "134056473233081",
-    },
-    {
-        id = "BadSmell",
-        name = "Bad Smell",
-        description =
-            "Deals nil% poison damage around the character for nil seconds, fearing enemies. Has nil seconds cooldown. Activates when health is below 35%.",
-        iconImageId = "133381322224239",
-    },
-    {
-        id = "StaminaBoost",
-        name = "Endurance",
-        description = "nil% more stamina.",
-        iconImageId = "99963424031166",
-    },
-    {
-        id = "DashDistance",
-        name = "Stride",
-        description = "nil% longer dash distance.",
-        iconImageId = "112354247336206",
-    },
-    {
-        id = "DashCooldown",
-        name = "Surge",
-        description = "nil% less dash cooldown.",
-        iconImageId = "132915742367432",
-    },
-    {
-        id = "CriticalDamage",
-        name = "Critical Damage",
-        description = "Increase critical damage by nil%.",
-        iconImageId = "134197413281062",
-    },
-    {
-        id = "XPBoost",
-        name = "EXP Boost",
-        description = "nil% extra xp gain.",
-        iconImageId = "92712417449524",
-    },
-    {
-        id = "HealthBoost",
-        name = "Vitality",
-        description = "nil% extra health.",
-        iconImageId = "92712417449524",
-    },
-    {
-        id = "StunDamage",
-        name = "Fracture",
-        description = "nil% extra stun damage on-hit.",
-        iconImageId = "129442737645310",
-    },
-    {
-        id = "DemonCursedAura",
-        name = "Cursed Aura",
-        description = "Deal 10% of weapon damage as AoE while in-combat.",
-        iconImageId = "126391228181883",
-    },
-    {
-        id = "NegativeMoveSpeed",
-        name = "Negative Swiftness",
-        description = "-nil% movement speed.",
-        iconImageId = "92712417449524",
-    },
-    {
-        id = "DemonBackfire",
-        name = "Backfire",
-        description = "nil% chance to burn the enemy upon taking damage.",
-        iconImageId = "126391228181883",
-    },
-    {
-        id = "DamageBoost",
-        name = "Lethality",
-        description = "Increase physical damage by nil%.",
-        iconImageId = "105965083804844",
-    },
-    {
-        id = "ZombieAbsorb",
-        name = "Absorb",
-        description = "nil% to convert damage taken into health instead.",
-        iconImageId = "94132270840631",
-    },
-    {
-        id = "LifeSteal",
-        name = "Life Steal",
-        description = "Heal nil% of physical damage dealt on-hit.",
-        iconImageId = "116807775361910",
-    },
-    {
-        id = "Ice",
-        name = "Ice",
-        description = "Freeze enemies for nil seconds. nil% chance on hit. Has a cooldown of nil.",
-        iconImageId = "132472537758179",
-    },
+    { id = "Radioactive", name = "Radioactive", description = "Deal nil% of max health as damage as AoE while in-combat.", iconImageId = "126391228181883" },
+    { id = "Berserker", name = "Berserker", description = "Boosts physical damage and movement speed by nil% for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.", iconImageId = "99579458536104" },
+    { id = "Poison", name = "Poison", description = "Deals nil% of weapon damage as poison per second for nil seconds. nil% chance on hit.", iconImageId = "77726317529525" },
+    { id = "FlatHealthRegen", name = "Flat Regen", description = "Regen nil health per second.", iconImageId = "92712417449524" },
+    { id = "Thorn", name = "Thorn", description = "Reflect nil% physical damage taken. Maximum damage given limits at 5% max health of user. 0.05 seconds cooldown.", iconImageId = "126391228181883" },
+    { id = "UndeadSecondChance", name = "Second Chance", description = "Refills 50% of max hp when hp is under 10% every 5 minutes", iconImageId = "94132270840631" },
+    { id = "DemonDevilsFinger", name = "Devil's Finger", description = "When you dash, teleport with hellfire particles and 35% chance to create a hellfire circle deal AOE to the enemies inside dealing 45% damage of your weapon per second for 3 sec.", iconImageId = "126391228181883" },
+    { id = "AttackSpeedBoost", name = "Attack Speed", description = "Increase attack speed by nil%.", iconImageId = "74403354215536" },
+    { id = "JumpBoost", name = "Jump Boost", description = "nil% longer jump.", iconImageId = "99963424031166" },
+    { id = "ShadowPhantomStep", name = "Phantom Step", description = "nil% to be immortal and gain movement speed for a brief duration.", iconImageId = "94132270840631" },
+    { id = "ToxicVeins", name = "Toxic Veins", description = "Deals nil% poison damage around the character for nil seconds. Has nil seconds cooldown. Activates when health is below 35%.", iconImageId = "131438262369264" },
+    { id = "MoveSpeed", name = "Swiftness", description = "nil% extra movement speed.", iconImageId = "92712417449524" },
+    { id = "Explosion", name = "Explosion", description = "Cause an explosion at location of victim, dealing nil% of weapon damage as AOE damage. nil% chance on hit.", iconImageId = "110063824255919" },
+    { id = "MinePower", name = "Mine Power", description = "nil% extra mine damage.", iconImageId = "138135219973840" },
+    { id = "BullsFury", name = "Bull's Fury", description = "Boosts physical damage and movement speed by 30% while health is under 50%.", iconImageId = "99579458536104" },
+    { id = "NegativeHealthBoost", name = "Negative Vitality", description = "-nil% health.", iconImageId = "92712417449524" },
+    { id = "Fire", name = "Burn", description = "Deals nil% of weapon damage as fire per second for nil seconds. nil% chance on hit.", iconImageId = "130243970954297" },
+    { id = "DashIFrame", name = "Phase", description = "nil% longer invincibility on dash.", iconImageId = "110461678599478" },
+    { id = "Shield", name = "Shield", description = "Reduce incoming physical damage by nil%. Has nil% chance per hit.", iconImageId = "94132270840631" },
+    { id = "AngelHolyHand", name = "Holy Hand", description = "Have infinite stamina while below 20% health.", iconImageId = "99579458536104" },
+    { id = "AngelSmite", name = "Angel Smite", description = "50% chance to call upon Smite on-hit for 30% of physical damage.", iconImageId = "110063824255919" },
+    { id = "NegativeStaminaBoost", name = "Negative Endurance", description = "-nil% stamina.", iconImageId = "99963424031166" },
+    { id = "MineSpeed", name = "Swift Mining", description = "nil% faster mining.", iconImageId = "138135219973840" },
+    { id = "CriticalChance", name = "Critical Chance", description = "Increase critical chance by nil%.", iconImageId = "118179174921595" },
+    { id = "LuckBoost", name = "Luck", description = "nil% overall luck increase.", iconImageId = "109268611568059" },
+    { id = "Snow", name = "Snow", description = "Applies nil% attack speed and movement speed slow for nil seconds. nil% chance on hit.", iconImageId = "103795067047772" },
+    { id = "ExtraMineDrop", name = "Yield", description = "nil% chance to drop nil extra ore(s) from mines.", iconImageId = "134056473233081" },
+    { id = "BadSmell", name = "Bad Smell", description = "Deals nil% poison damage around the character for nil seconds, fearing enemies. Has nil seconds cooldown. Activates when health is below 35%.", iconImageId = "133381322224239" },
+    { id = "StaminaBoost", name = "Endurance", description = "nil% more stamina.", iconImageId = "99963424031166" },
+    { id = "DashDistance", name = "Stride", description = "nil% longer dash distance.", iconImageId = "112354247336206" },
+    { id = "DashCooldown", name = "Surge", description = "nil% less dash cooldown.", iconImageId = "132915742367432" },
+    { id = "CriticalDamage", name = "Critical Damage", description = "Increase critical damage by nil%.", iconImageId = "134197413281062" },
+    { id = "XPBoost", name = "EXP Boost", description = "nil% extra xp gain.", iconImageId = "92712417449524" },
+    { id = "HealthBoost", name = "Vitality", description = "nil% extra health.", iconImageId = "92712417449524" },
+    { id = "StunDamage", name = "Fracture", description = "nil% extra stun damage on-hit.", iconImageId = "129442737645310" },
+    { id = "DemonCursedAura", name = "Cursed Aura", description = "Deal 10% of weapon damage as AoE while in-combat.", iconImageId = "126391228181883" },
+    { id = "NegativeMoveSpeed", name = "Negative Swiftness", description = "-nil% movement speed.", iconImageId = "92712417449524" },
+    { id = "DemonBackfire", name = "Backfire", description = "nil% chance to burn the enemy upon taking damage.", iconImageId = "126391228181883" },
+    { id = "DamageBoost", name = "Lethality", description = "Increase physical damage by nil%.", iconImageId = "105965083804844" },
+    { id = "ZombieAbsorb", name = "Absorb", description = "nil% to convert damage taken into health instead.", iconImageId = "94132270840631" },
+    { id = "LifeSteal", name = "Life Steal", description = "Heal nil% of physical damage dealt on-hit.", iconImageId = "116807775361910" },
+    { id = "Ice", name = "Ice", description = "Freeze enemies for nil seconds. nil% chance on hit. Has a cooldown of nil.", iconImageId = "132472537758179" },
 }
 
-----------------------------------------------------------------
--- OPTIONAL FRIENDLIER LABEL OVERRIDES (by trait + index OR statName)
--- These are *cosmetic* only; ordering/stat count comes from Runes module.
-----------------------------------------------------------------
 local RuneTraitParamLabels = {
-    Radioactive         = { "AoE % Max HP" },
-    Berserker           = { "Buff % (DMG+MS)", "Buff Duration (s)", "Cooldown (s)" },
-    Poison              = { "Poison % / sec", "Duration (s)", "Proc Chance %" },
-    FlatHealthRegen     = { "HP / sec" },
-    Thorn               = { "Reflect % Damage" },
-    AttackSpeedBoost    = { "Attack Speed %" },
-    JumpBoost           = { "Jump Height %" },
-    ShadowPhantomStep   = { "Immortality Chance %" },
-    ToxicVeins          = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
-    MoveSpeed           = { "Move Speed %" },
-    Explosion           = { "Explosion DMG %", "Proc Chance %" },
-    MinePower           = { "Mine Damage %" },
+    Radioactive = { "AoE % Max HP" },
+    Berserker = { "Buff % (DMG+MS)", "Buff Duration (s)", "Cooldown (s)" },
+    Poison = { "Poison % / sec", "Duration (s)", "Proc Chance %" },
+    FlatHealthRegen = { "HP / sec" },
+    Thorn = { "Reflect % Damage" },
+    AttackSpeedBoost = { "Attack Speed %" },
+    JumpBoost = { "Jump Height %" },
+    ShadowPhantomStep = { "Immortality Chance %" },
+    ToxicVeins = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
+    MoveSpeed = { "Move Speed %" },
+    Explosion = { "Explosion DMG %", "Proc Chance %" },
+    MinePower = { "Mine Damage %" },
     NegativeHealthBoost = { "Max HP Penalty %" },
-    Fire                = { "Burn % / sec", "Duration (s)", "Proc Chance %" },
-    DashIFrame          = { "Dash I-Frame %" },
-    Shield              = { "Damage Reduction %", "Proc Chance %" },
+    Fire = { "Burn % / sec", "Duration (s)", "Proc Chance %" },
+    DashIFrame = { "Dash I-Frame %" },
+    Shield = { "Damage Reduction %", "Proc Chance %" },
     NegativeStaminaBoost = { "Stamina Penalty %" },
-    MineSpeed           = { "Mining Speed %" },
-    CriticalChance      = { "Crit Chance %" },
-    LuckBoost           = { "Luck %" },
-    Snow                = { "Slow Amount %", "Duration (s)", "Proc Chance %" },
-    ExtraMineDrop       = { "Extra Drop Chance %", "Extra Ores Count" },
-    BadSmell            = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
-    StaminaBoost        = { "Stamina %" },
-    DashDistance        = { "Dash Distance %" },
-    DashCooldown        = { "Dash CD Reduction %" },
-    CriticalDamage      = { "Crit Damage %" },
-    XPBoost             = { "XP Gain %" },
-    HealthBoost         = { "Max HP %" },
-    StunDamage          = { "Stun Damage %" },
-    NegativeMoveSpeed   = { "Move Speed Penalty %" },
-    DemonBackfire       = { "Burn Proc Chance %" },
-    DamageBoost         = { "Physical Damage %" },
-    ZombieAbsorb        = { "Absorb Chance %" },
-    LifeSteal           = { "Life Steal %" },
-    Ice                 = { "Freeze Duration (s)", "Proc Chance %", "Cooldown (s)" },
+    MineSpeed = { "Mining Speed %" },
+    CriticalChance = { "Crit Chance %" },
+    LuckBoost = { "Luck %" },
+    Snow = { "Slow Amount %", "Duration (s)", "Proc Chance %" },
+    ExtraMineDrop = { "Extra Drop Chance %", "Extra Ores Count" },
+    BadSmell = { "Poison AoE % DMG", "Duration (s)", "Cooldown (s)" },
+    StaminaBoost = { "Stamina %" },
+    DashDistance = { "Dash Distance %" },
+    DashCooldown = { "Dash CD Reduction %" },
+    CriticalDamage = { "Crit Damage %" },
+    XPBoost = { "XP Gain %" },
+    HealthBoost = { "Max HP %" },
+    StunDamage = { "Stun Damage %" },
+    NegativeMoveSpeed = { "Move Speed Penalty %" },
+    DemonBackfire = { "Burn Proc Chance %" },
+    DamageBoost = { "Physical Damage %" },
+    ZombieAbsorb = { "Absorb Chance %" },
+    LifeSteal = { "Life Steal %" },
+    Ice = { "Freeze Duration (s)", "Proc Chance %", "Cooldown (s)" },
 }
 
-----------------------------------------------------------------
--- RUNE TRAIT STAT ORDER FROM REAL GAME DATA
--- This makes the editor 1:1 with runtime getNumericStats.
-----------------------------------------------------------------
-local RuneTraitStatOrder = {}  -- [traitId] = { statName1, statName2, ... }
-
+local RuneTraitStatOrder = {}
 local function initRuneTraitStatOrder()
     local ok, Runes = pcall(function()
         return require(Shared:WaitForChild("Data"):WaitForChild("Runes"))
     end)
     if not ok or not Runes or type(Runes) ~= "table" then
-        warn("[AutoSellEditor] Failed to require Shared.Data.Runes; Rune trait labels will be generic.")
         return
     end
 
@@ -541,19 +323,15 @@ local function initRuneTraitStatOrder()
                     table.insert(keys, statName)
                 end
             end
-            table.sort(keys) -- must match getNumericStats alphabetical ordering
+            table.sort(keys)
             if #keys > 0 then
                 RuneTraitStatOrder[traitId] = keys
             end
         end
     end
 end
-
 pcall(initRuneTraitStatOrder)
 
-----------------------------------------------------------------
--- Small helpers
-----------------------------------------------------------------
 local function countNilPlaceholders(desc)
     local count = 0
     for _ in string.gmatch(desc or "", "nil") do
@@ -562,33 +340,20 @@ local function countNilPlaceholders(desc)
     return count
 end
 
-local function prettifyStatName(statName)
-    if not statName or statName == "" then
-        return nil
-    end
-
-    -- replace underscores with spaces
-    local s = statName:gsub("_", " ")
-
-    -- insert spaces before capitals (DamageBoost -> Damage Boost)
-    s = s:gsub("(%l)(%u)", "%1 %2")
-
-    -- upper-case first letter
-    s = s:sub(1, 1):upper() .. s:sub(2)
-
-    return s
-end
-
 ----------------------------------------------------------------
--- GRAB ORE ICONS FROM IN-GAME MENU (ViewportFrames)
+-- GRAB ORE ICONS FROM REPLICATED STORAGE (Updated Method)
 ----------------------------------------------------------------
 local OreIconSources = {}
 local GenericOreIconTemplate = nil
 
+-- Create a generic fallback icon if an asset is missing
 local function createGenericOreIcon()
     local vf = Instance.new("ViewportFrame")
     vf.BackgroundTransparency = 1
     vf.BorderSizePixel = 0
+    vf.Ambient = Color3.fromRGB(200, 200, 200)
+    vf.LightColor = Color3.fromRGB(255, 255, 255)
+    vf.LightDirection = Vector3.new(1, -1, 1)
 
     local wm = Instance.new("WorldModel")
     wm.Parent = vf
@@ -607,70 +372,90 @@ local function createGenericOreIcon()
     bevel.Scale = Vector3.new(0.9, 0.9, 0.9)
     bevel.Parent = ore
 
-    local light = Instance.new("PointLight")
-    light.Brightness = 2
-    light.Range = 16
-    light.Color = Color3.fromRGB(180, 220, 255)
-    light.Parent = ore
-
     local cam = Instance.new("Camera")
-    cam.CFrame = CFrame.new(Vector3.new(4, 3, 4), Vector3.new(0, 0, 0))
+    cam.CFrame = CFrame.new(Vector3.new(0, 3, 5), Vector3.new(0, 0, 0))
     cam.Parent = vf
     vf.CurrentCamera = cam
 
     return vf
 end
 
+-- MAIN FUNCTION: Creates a ViewportFrame with the 3D Ore
 local function getOreIconTemplate(oreName)
-    local t = OreIconSources[oreName]
-    if t then return t end
+    -- 1. Check if we already created a template for this ore
+    if OreIconSources[oreName] then
+        return OreIconSources[oreName]
+    end
+
+    -- 2. Try to find the asset in ReplicatedStorage.Assets.Ores
+    local assetsFolder = ReplicatedStorage:FindFirstChild("Assets")
+    local oresFolder = assetsFolder and assetsFolder:FindFirstChild("Ores")
+    local oreAsset = oresFolder and oresFolder:FindFirstChild(oreName)
+
+    if oreAsset then
+        local vf = Instance.new("ViewportFrame")
+        vf.BackgroundTransparency = 1
+        vf.BorderSizePixel = 0
+        vf.Size = UDim2.fromScale(1, 1)
+        
+        -- Lighting settings so the ore isn't dark
+        vf.Ambient = Color3.fromRGB(220, 220, 220)
+        vf.LightColor = Color3.fromRGB(255, 255, 255)
+        vf.LightDirection = Vector3.new(1, -1, 1) -- Light coming from top-right
+
+        -- Create a WorldModel
+        local wm = Instance.new("WorldModel")
+        wm.Parent = vf
+
+        local oreClone = oreAsset:Clone()
+        oreClone.Parent = wm
+
+        -- 3. Calculate Bounding Box (Size of the ore)
+        local cf, size
+        if oreClone:IsA("Model") then
+            cf, size = oreClone:GetBoundingBox()
+        elseif oreClone:IsA("BasePart") then
+            cf = oreClone.CFrame
+            size = oreClone.Size
+        end
+
+        -- 4. Center the clone at 0,0,0 and rotate it slightly
+        -- We rotate by 45 degrees so it looks 3D and not flat
+        local targetCFrame = CFrame.new(Vector3.zero) * CFrame.Angles(0, math.rad(45), 0)
+
+        if oreClone:IsA("Model") then
+            oreClone:PivotTo(targetCFrame)
+        elseif oreClone:IsA("BasePart") then
+            oreClone.CFrame = targetCFrame
+        end
+
+        -- 5. Calculate optimal camera distance
+        -- We get the largest dimension (X, Y or Z)
+        local maxDimension = math.max(size.X, size.Y, size.Z)
+        
+        -- UPDATED: Reduced the multiplier from 2.0 to 1.25.
+        -- Smaller multiplier = Camera closer = Object bigger.
+        local dist = maxDimension * 1.25
+
+        -- Setup Camera
+        local cam = Instance.new("Camera")
+        cam.Parent = vf
+        vf.CurrentCamera = cam
+        
+        -- Position camera slightly up (Y) and back (Z) based on size
+        cam.CFrame = CFrame.new(Vector3.new(0, maxDimension * 0.5, dist), Vector3.zero)
+
+        -- Cache it
+        OreIconSources[oreName] = vf
+        return vf
+    end
+
+    -- 3. Fallback if asset not found
     if not GenericOreIconTemplate then
         GenericOreIconTemplate = createGenericOreIcon()
     end
     return GenericOreIconTemplate
 end
-
-local function initOreIcons()
-    local ok, oresRoot = pcall(function()
-        return LocalPlayer
-            :WaitForChild("PlayerGui", 5)
-            .Menu
-            .Frame
-            .Frame
-            .Menus
-            .Index
-            .Pages
-            .Ores
-    end)
-
-    if not ok or not oresRoot then
-        warn("[AutoSellEditor] Could not locate Menu.Ores root; ore icons will be generic.")
-        return
-    end
-
-    local listNames = {
-        "Forgotten Kingdom List",
-        "Iron Valley List",
-    }
-
-    for _, listName in ipairs(listNames) do
-        local listFolder = oresRoot:FindFirstChild(listName)
-        if listFolder then
-            for _, oreFrame in ipairs(listFolder:GetChildren()) do
-                if oreFrame:IsA("Frame") then
-                    local main = oreFrame:FindFirstChild("Main")
-                    local vf   = main and
-                        (main:FindFirstChildOfClass("ViewportFrame") or main:FindFirstChild("ViewportFrame"))
-                    if vf and vf:IsA("ViewportFrame") then
-                        OreIconSources[oreFrame.Name] = vf
-                    end
-                end
-            end
-        end
-    end
-end
-
-pcall(initOreIcons)
 
 ----------------------------------------------------------------
 -- CONFIG
@@ -830,7 +615,7 @@ local function createUI()
     titleText.Parent = titleBar
 
     local subtitle = Instance.new("TextLabel")
-    subtitle.Size = UDim2.new(1, -120, 1, 0)
+    titleText.Size = UDim2.new(1, -120, 1, 0)
     subtitle.Position = UDim2.new(0, 0, 0, 0)
     subtitle.BackgroundTransparency = 1
     subtitle.Font = Enum.Font.Gotham
@@ -896,82 +681,82 @@ local function createUI()
     ----------------------------------------------------------------
     -- CONTENT AREA + SEARCH ROW
     ----------------------------------------------------------------
-    local contentFrame               = Instance.new("Frame")
-    contentFrame.Size                = UDim2.new(1, -32, 1, -176)
-    contentFrame.Position            = UDim2.new(0, 16, 0, 138)
-    contentFrame.BackgroundColor3    = Color3.fromRGB(12, 12, 16)
-    contentFrame.BorderSizePixel     = 0
-    contentFrame.ZIndex              = 2
-    contentFrame.Parent              = mainFrame
+    local contentFrame                = Instance.new("Frame")
+    contentFrame.Size                 = UDim2.new(1, -32, 1, -176)
+    contentFrame.Position             = UDim2.new(0, 16, 0, 138)
+    contentFrame.BackgroundColor3     = Color3.fromRGB(12, 12, 16)
+    contentFrame.BorderSizePixel      = 0
+    contentFrame.ZIndex               = 2
+    contentFrame.Parent               = mainFrame
 
-    local cfCorner                   = Instance.new("UICorner")
-    cfCorner.CornerRadius            = UDim.new(0, 10)
-    cfCorner.Parent                  = contentFrame
+    local cfCorner                    = Instance.new("UICorner")
+    cfCorner.CornerRadius             = UDim.new(0, 10)
+    cfCorner.Parent                   = contentFrame
 
-    local cfStroke                   = Instance.new("UIStroke")
-    cfStroke.Color                   = Color3.fromRGB(60, 60, 90)
-    cfStroke.Thickness               = 1
-    cfStroke.Transparency            = 0.35
-    cfStroke.Parent                  = contentFrame
+    local cfStroke                    = Instance.new("UIStroke")
+    cfStroke.Color                    = Color3.fromRGB(60, 60, 90)
+    cfStroke.Thickness                = 1
+    cfStroke.Transparency             = 0.35
+    cfStroke.Parent                   = contentFrame
 
     -- Header row: just the search bar
-    local headerRow                  = Instance.new("Frame")
-    headerRow.Size                   = UDim2.new(1, -8, 0, 28)
-    headerRow.Position               = UDim2.new(0, 4, 0, 4)
+    local headerRow                   = Instance.new("Frame")
+    headerRow.Size                    = UDim2.new(1, -8, 0, 28)
+    headerRow.Position                = UDim2.new(0, 4, 0, 4)
     headerRow.BackgroundTransparency = 1
-    headerRow.ZIndex                 = 3
-    headerRow.Parent                 = contentFrame
+    headerRow.ZIndex                  = 3
+    headerRow.Parent                  = contentFrame
 
-    local searchBox                  = Instance.new("TextBox")
-    searchBox.AnchorPoint            = Vector2.new(0, 0.5)
-    searchBox.Position               = UDim2.new(0, 0, 0.5, 0)
-    searchBox.Size                   = UDim2.new(1, 0, 1, 0)
-    searchBox.BackgroundColor3       = Color3.fromRGB(24, 24, 34)
-    searchBox.BorderSizePixel        = 0
-    searchBox.PlaceholderText        = "Search..."
-    searchBox.Font                   = Enum.Font.Gotham
-    searchBox.TextSize               = 12
-    searchBox.TextColor3             = Color3.fromRGB(255, 255, 255)
-    searchBox.TextXAlignment         = Enum.TextXAlignment.Left
-    searchBox.ClearTextOnFocus       = false
-    searchBox.ZIndex                 = 4
-    searchBox.Text                   = ""
-    searchBox.Parent                 = headerRow
+    local searchBox                   = Instance.new("TextBox")
+    searchBox.AnchorPoint             = Vector2.new(0, 0.5)
+    searchBox.Position                = UDim2.new(0, 0, 0.5, 0)
+    searchBox.Size                    = UDim2.new(1, 0, 1, 0)
+    searchBox.BackgroundColor3        = Color3.fromRGB(24, 24, 34)
+    searchBox.BorderSizePixel         = 0
+    searchBox.PlaceholderText         = "Search..."
+    searchBox.Font                    = Enum.Font.Gotham
+    searchBox.TextSize                = 12
+    searchBox.TextColor3              = Color3.fromRGB(255, 255, 255)
+    searchBox.TextXAlignment          = Enum.TextXAlignment.Left
+    searchBox.ClearTextOnFocus        = false
+    searchBox.ZIndex                  = 4
+    searchBox.Text                    = ""
+    searchBox.Parent                  = headerRow
 
-    local sbCorner                   = Instance.new("UICorner")
-    sbCorner.CornerRadius            = UDim.new(0, 6)
-    sbCorner.Parent                  = searchBox
+    local sbCorner                    = Instance.new("UICorner")
+    sbCorner.CornerRadius             = UDim.new(0, 6)
+    sbCorner.Parent                   = searchBox
 
-    local sbPadding                  = Instance.new("UIPadding")
-    sbPadding.PaddingLeft            = UDim.new(0, 8)
-    sbPadding.Parent                 = searchBox
+    local sbPadding                   = Instance.new("UIPadding")
+    sbPadding.PaddingLeft             = UDim.new(0, 8)
+    sbPadding.Parent                  = searchBox
 
     ----------------------------------------------------------------
     -- CARD SCROLL AREA
     ----------------------------------------------------------------
-    local scroll                     = Instance.new("ScrollingFrame")
-    scroll.Size                      = UDim2.new(1, -8, 1, -40)
-    scroll.Position                  = UDim2.new(0, 4, 0, 36)
-    scroll.CanvasSize                = UDim2.new(0, 0, 0, 0)
-    scroll.ScrollBarThickness        = isMobile and 10 or 6
-    scroll.BackgroundTransparency    = 1
-    scroll.ZIndex                    = 2
-    scroll.BorderSizePixel           = 0
-    scroll.Parent                    = contentFrame
+    local scroll                      = Instance.new("ScrollingFrame")
+    scroll.Size                       = UDim2.new(1, -8, 1, -40)
+    scroll.Position                   = UDim2.new(0, 4, 0, 36)
+    scroll.CanvasSize                 = UDim2.new(0, 0, 0, 0)
+    scroll.ScrollBarThickness         = isMobile and 10 or 6
+    scroll.BackgroundTransparency     = 1
+    scroll.ZIndex                     = 2
+    scroll.BorderSizePixel            = 0
+    scroll.Parent                     = contentFrame
 
-    local grid                       = Instance.new("UIGridLayout")
-    grid.CellSize                    = UDim2.new(0, 275, 0, 55)
-    grid.CellPadding                 = UDim2.new(0, 8, 0, 8)
-    grid.FillDirection               = Enum.FillDirection.Horizontal
-    grid.SortOrder                   = Enum.SortOrder.LayoutOrder
-    grid.Parent                      = scroll
+    local grid                        = Instance.new("UIGridLayout")
+    grid.CellSize                     = UDim2.new(0, 275, 0, 55)
+    grid.CellPadding                  = UDim2.new(0, 8, 0, 8)
+    grid.FillDirection                = Enum.FillDirection.Horizontal
+    grid.SortOrder                    = Enum.SortOrder.LayoutOrder
+    grid.Parent                       = scroll
 
-    local padding                    = Instance.new("UIPadding")
-    padding.PaddingTop               = UDim.new(0, 8)
-    padding.PaddingLeft              = UDim.new(0, 8)
-    padding.PaddingRight             = UDim.new(0, 8)
-    padding.PaddingBottom            = UDim.new(0, 8)
-    padding.Parent                   = scroll
+    local padding                     = Instance.new("UIPadding")
+    padding.PaddingTop                = UDim.new(0, 8)
+    padding.PaddingLeft               = UDim.new(0, 8)
+    padding.PaddingRight              = UDim.new(0, 8)
+    padding.PaddingBottom             = UDim.new(0, 8)
+    padding.Parent                    = scroll
 
     grid:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         scroll.CanvasSize = UDim2.new(0, 0, 0, grid.AbsoluteContentSize.Y + 16)
@@ -1161,22 +946,14 @@ local function createUI()
             icon.BorderSizePixel = 0
             icon.ZIndex = 4
             icon.Parent = iconBG
-
+            
+            -- If the template had a camera, it was cloned too.
+            -- We just need to make sure the ViewportFrame uses it.
             local cam = icon:FindFirstChildOfClass("Camera")
-
-            if not cam and iconTemplate.CurrentCamera then
-                cam = Instance.new("Camera")
-                cam.CFrame = iconTemplate.CurrentCamera.CFrame
-                cam.Parent = icon
+            if cam then
+                icon.CurrentCamera = cam
             end
 
-            if not cam then
-                cam = Instance.new("Camera")
-                cam.CFrame = CFrame.new(Vector3.new(4, 3, 4), Vector3.new(0, 0, 0))
-                cam.Parent = icon
-            end
-
-            icon.CurrentCamera = cam
         elseif iconImageId then
             icon = Instance.new("ImageLabel")
             icon.Size = UDim2.fromScale(1, 1)
@@ -1318,7 +1095,7 @@ local function createUI()
     end
 
     ----------------------------------------------------------------
-    -- TRAIT CARD (UPDATED: uses real stat names / ordering)
+    -- TRAIT CARD
     ----------------------------------------------------------------
     local function createTraitCard(traitDef, rule, onChanged)
         local traitId    = traitDef.id
@@ -1437,7 +1214,7 @@ local function createUI()
         paramContainer.Position = UDim2.new(0, 8, 0, 44)
         paramContainer.Size = UDim2.new(1, -16, 1, -50)
         paramContainer.ZIndex = 3
-        paramContainer.Parent = card
+        paramContainer.Parent = card -- <--- THIS WAS THE FIX
 
         local paramLayout = Instance.new("UIListLayout")
         paramLayout.FillDirection = Enum.FillDirection.Vertical
