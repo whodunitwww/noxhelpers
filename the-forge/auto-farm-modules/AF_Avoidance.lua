@@ -37,12 +37,12 @@ return function(env)
     local Hazards = {}  -- { { part = BasePart, cframe = CFrame, halfSize = Vector3 } }
     local RedCaveMin = Vector3.new(
         math.min(360.7152099609375, 771.6004638671875),
-        math.min(10.97214126586914, 79.01676177978516),
+        math.min(0.97214126586914, 79.01676177978516),
         math.min(111.72977447509766, -149.13143920898438)
     )
     local RedCaveMax = Vector3.new(
         math.max(360.7152099609375, 771.6004638671875),
-        math.max(10.97214126586914, 79.01676177978516),
+        math.max(0.97214126586914, 79.01676177978516),
         math.max(111.72977447509766, -149.13143920898438)
     )
 
