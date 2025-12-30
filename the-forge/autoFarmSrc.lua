@@ -510,8 +510,8 @@ return function(ctx)
         if BossState.prevOffset == nil then
             BossState.prevOffset = AF_Config.ExtraYOffset
         end
-        if AF_Config.ExtraYOffset ~= -8 then
-            AF_Config.ExtraYOffset = -8
+        if AF_Config.ExtraYOffset ~= -4 then
+            AF_Config.ExtraYOffset = -4
             if FarmState.enabled and FarmState.currentTarget and FarmState.attached then
                 Movement.realignAttach(FarmState.currentTarget)
             end
