@@ -44,6 +44,7 @@ return function(ctx)
         WhitelistedZones             = {},
         TargetBlacklist              = {},
         ExtraYOffset                 = 0,
+        BossExtraYOffset             = -15,
         FarmSpeed                    = 80,
         AltFarmEnabled               = false,
         AltFarmMode                  = ALT_FARM_MODE_MAIN,
@@ -88,6 +89,9 @@ return function(ctx)
         spawnInProgress  = false,
         bossTarget       = nil,
         lastTimerText    = nil,
+        lastReadyAttempt = 0,
+        lastFailedAttempt = 0,
+        initialSpawnAttempted = false,
         watchThread      = nil,
         lastSpawnAttempt = 0,
         spawnThread      = nil,
@@ -96,6 +100,7 @@ return function(ctx)
 
     local BOSS_READY_TEXT      = "30:00"
     local BOSS_SPAWN_TIMEOUT   = 5
+    local BOSS_RETRY_COOLDOWN  = 10
 
     ----------------------------------------------------------------
     -- MODULE LOADER (file -> GitHub fallback)
@@ -306,6 +311,54 @@ return function(ctx)
         return createParty and createParty:FindFirstChild("ProximityPrompt")
     end
 
+    local function resolveBossPromptPart(prompt)
+        if not prompt then
+            return nil
+        end
+
+        local parent = prompt.Parent
+        if parent and parent:IsA("Attachment") then
+            parent = parent.Parent
+        end
+        if parent and parent:IsA("BasePart") then
+            return parent
+        end
+
+        local ok, adornee = pcall(function()
+            return prompt.Adornee
+        end)
+        if ok and adornee and adornee:IsA("BasePart") then
+            return adornee
+        end
+
+        return nil
+    end
+
+    local function isDoBossesToggleOn()
+        return Toggles and Toggles.AF_DoBosses and Toggles.AF_DoBosses.Value == true
+    end
+
+    local function isBossReady()
+        local label = getBossTimerLabel()
+        local text = label and tostring(label.Text) or BossState.lastTimerText
+        return text == BOSS_READY_TEXT
+    end
+
+    local function getBossPromptTimeout(targetPart)
+        local hrp = getLocalHRP()
+        if not hrp or not targetPart then
+            return 6
+        end
+        if AF_Config.MovementMode == "Teleport" then
+            return 2
+        end
+
+        local dist = (hrp.Position - targetPart.Position).Magnitude
+        local speed = tonumber(AF_Config.FarmSpeed) or 80
+        local travel = dist / math.max(speed, 1)
+        return math.clamp(travel + 3, 6, 30)
+    end
+
     local function resolveBossActivateRF()
         if PartyActivateRF and PartyActivateRF.Parent then
             return PartyActivateRF
@@ -335,13 +388,7 @@ return function(ctx)
             return nil
         end
 
-        local targetPart = prompt.Adornee
-        if not (targetPart and targetPart:IsA("BasePart")) then
-            local parent = prompt.Parent
-            if parent and parent:IsA("BasePart") then
-                targetPart = parent
-            end
-        end
+        local targetPart = resolveBossPromptPart(prompt)
         if not targetPart then
             return nil
         end
@@ -398,6 +445,10 @@ return function(ctx)
         end
 
         local now = os.clock()
+        local lastFail = BossState.lastFailedAttempt or 0
+        if (now - lastFail) < BOSS_RETRY_COOLDOWN then
+            return
+        end
         if (now - (BossState.lastSpawnAttempt or 0)) < 2 then
             return
         end
@@ -405,6 +456,7 @@ return function(ctx)
         BossState.spawnInProgress  = true
 
         BossState.spawnThread = task.spawn(function()
+            local spawned = false
             local ok, err = pcall(function()
                 if not BossState.enabled then
                     return
@@ -421,15 +473,21 @@ return function(ctx)
 
                 local prompt = getBossPrompt()
                 if not prompt then
+                    BossState.lastFailedAttempt = os.clock()
                     return
                 end
 
                 local targetPart = moveToBossPrompt(prompt)
                 if not targetPart then
+                    BossState.lastFailedAttempt = os.clock()
                     return
                 end
 
-                waitForBossPromptReach(targetPart, 5)
+                local reached = waitForBossPromptReach(targetPart, getBossPromptTimeout(targetPart))
+                if not reached then
+                    BossState.lastFailedAttempt = os.clock()
+                    return
+                end
                 stopMoving()
                 if not BossState.enabled then
                     return
@@ -455,6 +513,8 @@ return function(ctx)
                 while BossState.enabled and (os.clock() - start) < BOSS_SPAWN_TIMEOUT do
                     local golem = findAliveGolem()
                     if golem then
+                        spawned = true
+                        BossState.lastFailedAttempt = 0
                         BossState.bossTarget      = golem
                         FarmState.currentTarget   = golem
                         FarmState.attached        = false
@@ -467,6 +527,10 @@ return function(ctx)
                         return
                     end
                     task.wait(0.2)
+                end
+
+                if not spawned then
+                    BossState.lastFailedAttempt = os.clock()
                 end
             end)
 
@@ -483,10 +547,20 @@ return function(ctx)
         while BossState.enabled do
             local label = getBossTimerLabel()
             local text  = label and tostring(label.Text) or nil
-            if text and text ~= BossState.lastTimerText then
-                BossState.lastTimerText = text
-                if text == BOSS_READY_TEXT then
+            if text == BOSS_READY_TEXT then
+                local now = os.clock()
+                local shouldAttempt = (BossState.lastTimerText ~= BOSS_READY_TEXT)
+                    or ((now - (BossState.lastReadyAttempt or 0)) >= BOSS_RETRY_COOLDOWN)
+                if shouldAttempt then
+                    BossState.lastReadyAttempt = now
                     attemptBossSpawn("timer")
+                end
+            end
+
+            if text ~= BossState.lastTimerText then
+                BossState.lastTimerText = text
+                if text ~= BOSS_READY_TEXT then
+                    BossState.lastReadyAttempt = 0
                 end
             end
             task.wait(0.1)
@@ -498,20 +572,23 @@ return function(ctx)
             return
         end
         BossState.lastTimerText = nil
+        BossState.lastReadyAttempt = 0
         BossState.watchThread   = task.spawn(bossWatchLoop)
     end
 
     local function stopBossWatcher()
         BossState.watchThread = nil
         BossState.lastTimerText = nil
+        BossState.lastReadyAttempt = 0
     end
 
     local function applyBossOffset()
         if BossState.prevOffset == nil then
             BossState.prevOffset = AF_Config.ExtraYOffset
         end
-        if AF_Config.ExtraYOffset ~= -4 then
-            AF_Config.ExtraYOffset = -4
+        local bossOffset = tonumber(AF_Config.BossExtraYOffset) or -15
+        if AF_Config.ExtraYOffset ~= bossOffset then
+            AF_Config.ExtraYOffset = bossOffset
             if FarmState.enabled and FarmState.currentTarget and FarmState.attached then
                 Movement.realignAttach(FarmState.currentTarget)
             end
@@ -1399,11 +1476,6 @@ return function(ctx)
                     return
                 end
 
-                if BossState.spawnInProgress then
-                    task.wait(0.1)
-                    return
-                end
-
                 local bossTarget = nil
                 if BossState.enabled then
                     local foundBoss = findAliveGolem()
@@ -1411,6 +1483,21 @@ return function(ctx)
                         BossState.bossTarget = foundBoss
                     elseif BossState.bossTarget and not isMobAlive(BossState.bossTarget) then
                         BossState.bossTarget = nil
+                    end
+
+                    if not BossState.bossTarget then
+                        if BossState.spawnInProgress then
+                            task.wait(0.1)
+                            return
+                        end
+                        if isBossReady() then
+                            local lastFail = BossState.lastFailedAttempt or 0
+                            if (os.clock() - lastFail) >= BOSS_RETRY_COOLDOWN then
+                                attemptBossSpawn("priority")
+                                task.wait(0.1)
+                                return
+                            end
+                        end
                     end
 
                     bossTarget = BossState.bossTarget
@@ -1820,7 +1907,12 @@ return function(ctx)
 
                         local now = os.clock()
                         if now - FarmState.lastHit >= activeDef.hitInterval then
-                            swingTool(activeDef.toolRemoteArg)
+                            if activeDef.name == FARM_MODE_ORES then
+                                swingTool("Pickaxe")
+                                swingTool("Weapon")
+                            else
+                                swingTool(activeDef.toolRemoteArg)
+                            end
                             FarmState.lastHit = now
                         end
                     else
@@ -1933,6 +2025,20 @@ return function(ctx)
         FarmState.enabled       = true
         FarmState.farmThread    = task.spawn(farmLoop)
 
+        if isDoBossesToggleOn() and not BossState.enabled then
+            BossState.enabled = true
+        end
+
+        if BossState.enabled then
+            BossState.lastFailedAttempt = 0
+            BossState.initialSpawnAttempted = false
+            startBossWatcher()
+            if not BossState.initialSpawnAttempted then
+                BossState.initialSpawnAttempted = true
+                attemptBossSpawn("autofarm-start")
+            end
+        end
+
         Potions.startPotionLoop()
     end
 
@@ -1951,6 +2057,14 @@ return function(ctx)
         local hrp               = getLocalHRP()
         if hrp then
             hrp.Anchored = false
+        end
+
+        if BossState.enabled then
+            BossState.enabled = false
+            stopBossWatcher()
+            BossState.bossTarget      = nil
+            BossState.spawnInProgress = false
+            restoreBossOffset()
         end
 
         disableNoclip()
@@ -2193,6 +2307,21 @@ return function(ctx)
         end,
     })
 
+    FarmGroup:AddSlider("AF_BossOffsetAdjust", {
+        Text     = "Boss Offset",
+        Min      = -15,
+        Max      = 40,
+        Default  = AF_Config.BossExtraYOffset,
+        Rounding = 1,
+        Suffix   = " studs",
+        Callback = function(value)
+            AF_Config.BossExtraYOffset = tonumber(value) or AF_Config.BossExtraYOffset
+            if BossState.enabled and FarmState.enabled and FarmState.currentTarget and FarmState.attached then
+                applyBossOffset()
+            end
+        end,
+    })
+
     FarmGroup:AddSlider("AF_Speed", {
         Text     = "Flight Speed",
         Min      = 50,
@@ -2305,11 +2434,23 @@ return function(ctx)
         Text     = "Do Bosses",
         Default  = false,
         Callback = function(state)
-            BossState.enabled = state and true or false
             if state then
-                startBossWatcher()
-                attemptBossSpawn("toggle")
+                if FarmState.enabled then
+                    BossState.enabled = true
+                    BossState.lastFailedAttempt = 0
+                    BossState.initialSpawnAttempted = false
+                    startBossWatcher()
+                    if not BossState.initialSpawnAttempted then
+                        BossState.initialSpawnAttempted = true
+                        attemptBossSpawn("toggle")
+                    end
+                else
+                    BossState.enabled = false
+                    BossState.initialSpawnAttempted = false
+                end
             else
+                BossState.enabled = false
+                BossState.initialSpawnAttempted = false
                 stopBossWatcher()
                 BossState.bossTarget      = nil
                 BossState.spawnInProgress = false
