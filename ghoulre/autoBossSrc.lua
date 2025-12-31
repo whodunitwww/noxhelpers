@@ -81,7 +81,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         },
 
         EffectiveMode   = "Solo", -- "Solo" | "Host" | "Member"
-        QDidForThisLife = false,
+        WDidForThisLife = false,
     }
 
     ------------------------------------------------------
@@ -180,16 +180,16 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     LoadConfigs()
 
     ------------------------------------------------------
-    -- Q key helper
+    -- W key helper (press once per life in boss arena)
     ------------------------------------------------------
-    local function FireQOnce()
-        VIM:SendKeyEvent(true, Enum.KeyCode.Q, false, game)
+    local function FireWOnce()
+        VIM:SendKeyEvent(true, Enum.KeyCode.W, false, game)
         task.wait(0.05)
-        VIM:SendKeyEvent(false, Enum.KeyCode.Q, false, game)
+        VIM:SendKeyEvent(false, Enum.KeyCode.W, false, game)
     end
 
     local function OnCharacterArriveAtBoss(char)
-        BossState.QDidForThisLife = false
+        BossState.WDidForThisLife = false
 
         if not Toggles.AutoBoss_Integrated
             or not Toggles.AutoBoss_Integrated.Value then
@@ -202,9 +202,9 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
 
         task.spawn(function()
             task.wait(0.5) -- allow full spawn
-            if not BossState.QDidForThisLife then
-                FireQOnce()
-                BossState.QDidForThisLife = true
+            if not BossState.WDidForThisLife then
+                FireWOnce()
+                BossState.WDidForThisLife = true
             end
         end)
     end
@@ -257,7 +257,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         Default = BossState.PartyConfig.PartyEnabled,
     })
 
-    local HostInput = AutoBossGroupbox:AddInput("AutoBoss_HostName", {
+    AutoBossGroupbox:AddInput("AutoBoss_HostName", {
         Text        = "Host Username",
         Default     = BossState.PartyConfig.HostName or "",
         Placeholder = "Exact Roblox username",
@@ -465,7 +465,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         BossState.IsVoiding        = false
         BossState.VoidTriggered    = false
         BossState.ActiveTarget     = nil
-        BossState.QDidForThisLife  = false
+        BossState.WDidForThisLife  = false
 
         if AutoFarm then
             AutoFarm.Active = false
@@ -757,6 +757,9 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                     local pos = root.Position
                     if MoveToPos then
                         MoveToPos(Vector3.new(pos.X, -5000, pos.Z), 10000)
+                    else
+                        -- hard fallback if MoveToPos not injected
+                        root.CFrame = CFrame.new(pos.X, -5000, pos.Z)
                     end
                 end
                 return
