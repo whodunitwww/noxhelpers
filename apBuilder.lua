@@ -15,6 +15,10 @@ local LocalPlayer         = Players.LocalPlayer
 return function(opts)
     opts = opts or {}
 
+    -- [NEW] flag to toggle counter editing in the editor
+    -- default: true (show), pass CounterEditEnabled = false to hide
+    local counterEditEnabled = (opts.CounterEditEnabled ~= false)
+
     -- ==== LOAD UI LIB ==== --
     -- Ensure you trust this source or replace with your own UI library loader
     local AutoParryUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/apUi.lua"))()
@@ -772,29 +776,31 @@ return function(opts)
                 saveConfigs()
             end)
 
-            -- Counter Attacks
-            popupLabel("--- Counter Attack ---", 18)
-            local cType = (cfg.counter and cfg.counter.type) or ""
-            local cDelay = (cfg.counter and cfg.counter.delay) or 0.4
-            
-            popupInputRow("Counter Type (e.g. M2, Z) - Empty to disable", cType, function(text)
-                if text == "" then
-                    cfg.counter = nil
-                else
-                    if not cfg.counter then cfg.counter = { delay = cDelay } end
-                    cfg.counter.type = text
-                end
-                saveConfigs()
-            end)
-            
-            popupInputRow("Counter Delay (seconds)", tostring(cDelay), function(text)
-                local v = tonumber(text)
-                if v then 
-                    if cfg.counter then cfg.counter.delay = v end
-                    cDelay = v 
-                    saveConfigs() 
-                end
-            end)
+            -- Counter Attacks (conditionally visible)
+            if counterEditEnabled then
+                popupLabel("--- Counter Attack ---", 18)
+                local cType  = (cfg.counter and cfg.counter.type) or ""
+                local cDelay = (cfg.counter and cfg.counter.delay) or 0.4
+                
+                popupInputRow("Counter Type (e.g. M2, Z) - Empty to disable", cType, function(text)
+                    if text == "" then
+                        cfg.counter = nil
+                    else
+                        if not cfg.counter then cfg.counter = { delay = cDelay } end
+                        cfg.counter.type = text
+                    end
+                    saveConfigs()
+                end)
+                
+                popupInputRow("Counter Delay (seconds)", tostring(cDelay), function(text)
+                    local v = tonumber(text)
+                    if v then 
+                        if cfg.counter then cfg.counter.delay = v end
+                        cDelay = v 
+                        saveConfigs() 
+                    end
+                end)
+            end
 
             -- Roll On Fail
             popupBoolToggle("Roll on fail", (cfg.rollOnFail == true), function(val)
