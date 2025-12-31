@@ -44,7 +44,7 @@ return function(ctx)
         WhitelistedZones             = {},
         TargetBlacklist              = {},
         ExtraYOffset                 = 0,
-        BossExtraYOffset             = -15,
+        BossExtraYOffset             = -2.5,
         FarmSpeed                    = 80,
         AltFarmEnabled               = false,
         AltFarmMode                  = ALT_FARM_MODE_MAIN,
