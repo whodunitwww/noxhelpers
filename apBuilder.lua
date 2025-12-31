@@ -363,7 +363,7 @@ return function(opts)
         hookLocalHumanoid()
     end
 
-    -- ==== DAMAGE ANALYSIS HELPER ==== --
+    -- ==== DAMAGE ANALYSIS HELPER (FIXED) ==== --
     local function getClosestDamageDelta(targetAnimId)
         local animTimes = {}
         local damageTimes = {}
@@ -379,27 +379,29 @@ return function(opts)
 
         if #animTimes == 0 or #damageTimes == 0 then return nil end
 
-        local closestDelta = nil
-        local minAbsDiff = math.huge
+        local bestDelta = nil
+        local minDiff = math.huge
 
         for _, tA in ipairs(animTimes) do
             for _, tD in ipairs(damageTimes) do
-                local diff = tD - tA -- Positive if damage happened AFTER anim
-                local absDiff = math.abs(diff)
+                local diff = tD - tA 
                 
-                -- Check if this is the closest pair found so far
-                if absDiff < minAbsDiff then
-                    minAbsDiff = absDiff
-                    closestDelta = diff
+                -- FIX: We only want SUBSEQUENT damage (diff >= 0)
+                -- We accept a tiny negative buffer (-0.05) just in case of tick misalignment
+                if diff > -0.05 and diff < 2.0 then 
+                    -- We also ignore damage that happened 2+ seconds later (irrelevant)
+                    if diff < minDiff then
+                        minDiff = diff
+                        bestDelta = diff
+                    end
                 end
             end
         end
 
-        return closestDelta
+        return bestDelta
     end
 
     -- ==== BUILD GUI ==== --
-
     window = AutoParryUI.CreateWindow({
         Title        = "AutoParry Config Builder",
         Size         = Vector2.new(900, 520),
