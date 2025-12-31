@@ -1,4 +1,7 @@
-return function(Services, Tabs, References, Toggles, Options, Library)
+return function(Services, Tabs, References, Toggles, Options, Library, Shared)
+    -- ============================
+    --   SERVICE SHORTCUTS
+    -- ============================
     local Players           = Services.Players
     local RunService        = Services.RunService
     local UIS               = Services.UserInputService
@@ -6,6 +9,19 @@ return function(Services, Tabs, References, Toggles, Options, Library)
     local Workspace         = Services.Workspace
     local ReplicatedStorage = Services.ReplicatedStorage
     local VIM               = Services.VirtualInputManager or game:GetService("VirtualInputManager")
+    local CoreGui           = Services.CoreGui or game:GetService("CoreGui")
+
+    -- ============================
+    --   EXTERNAL HELPERS
+    -- ============================
+    -- Injected from loader via Shared, with soft fallbacks if you ever move them
+    local AttachPanel  = Shared and Shared.AttachPanel  or getgenv().AttachPanel
+    local MoveToPos    = Shared and Shared.MoveToPos    or getgenv().MoveToPos
+    local SecureTravel = Shared and Shared.SecureTravel or getgenv().SecureTravel
+
+    -- Ensure AutoFarm table exists and prefer injected one
+    getgenv().AutoFarm = getgenv().AutoFarm or { Active = false }
+    local AutoFarm = (Shared and Shared.AutoFarm) or getgenv().AutoFarm
 
     local BOSS_PLACE_ID = 89413197677760
 
@@ -67,10 +83,6 @@ return function(Services, Tabs, References, Toggles, Options, Library)
         EffectiveMode   = "Solo", -- "Solo" | "Host" | "Member"
         QDidForThisLife = false,
     }
-
-    -- Ensure AutoFarm table exists (shared global)
-    getgenv().AutoFarm = getgenv().AutoFarm or { Active = false }
-    local AutoFarm = getgenv().AutoFarm
 
     ------------------------------------------------------
     -- Party mode resolver
@@ -387,12 +399,12 @@ return function(Services, Tabs, References, Toggles, Options, Library)
     ------------------------------------------------------
     -- Replay helpers
     ------------------------------------------------------
-    Services.UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    UIS.InputBegan:Connect(function(input, gameProcessed)
         if BossState.WaitingForClickSet
             and input.UserInputType == Enum.UserInputType.MouseButton1 then
 
             BossState.WaitingForClickSet = false
-            local mousePos   = Services.UserInputService:GetMouseLocation()
+            local mousePos   = UIS:GetMouseLocation()
             local screenSize = Workspace.CurrentCamera.ViewportSize
 
             BossState.ReplayConfig.ScaleX = mousePos.X / screenSize.X
@@ -410,7 +422,7 @@ return function(Services, Tabs, References, Toggles, Options, Library)
     local function VisualizeClick(x, y)
         local gui = Instance.new("ScreenGui")
         gui.Name = "AutoBossDebugVisual"
-        gui.Parent = Services.CoreGui or game:GetService("CoreGui")
+        gui.Parent = CoreGui
 
         local dot = Instance.new("Frame")
         dot.Size = UDim2.new(0, 10, 0, 10)
@@ -584,6 +596,8 @@ return function(Services, Tabs, References, Toggles, Options, Library)
             if (References.humanoidRootPart.Position - fallbackPos).Magnitude > 20 then
                 if SecureTravel then
                     SecureTravel(fallbackPos)
+                else
+                    References.humanoidRootPart.CFrame = CFrame.new(fallbackPos)
                 end
             else
                 References.humanoidRootPart.CFrame = CFrame.new(fallbackPos)
