@@ -2,14 +2,14 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     -- ============================
     --   SERVICE SHORTCUTS
     -- ============================
-    local Players           = Services.Players
-    local RunService        = Services.RunService
-    local UIS               = Services.UserInputService
-    local HttpService       = Services.HttpService
-    local Workspace         = Services.Workspace
-    local ReplicatedStorage = Services.ReplicatedStorage
+    local Players           = Services.Players           or game:GetService("Players")
+    local RunService        = Services.RunService        or game:GetService("RunService")
+    local UIS               = Services.UserInputService  or game:GetService("UserInputService")
+    local HttpService       = Services.HttpService       or game:GetService("HttpService")
+    local Workspace         = Services.Workspace         or game:GetService("Workspace")
+    local ReplicatedStorage = Services.ReplicatedStorage or game:GetService("ReplicatedStorage")
     local VIM               = Services.VirtualInputManager or game:GetService("VirtualInputManager")
-    local CoreGui           = Services.CoreGui or game:GetService("CoreGui")
+    local CoreGui           = Services.CoreGui           or game:GetService("CoreGui")
 
     -- ============================
     --   EXTERNAL HELPERS
@@ -288,7 +288,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     RefreshMemberLabel()
 
     -- Input to add a single member at a time; Enter commits + clears
-    local AddMemberInput = AutoBossGroupbox:AddInput("AutoBoss_AddMember", {
+    AutoBossGroupbox:AddInput("AutoBoss_AddMember", {
         Text        = "Add Member",
         Default     = "",
         Placeholder = "Username (press Enter)",
@@ -851,16 +851,9 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                         and Toggles.AutoBoss_Integrated.Value do
 
                         if game.PlaceId == BOSS_PLACE_ID then
-                            -- ensure combat loop is running
-                            local hasHB = false
-                            for _, conn in ipairs(BossState.Connections) do
-                                if conn and conn.Connected then
-                                    hasHB = true
-                                    break
-                                end
-                            end
-
-                            if not hasHB then
+                            -- replicate original behaviour: only start combat loop when we have
+                            -- 0 or 1 connections (usually just charConn)
+                            if #BossState.Connections <= 1 then
                                 Library:Notify("Boss Arena Detected. Engaging.", 3)
                                 HandleBossCombat()
                             end
