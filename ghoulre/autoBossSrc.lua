@@ -183,6 +183,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     -- W key helper (press once per life in boss arena)
     ------------------------------------------------------
     local function FireWOnce()
+        wait(1)
         VIM:SendKeyEvent(true, Enum.KeyCode.W, false, game)
         task.wait(0.05)
         VIM:SendKeyEvent(false, Enum.KeyCode.W, false, game)
