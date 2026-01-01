@@ -348,7 +348,6 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             if Options.AutoBoss_AddMember then
                 Options.AutoBoss_AddMember:SetValue("")
             end
-
             Library:Notify("Added " .. name .. " to party members.", 3)
         end
     })
@@ -784,10 +783,10 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             end
 
             local healthPct = hum.Health / hum.MaxHealth
-            
+
             -- UPDATED LOGIC: Use dynamic VoidHealthThreshold
             local threshold = (BossState.VoidHealthThreshold or 30) / 100
-            
+
             if healthPct <= threshold then
                 BossState.IsVoiding = true
             end
@@ -833,16 +832,15 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                     if v:IsA("Model")
                         and v ~= References.character then
 
+                        -- UPDATED: we NO LONGER require a Humanoid or Health > 0.
+                        -- We just care that the model has a HumanoidRootPart and a matching name.
                         local hrp = v:FindFirstChild("HumanoidRootPart")
-                        local humV = v:FindFirstChild("Humanoid")
-                        if hrp and humV and humV.Health > 0 then
-                            if string.find(string.lower(v.Name), filterName, 1, true) then
-                                local offset = hrp.Position - rootPos
-                                local distSq = offset.X * offset.X + offset.Y * offset.Y + offset.Z * offset.Z
-                                if distSq < closestDistSq then
-                                    closestDistSq = distSq
-                                    closestTarget = v
-                                end
+                        if hrp and string.find(string.lower(v.Name), filterName, 1, true) then
+                            local offset = hrp.Position - rootPos
+                            local distSq = offset.X * offset.X + offset.Y * offset.Y + offset.Z * offset.Z
+                            if distSq < closestDistSq then
+                                closestDistSq = distSq
+                                closestTarget = v
                             end
                         end
                     end
@@ -853,17 +851,18 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             end
 
             if targetToUse then
+                -- UPDATED: only treat target as invalid when it's actually removed or missing HRP
                 local hrp = targetToUse:FindFirstChild("HumanoidRootPart")
-                local humT = targetToUse:FindFirstChild("Humanoid")
 
-                if not (hrp and humT and humT.Health > 0) then
-                    -- target invalidated this frame
+                if not (targetToUse.Parent and hrp) then
+                    -- Boss is gone (or no more root part) → detach & allow replay
                     BossState.ActiveTarget = nil
                     if AttachPanel then
                         AttachPanel.Stop()
                     end
+                    lastAttachTarget = nil
                 else
-                    -- OPT: only call SetTarget when target changes
+                    -- Keep attaching EVEN IF Humanoid health is 0.
                     if AttachPanel then
                         if targetToUse ~= lastAttachTarget then
                             lastAttachTarget = targetToUse
@@ -879,6 +878,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                     root.AssemblyAngularVelocity = Vector3.zero
                 end
             else
+                -- No active target (boss fully gone) → stop attaching and optionally replay
                 if AttachPanel then
                     AttachPanel.Stop()
                     lastAttachTarget = nil
