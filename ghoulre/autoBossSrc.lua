@@ -11,10 +11,15 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     local VIM               = Services.VirtualInputManager or game:GetService("VirtualInputManager")
     local CoreGui           = Services.CoreGui           or game:GetService("CoreGui")
 
+    -- OPT: cache some frequently-used references
+    local LocalPlayer       = Players.LocalPlayer
+    local CurrentCamera     = Workspace.CurrentCamera
+    local RemotesFolder     = ReplicatedStorage:FindFirstChild("Remotes")
+    local PartyRemote       = RemotesFolder and RemotesFolder:FindFirstChild("Party")
+
     -- ============================
     --   EXTERNAL HELPERS
     -- ============================
-    -- Injected from loader via Shared, with soft fallbacks if you ever move them
     local AttachPanel  = Shared and Shared.AttachPanel  or getgenv().AttachPanel
     local MoveToPos    = Shared and Shared.MoveToPos    or getgenv().MoveToPos
     local SecureTravel = Shared and Shared.SecureTravel or getgenv().SecureTravel
@@ -24,6 +29,10 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     local AutoFarm = (Shared and Shared.AutoFarm) or getgenv().AutoFarm
 
     local BOSS_PLACE_ID = 89413197677760
+
+    -- OPT: scan throttling constants
+    local BOSS_SCAN_INTERVAL = 0.10 -- seconds (10x/sec is plenty)
+    local REPLAY_CLICK_COOLDOWN = 2
 
     -- ============================
     --   CONFIG PATHS / FOLDERS
@@ -93,7 +102,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             return
         end
 
-        local lp = Players.LocalPlayer
+        local lp = LocalPlayer
         if not lp then
             BossState.EffectiveMode = "Solo"
             return
@@ -180,10 +189,18 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     LoadConfigs()
 
     ------------------------------------------------------
+    -- Small helpers
+    ------------------------------------------------------
+    local function GetPlayerGui()
+        local lp = LocalPlayer
+        return lp and lp:FindFirstChild("PlayerGui") or nil
+    end
+
+    ------------------------------------------------------
     -- W key helper (press once per life in boss arena)
     ------------------------------------------------------
     local function FireWOnce()
-        wait(1)
+        task.wait(1)
         VIM:SendKeyEvent(true, Enum.KeyCode.W, false, game)
         task.wait(0.05)
         VIM:SendKeyEvent(false, Enum.KeyCode.W, false, game)
@@ -264,7 +281,6 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         Placeholder = "Exact Roblox username",
         Finished    = true,
         Callback    = function(val)
-            -- normalize + trim
             local host = tostring(val or "")
             host = host:gsub("^%s+", ""):gsub("%s+$", "")
             BossState.PartyConfig.HostName = host
@@ -273,7 +289,6 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         end
     })
 
-    -- Label showing current members
     local MemberListLabel = AutoBossGroupbox:AddLabel("Members: (none)", true)
 
     local function RefreshMemberLabel()
@@ -288,7 +303,6 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
 
     RefreshMemberLabel()
 
-    -- Input to add a single member at a time; Enter commits + clears
     AutoBossGroupbox:AddInput("AutoBoss_AddMember", {
         Text        = "Add Member",
         Default     = "",
@@ -302,11 +316,9 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                 return
             end
 
-            -- check duplicate (case-insensitive)
             for _, existing in ipairs(BossState.PartyConfig.MemberNames or {}) do
                 if string.lower(existing) == string.lower(name) then
                     Library:Notify(name .. " is already in the member list.", 3)
-                    -- clear input anyway
                     if Options.AutoBoss_AddMember then
                         Options.AutoBoss_AddMember:SetValue("")
                     end
@@ -319,7 +331,6 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             SavePartyConfig()
             RefreshMemberLabel()
 
-            -- clear input after commit
             if Options.AutoBoss_AddMember then
                 Options.AutoBoss_AddMember:SetValue("")
             end
@@ -339,8 +350,6 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             SavePartyConfig()
         end
     })
-
-    -- ===== Extra config buttons =====
 
     AutoBossGroupbox:AddButton({
         Text = "Clear Party Config",
@@ -406,8 +415,10 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
 
             BossState.WaitingForClickSet = false
             local mousePos   = UIS:GetMouseLocation()
-            local screenSize = Workspace.CurrentCamera.ViewportSize
+            local cam        = Workspace.CurrentCamera or CurrentCamera
+            if not cam then return end
 
+            local screenSize = cam.ViewportSize
             BossState.ReplayConfig.ScaleX = mousePos.X / screenSize.X
             BossState.ReplayConfig.ScaleY = mousePos.Y / screenSize.Y
 
@@ -442,7 +453,10 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     end
 
     local function PerformReplayClick()
-        local screenSize = Workspace.CurrentCamera.ViewportSize
+        local cam = Workspace.CurrentCamera or CurrentCamera
+        if not cam then return end
+
+        local screenSize = cam.ViewportSize
         local absX = screenSize.X * BossState.ReplayConfig.ScaleX
         local absY = screenSize.Y * BossState.ReplayConfig.ScaleY
 
@@ -477,7 +491,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     end
 
     local function GetPartyMemberCount()
-        local gui = Players.LocalPlayer:WaitForChild("PlayerGui", 5)
+        local gui = GetPlayerGui()
         local membersFolder =
             gui
             and gui:FindFirstChild("Party")
@@ -502,8 +516,14 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             return true
         end
 
-        local mode   = BossState.EffectiveMode or "Solo"
-        local Remote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Party")
+        local mode = BossState.EffectiveMode or "Solo"
+        local Remote = PartyRemote
+            or (RemotesFolder and RemotesFolder:FindFirstChild("Party"))
+
+        if not Remote then
+            Library:Notify("Party remote not found; running Solo.", 3)
+            return true
+        end
 
         if mode == "Host" then
             if GetPartyMemberCount() == 0 then
@@ -531,7 +551,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             end
 
         elseif mode == "Member" then
-            local gui = Players.LocalPlayer:WaitForChild("PlayerGui", 5)
+            local gui = GetPlayerGui()
             local inviteFolder =
                 gui
                 and gui:FindFirstChild("Party")
@@ -607,7 +627,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             TargetPart = findArenaPart()
         end
 
-        if TargetPart then
+        if TargetPart and References.humanoidRootPart then
             local frontCFrame = TargetPart.CFrame * CFrame.new(0, 0, -4)
             local targetPos   = frontCFrame.Position
             local currentDist = (References.humanoidRootPart.Position - targetPos).Magnitude
@@ -623,10 +643,8 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                 References.humanoidRootPart.AssemblyLinearVelocity = Vector3.zero
             end
 
-            if References.humanoidRootPart then
-                References.humanoidRootPart.CFrame = CFrame.new(targetPos, TargetPart.Position)
-                References.humanoidRootPart.AssemblyLinearVelocity = Vector3.zero
-            end
+            References.humanoidRootPart.CFrame = CFrame.new(targetPos, TargetPart.Position)
+            References.humanoidRootPart.AssemblyLinearVelocity = Vector3.zero
 
             task.wait(0.5)
 
@@ -701,6 +719,9 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         BossState.JoiningDebounce = false
     end
 
+    ------------------------------------------------------
+    -- Boss combat (optimised)
+    ------------------------------------------------------
     local function HandleBossCombat()
         if AttachPanel then
             AttachPanel.SetMode("Aligned")
@@ -715,7 +736,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                 if skipRemote then
                     Library:Notify("Skipping Cutscene...", 2)
                     while (os.clock() - start) < 20 do
-                        if not Toggles.AutoBoss_Integrated.Value then
+                        if not (Toggles.AutoBoss_Integrated and Toggles.AutoBoss_Integrated.Value) then
                             break
                         end
                         pcall(function() skipRemote:FireServer() end)
@@ -725,7 +746,15 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             end)
         end
 
+        local lastScanTime = 0
+        local lastAttachTarget = nil
+
         local hb = RunService.Heartbeat:Connect(function()
+            -- OPT: bail fast if toggle went off
+            if not (Toggles.AutoBoss_Integrated and Toggles.AutoBoss_Integrated.Value) then
+                return
+            end
+
             if not References.player or not References.character then
                 return
             end
@@ -741,7 +770,6 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             end
 
             local healthPct = hum.Health / hum.MaxHealth
-
             if healthPct <= 0.30 then
                 BossState.IsVoiding = true
             end
@@ -759,7 +787,6 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                     if MoveToPos then
                         MoveToPos(Vector3.new(pos.X, -5000, pos.Z), 10000)
                     else
-                        -- hard fallback if MoveToPos not injected
                         root.CFrame = CFrame.new(pos.X, -5000, pos.Z)
                     end
                 end
@@ -768,47 +795,82 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                 BossState.VoidTriggered = false
             end
 
-            local entityFolder = Workspace:FindFirstChild("Entities") or Workspace
-            local filterName   = tostring(BossDropdown.Value):lower()
-            local closestTarget, closestDist = nil, 99999
+            local now = os.clock()
+            local targetToUse = BossState.ActiveTarget
 
-            for _, v in ipairs(entityFolder:GetChildren()) do
-                if v:IsA("Model")
-                    and v ~= References.character
-                    and v:FindFirstChild("HumanoidRootPart")
-                    and v:FindFirstChild("Humanoid") then
+            -- OPT: only rescan Entities every BOSS_SCAN_INTERVAL
+            if (now - lastScanTime) >= BOSS_SCAN_INTERVAL
+                or (not targetToUse) or (not targetToUse.Parent) then
 
-                    if string.find(string.lower(v.Name), filterName) then
-                        local dist = (root.Position - v.HumanoidRootPart.Position).Magnitude
-                        if dist < closestDist then
-                            closestDist  = dist
-                            closestTarget = v
+                lastScanTime = now
+                targetToUse = nil
+
+                local entityFolder = Workspace:FindFirstChild("Entities") or Workspace
+                local filterName   = tostring(BossDropdown.Value):lower()
+                local closestTarget
+                local closestDistSq = math.huge
+                local rootPos = root.Position
+
+                for _, v in ipairs(entityFolder:GetChildren()) do
+                    if v:IsA("Model")
+                        and v ~= References.character then
+
+                        local hrp = v:FindFirstChild("HumanoidRootPart")
+                        local humV = v:FindFirstChild("Humanoid")
+                        if hrp and humV and humV.Health > 0 then
+                            if string.find(string.lower(v.Name), filterName, 1, true) then
+                                local offset = hrp.Position - rootPos
+                                local distSq = offset.X * offset.X + offset.Y * offset.Y + offset.Z * offset.Z
+                                if distSq < closestDistSq then
+                                    closestDistSq = distSq
+                                    closestTarget = v
+                                end
+                            end
                         end
                     end
                 end
+
+                BossState.ActiveTarget = closestTarget
+                targetToUse = closestTarget
             end
 
-            if closestTarget then
-                BossState.ActiveTarget = closestTarget
-                if AttachPanel then
-                    AttachPanel.SetTarget(closestTarget)
-                    AttachPanel.TeleportToTarget(closestTarget)
+            if targetToUse then
+                local hrp = targetToUse:FindFirstChild("HumanoidRootPart")
+                local humT = targetToUse:FindFirstChild("Humanoid")
+
+                if not (hrp and humT and humT.Health > 0) then
+                    -- target invalidated this frame
+                    BossState.ActiveTarget = nil
+                    if AttachPanel then
+                        AttachPanel.Stop()
+                    end
                 else
-                    root.CFrame = closestTarget.HumanoidRootPart.CFrame
-                        * CFrame.new(BossState.CurrentHorizOffset, BossState.CurrentYOffset, 0)
+                    -- OPT: only call SetTarget when target changes
+                    if AttachPanel then
+                        if targetToUse ~= lastAttachTarget then
+                            lastAttachTarget = targetToUse
+                            AttachPanel.SetTarget(targetToUse)
+                        end
+                        AttachPanel.TeleportToTarget(targetToUse)
+                    else
+                        root.CFrame = hrp.CFrame
+                            * CFrame.new(BossState.CurrentHorizOffset, BossState.CurrentYOffset, 0)
+                    end
+
+                    root.AssemblyLinearVelocity  = Vector3.zero
+                    root.AssemblyAngularVelocity = Vector3.zero
                 end
-                root.AssemblyLinearVelocity  = Vector3.zero
-                root.AssemblyAngularVelocity = Vector3.zero
             else
                 if AttachPanel then
                     AttachPanel.Stop()
+                    lastAttachTarget = nil
                 end
 
                 if Toggles.AutoBoss_AutoReplay
                     and Toggles.AutoBoss_AutoReplay.Value then
 
-                    if (os.clock() - BossState.LastReplayClick) > 2 then
-                        BossState.LastReplayClick = os.clock()
+                    if (now - BossState.LastReplayClick) > REPLAY_CLICK_COOLDOWN then
+                        BossState.LastReplayClick = now
                         PerformReplayClick()
                     end
                 end
@@ -840,7 +902,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
 
                 Library:Notify("Auto Boss: " .. modeLabel, 3)
 
-                local lp = Players.LocalPlayer
+                local lp = LocalPlayer
                 if lp then
                     local charConn = lp.CharacterAdded:Connect(OnCharacterArriveAtBoss)
                     table.insert(BossState.Connections, charConn)
@@ -855,8 +917,6 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                         and Toggles.AutoBoss_Integrated.Value do
 
                         if game.PlaceId == BOSS_PLACE_ID then
-                            -- replicate original behaviour: only start combat loop when we have
-                            -- 0 or 1 connections (usually just charConn)
                             if #BossState.Connections <= 1 then
                                 Library:Notify("Boss Arena Detected. Engaging.", 3)
                                 HandleBossCombat()
