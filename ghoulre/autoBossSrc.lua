@@ -76,6 +76,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         WaitingForClickSet = false,
         CurrentYOffset     = 20,
         CurrentHorizOffset = 0,
+        VoidHealthThreshold = 30, -- Default 30%
 
         PartyConfig = {
             PartyEnabled    = false,
@@ -264,6 +265,19 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             if AttachPanel then
                 AttachPanel.SetHorizDist(val)
             end
+        end
+    })
+
+    -- NEW SLIDER FOR VOID HEALTH
+    AutoBossGroupbox:AddSlider("BossVoidHealth", {
+        Text    = "Void Health %",
+        Default = BossState.VoidHealthThreshold,
+        Min     = 5,
+        Max     = 95,
+        Rounding = 0,
+        Suffix  = "%",
+        Callback = function(val)
+            BossState.VoidHealthThreshold = val
         end
     })
 
@@ -770,7 +784,11 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
             end
 
             local healthPct = hum.Health / hum.MaxHealth
-            if healthPct <= 0.30 then
+            
+            -- UPDATED LOGIC: Use dynamic VoidHealthThreshold
+            local threshold = (BossState.VoidHealthThreshold or 30) / 100
+            
+            if healthPct <= threshold then
                 BossState.IsVoiding = true
             end
 
