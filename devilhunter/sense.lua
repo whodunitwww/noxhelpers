@@ -214,68 +214,53 @@ function EspObject:Destruct()
  end
 
 function EspObject:Update()
-    local interface = self.interface;
+	local interface = self.interface;
 
-    self.options = interface.teamSettings[interface.isFriendly(self.player) and "friendly" or "enemy"];
-    self.character = interface.getCharacter(self.player);
-    self.health, self.maxHealth = interface.getHealth(self.character);
-    self.weapon = interface.getWeapon(self.player);
+	self.options = interface.teamSettings[interface.isFriendly(self.player) and "friendly" or "enemy"];
+	self.character = interface.getCharacter(self.player);
+	self.health, self.maxHealth = interface.getHealth(self.character);
+	self.weapon = interface.getWeapon(self.player);
+	self.enabled = self.options.enabled and self.character and not
+		(#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId));
 
-    -- NEW: Default to true (visible)
-    local isValidEntity = true
+	local head = self.enabled and findFirstChild(self.character, "Head");
+	if not head then
+		return;
+	end
 
-    -- ONLY apply the folder check if this is a real Player
-    if self.player:IsA("Player") then
-        local world = workspace:FindFirstChild("World")
-        local entities = world and world:FindFirstChild("Entities")
-        -- If player is NOT in the folder, mark as invalid
-        if not (entities and entities:FindFirstChild(self.player.Name)) then
-            isValidEntity = false
-        end
-    end
+	local _, onScreen, depth = worldToScreen(head.Position);
+	self.onScreen = onScreen;
+	self.distance = depth;
 
-    -- Add isValidEntity to the enabled check
-    self.enabled = self.options.enabled and self.character and isValidEntity and not
-        (#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId));
+	if interface.sharedSettings.limitDistance and depth > interface.sharedSettings.maxDistance then
+		self.onScreen = false;
+	end
 
-    local head = self.enabled and findFirstChild(self.character, "Head");
-    if not head then
-        return;
-    end
+	if self.onScreen then
+		local cache = self.charCache;
+		local children = getChildren(self.character);
+		if not cache[1] or self.childCount ~= #children then
+			clear(cache);
 
-    local _, onScreen, depth = worldToScreen(head.Position);
-    self.onScreen = onScreen;
-    self.distance = depth;
+			for i = 1, #children do
+				local part = children[i];
+				if isA(part, "BasePart") and isBodyPart(part.Name) then
+					cache[#cache + 1] = part;
+				end
+			end
 
-    if interface.sharedSettings.limitDistance and depth > interface.sharedSettings.maxDistance then
-        self.onScreen = false;
-    end
+			self.childCount = #children;
+		end
 
-    if self.onScreen then
-        local cache = self.charCache;
-        local children = getChildren(self.character);
-        if not cache[1] or self.childCount ~= #children then
-            clear(cache);
+		self.corners = calculateCorners(getBoundingBox(cache));
+	elseif self.options.offScreenArrow then
+		local _, yaw, roll = toOrientation(camera.CFrame);
+		local flatCFrame = CFrame.Angles(0, yaw, roll) + camera.CFrame.Position;
+		local objectSpace = pointToObjectSpace(flatCFrame, head.Position);
+		local angle = atan2(objectSpace.Z, objectSpace.X);
 
-            for i = 1, #children do
-                local part = children[i];
-                if isA(part, "BasePart") and isBodyPart(part.Name) then
-                    cache[#cache + 1] = part;
-                end
-            end
-
-            self.childCount = #children;
-        end
-
-        self.corners = calculateCorners(getBoundingBox(cache));
-    elseif self.options.offScreenArrow then
-        local _, yaw, roll = toOrientation(camera.CFrame);
-        local flatCFrame = CFrame.Angles(0, yaw, roll) + camera.CFrame.Position;
-        local objectSpace = pointToObjectSpace(flatCFrame, head.Position);
-        local angle = atan2(objectSpace.Z, objectSpace.X);
-
-        self.direction = Vector2.new(cos(angle), sin(angle));
-    end
+		self.direction = Vector2.new(cos(angle), sin(angle));
+	end
 end
 
 function EspObject:Render()
@@ -484,37 +469,24 @@ function ChamObject:Destruct()
 end
 
 function ChamObject:Update()
-    local highlight = self.highlight;
-    local interface = self.interface;
-    local character = interface.getCharacter(self.player);
-    local options = interface.teamSettings[interface.isFriendly(self.player) and "friendly" or "enemy"];
+	local highlight = self.highlight;
+	local interface = self.interface;
+	local character = interface.getCharacter(self.player);
+	local options = interface.teamSettings[interface.isFriendly(self.player) and "friendly" or "enemy"];
+	local enabled = options.enabled and character and not
+		(#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId));
 
-    -- NEW: Default to true
-    local isValidEntity = true
-
-    -- ONLY apply the folder check if this is a real Player
-    if self.player:IsA("Player") then
-        local world = workspace:FindFirstChild("World")
-        local entities = world and world:FindFirstChild("Entities")
-        -- If player is NOT in the folder, mark as invalid
-        if not (entities and entities:FindFirstChild(self.player.Name)) then
-            isValidEntity = false
-        end
-    end
-
-    local enabled = options.enabled and character and isValidEntity and not
-        (#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId));
-
-    highlight.Enabled = enabled and options.chams;
-    if highlight.Enabled then
-        highlight.DepthMode = options.chamsVisibleOnly and Enum.HighlightDepthMode.Occluded or Enum.HighlightDepthMode.AlwaysOnTop;
-        highlight.Adornee = character;
-        highlight.FillColor = options.chamsFillColor[1];
-        highlight.FillTransparency = options.chamsFillColor[2];
-        highlight.OutlineColor = options.chamsOutlineColor[1];
-        highlight.OutlineTransparency = options.chamsOutlineColor[2];
-    end
+	highlight.Enabled = enabled and options.chams;
+	if highlight.Enabled then
+		highlight.DepthMode = options.chamsVisibleOnly and Enum.HighlightDepthMode.Occluded or Enum.HighlightDepthMode.AlwaysOnTop;
+		highlight.Adornee = character;
+		highlight.FillColor = options.chamsFillColor[1];
+		highlight.FillTransparency = options.chamsFillColor[2];
+		highlight.OutlineColor = options.chamsOutlineColor[1];
+		highlight.OutlineTransparency = options.chamsOutlineColor[2];
+	end
 end
+
 
 local InstanceEspObject = {};
 InstanceEspObject.__index = InstanceEspObject;
