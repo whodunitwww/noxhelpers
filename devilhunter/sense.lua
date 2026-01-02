@@ -221,12 +221,17 @@ function EspObject:Update()
     self.health, self.maxHealth = interface.getHealth(self.character);
     self.weapon = interface.getWeapon(self.player);
 
-    -- NEW: Check if player exists in workspace.World.Entities
-    local isValidEntity = false
-    local world = workspace:FindFirstChild("World")
-    local entities = world and world:FindFirstChild("Entities")
-    if entities and entities:FindFirstChild(self.player.Name) then
-        isValidEntity = true
+    -- NEW: Default to true (visible)
+    local isValidEntity = true
+
+    -- ONLY apply the folder check if this is a real Player
+    if self.player:IsA("Player") then
+        local world = workspace:FindFirstChild("World")
+        local entities = world and world:FindFirstChild("Entities")
+        -- If player is NOT in the folder, mark as invalid
+        if not (entities and entities:FindFirstChild(self.player.Name)) then
+            isValidEntity = false
+        end
     end
 
     -- Add isValidEntity to the enabled check
@@ -484,15 +489,19 @@ function ChamObject:Update()
     local character = interface.getCharacter(self.player);
     local options = interface.teamSettings[interface.isFriendly(self.player) and "friendly" or "enemy"];
 
-    -- NEW: Check if player exists in workspace.World.Entities
-    local isValidEntity = false
-    local world = workspace:FindFirstChild("World")
-    local entities = world and world:FindFirstChild("Entities")
-    if entities and entities:FindFirstChild(self.player.Name) then
-        isValidEntity = true
+    -- NEW: Default to true
+    local isValidEntity = true
+
+    -- ONLY apply the folder check if this is a real Player
+    if self.player:IsA("Player") then
+        local world = workspace:FindFirstChild("World")
+        local entities = world and world:FindFirstChild("Entities")
+        -- If player is NOT in the folder, mark as invalid
+        if not (entities and entities:FindFirstChild(self.player.Name)) then
+            isValidEntity = false
+        end
     end
 
-    -- Add isValidEntity to the enabled check
     local enabled = options.enabled and character and isValidEntity and not
         (#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId));
 
