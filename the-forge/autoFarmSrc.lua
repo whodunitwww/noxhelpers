@@ -1,1525 +1,537 @@
 -- autoFarmSrc.lua
--- Unified Auto-Farm script loading separated modules from "The Forge" folder
+-- Simple unified auto farm (ores + enemies) using AttachPanel
+-- Outsourced module version.
+-- UPDATED: Integrated Auto Potions & Auto Restock
+
 return function(ctx)
     ----------------------------------------------------------------
     -- CONTEXT BINDINGS
     ----------------------------------------------------------------
-    local Services             = ctx.Services or {}
-    local Tabs                 = ctx.Tabs
-    local References           = ctx.References
-    local Library              = ctx.Library
-    local Options              = ctx.Options
-    local Toggles              = ctx.Toggles
-    local META                 = ctx.META or {}
-    local AttachPanel          = ctx.AttachPanel
-    local MoveToPos            = ctx.MoveToPos
-    local RunService           = Services.RunService or game:GetService("RunService")
-    local UserInputService     = Services.UserInputService or game:GetService("UserInputService")
-    local HttpService          = Services.HttpService or game:GetService("HttpService")
-    local VirtualInputManager  = Services.VirtualInputManager or game:GetService("VirtualInputManager")
-    local Players              = game:GetService("Players")
-    local Workspace            = Services.Workspace or workspace
+    local Services            = ctx.Services
+    local Tabs                = ctx.Tabs
+    local References          = ctx.References
+    local Library             = ctx.Library
+    local Options             = ctx.Options
+    local Toggles             = ctx.Toggles
+    local META                = ctx.META or {}
 
-    local ALT_FARM_MODE_MAIN   = "Main Alt"
-    local ALT_FARM_MODE_HELPER = "Helper Alt"
-    local ALT_FARM_DATA_FILE   = "Cerberus/The Forge/AltFarmAlts.txt"
+    local AttachPanel         = ctx.AttachPanel
+    local MoveToPos           = ctx.MoveToPos
+    local RunService          = Services.RunService
+    local UserInputService    = Services.UserInputService
+    local HttpService         = Services.HttpService
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    local Players             = Services.Players
 
     ----------------------------------------------------------------
-    -- CONFIGURATION FLAGS & STATE
+    -- INTERNAL HELPERS (Global Scope)
     ----------------------------------------------------------------
-    local AF_Config            = {
-        AvoidLava                    = false,
-        AvoidRedCave                = false,
-        AvoidPlayers                 = false,
-        DamageDitchEnabled           = false,
-        DamageDitchThreshold         = 100,
-        TargetFullHealth             = false,
-        PlayerAvoidRadius            = 40,
-        AttackNearbyMobs             = false,
-        NearbyMobRange               = 40,
-        OreWhitelistEnabled          = false,
-        WhitelistedOres              = {},
-        WhitelistAppliesTo           = {},
-        ZoneWhitelistEnabled         = false,
-        WhitelistedZones             = {},
-        TargetBlacklist              = {},
-        ExtraYOffset                 = 0,
-        BossExtraYOffset             = -15,
-        FarmSpeed                    = 80,
-        AltFarmEnabled               = false,
-        AltFarmMode                  = ALT_FARM_MODE_MAIN,
-        AltNames                     = {},
-        AltNameSet                   = {},
-        QuestPriorityOverrideEnabled = false,
-        QuestAutoCompleteEnabled     = false,
-        QuestTargetFilter            = {},
-        MovementMode                 = "Tween",
+
+    local function getLocalHRP()
+        return References.humanoidRootPart
+    end
+
+    local function notify(msg, time)
+        if Library and Library.Notify then
+            Library:Notify(msg, time or 3)
+        end
+    end
+
+    local function getRocksFolder()
+        return Services.Workspace:FindFirstChild("Rocks")
+    end
+
+    local function rockHealth(model)
+        if not model or not model.Parent then
+            return nil
+        end
+        local ok, value = pcall(function()
+            return model:GetAttribute("Health")
+        end)
+        if not ok or value == nil then
+            return nil
+        end
+        return tonumber(value)
+    end
+
+    local function isRockAlive(model)
+        local h = rockHealth(model)
+        return h and h > 0
+    end
+
+    local function isRockLastHitByOther(model)
+        if not model or not model.Parent then return false end
+
+        local ok, value = pcall(function()
+            return model:GetAttribute("LastHitPlayer")
+        end)
+        if not ok or value == nil then
+            -- no attribute / error => treat as free rock
+            return false
+        end
+
+        local plr = References.player or Players.LocalPlayer
+        if not plr then return false end
+
+        local v = tostring(value)
+
+        -- Allow a few common encodings of "us"
+        if v == plr.Name
+            or v == plr.DisplayName
+            or v == tostring(plr.UserId)
+        then
+            return false -- it's ours
+        end
+
+        -- Attribute exists and *doesn't* match us => someone else
+        return true
+    end
+
+
+    local function rockRoot(model)
+        if not model or not model.Parent then return nil end
+        if model:IsA("BasePart") then
+            return model
+        end
+
+        local part = AttachPanel.HrpOf and AttachPanel.HrpOf(model) or nil
+        if part then return part end
+
+        for _, inst in ipairs(model:GetDescendants()) do
+            if inst:IsA("BasePart") then
+                return inst
+            end
+        end
+        return nil
+    end
+
+    local function rockPosition(model)
+        local root = rockRoot(model)
+        return root and root.Position or nil
+    end
+
+    -- Shared ToolService remote
+    local ToolActivatedRF = Services.ReplicatedStorage
+        :WaitForChild("Shared")
+        :WaitForChild("Packages")
+        :WaitForChild("Knit")
+        :WaitForChild("Services")
+        :WaitForChild("ToolService")
+        :WaitForChild("RF")
+        :WaitForChild("ToolActivated")
+
+    local PurchaseRF = Services.ReplicatedStorage
+        :WaitForChild("Shared")
+        :WaitForChild("Packages")
+        :WaitForChild("Knit")
+        :WaitForChild("Services")
+        :WaitForChild("ProximityService")
+        :WaitForChild("RF")
+        :WaitForChild("Purchase")
+
+    local function swingTool(remoteArg)
+        local ok, err = pcall(function()
+            ToolActivatedRF:InvokeServer(remoteArg)
+        end)
+        if not ok then
+            warn("[AutoFarm] ToolActivated error:", err)
+        end
+    end
+
+    -- ====================================================================
+    --  POTION CONSTANTS & HELPERS
+    -- ====================================================================
+
+    local RESTOCK_CFRAME = CFrame.new(-94.434898, 20.585484, -34.270695)
+
+    local PotionDisplayToToolId = {
+        ["Damage Potion I"] = "AttackDamagePotion1",
+        ["Speed Potion I"]  = "MovementSpeedPotion1",
+        ["Health Potion I"] = "HealthPotion1",
+        ["Luck Potion I"]   = "LuckPotion1",
+        ["Miner Potion I"]  = "MinerPotion1",
     }
+
+    -- Helper: read hotbar UI count
+    local function getPotionCount(displayName)
+        local player = Players.LocalPlayer
+        if not player then return 0 end
+
+        local playerGui   = player:FindFirstChild("PlayerGui")
+        local backpackGui = playerGui and playerGui:FindFirstChild("BackpackGui")
+        local backpack    = backpackGui and backpackGui:FindFirstChild("Backpack")
+        local hotbar      = backpack and backpack:FindFirstChild("Hotbar")
+
+        if not hotbar then return 0 end
+
+        for _, slot in pairs(hotbar:GetChildren()) do
+            local frame = slot:FindFirstChild("Frame")
+            if frame then
+                local toolName = frame:FindFirstChild("ToolName")
+                if toolName and toolName.Text == displayName then
+                    local stack = frame:FindFirstChild("StackNumber")
+                    if stack and stack.Visible and stack.Text ~= "" then
+                        return tonumber(string.match(stack.Text, "%d+")) or 1
+                    else
+                        return 1
+                    end
+                end
+            end
+        end
+        return 0
+    end
+
+    local function freezeCharacter(char)
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        local hum  = char:FindFirstChildOfClass("Humanoid")
+        if not root or not hum then return end
+
+        -- Only save once
+        if not root:GetAttribute("CerbStateSaved") then
+            root:SetAttribute("CerbPrevAnchored", root.Anchored)
+            root:SetAttribute("CerbPrevVel", root.AssemblyLinearVelocity)
+            root:SetAttribute("CerbPrevRotVel", root.AssemblyAngularVelocity)
+
+            root:SetAttribute("CerbPrevState", hum:GetState())
+            root:SetAttribute("CerbPrevWalkSpeed", hum.WalkSpeed)
+            root:SetAttribute("CerbPrevJumpPower", hum.JumpPower)
+            root:SetAttribute("CerbPrevPlatformStand", hum.PlatformStand)
+            root:SetAttribute("CerbPrevAutoRotate", hum.AutoRotate)
+
+            root:SetAttribute("CerbStateSaved", true)
+        end
+
+        -- HARD FREEZE
+        root.Anchored = true
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
+
+        hum.WalkSpeed = 0
+        hum.JumpPower = 0
+        hum.AutoRotate = false
+        hum.PlatformStand = true
+
+        pcall(function()
+            hum:ChangeState(Enum.HumanoidStateType.Physics)
+        end)
+    end
+
+    local function unfreezeCharacter(char)
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        local hum  = char:FindFirstChildOfClass("Humanoid")
+        if not root or not hum then return end
+
+        if not root:GetAttribute("CerbStateSaved") then return end
+
+        -- Restore values
+        root.Anchored = root:GetAttribute("CerbPrevAnchored")
+        root.AssemblyLinearVelocity = root:GetAttribute("CerbPrevVel")
+        root.AssemblyAngularVelocity = root:GetAttribute("CerbPrevRotVel")
+
+        hum.WalkSpeed = root:GetAttribute("CerbPrevWalkSpeed")
+        hum.JumpPower = root:GetAttribute("CerbPrevJumpPower")
+        hum.AutoRotate = root:GetAttribute("CerbPrevAutoRotate")
+        hum.PlatformStand = root:GetAttribute("CerbPrevPlatformStand")
+
+        pcall(function()
+            hum:ChangeState(root:GetAttribute("CerbPrevState"))
+        end)
+
+        -- Allow new freeze cycles
+        root:SetAttribute("CerbStateSaved", nil)
+    end
+
+    local function equipHotbarItemByName(name)
+        local player = Players.LocalPlayer
+        local pg = player:FindFirstChild("PlayerGui")
+        local hb = pg and pg:FindFirstChild("BackpackGui") and pg.BackpackGui:FindFirstChild("Backpack") and
+            pg.BackpackGui.Backpack:FindFirstChild("Hotbar")
+        if not hb then return false end
+
+        for _, slot in ipairs(hb:GetChildren()) do
+            local idx = tonumber(slot.Name)
+            if idx then
+                local frame = slot:FindFirstChild("Frame")
+                local tn = frame and frame:FindFirstChild("ToolName")
+                if tn and tn.Text == name then
+                    local fallback = {
+                        Enum.KeyCode.One, Enum.KeyCode.Two, Enum.KeyCode.Three,
+                        Enum.KeyCode.Four, Enum.KeyCode.Five, Enum.KeyCode.Six,
+                        Enum.KeyCode.Seven, Enum.KeyCode.Eight, Enum.KeyCode.Nine,
+                        Enum.KeyCode.Zero,
+                    }
+                    local kc = fallback[idx]
+
+                    if kc then
+                        VirtualInputManager:SendKeyEvent(true, kc, false, player)
+                        task.wait(0.05)
+                        VirtualInputManager:SendKeyEvent(false, kc, false, player)
+                        return true
+                    end
+                end
+            end
+        end
+        return false
+    end
+
+    -- ====================================================================
+    --  PRIORITY TABLES & CONFIG LOADING (Versioned v1.1)
+    -- ====================================================================
+
+    local PRIORITY_CONFIG_VERSION = 1.1
+
+    local DefaultOrePriority      = {
+        ["Crimson Crystal"] = 1,
+        ["Violet Crystal"]  = 1,
+        ["Cyan Crystal"]    = 1,
+        ["Earth Crystal"]   = 1,
+        ["Light Crystal"]   = 1,
+        ["Volcanic Rock"]   = 2,
+        ["Basalt Vein"]     = 3,
+        ["Basalt Core"]     = 4,
+        ["Basalt Rock"]     = 5,
+        ["Boulder"]         = 6,
+        ["Rock"]            = 6,
+        ["Pebble"]          = 6,
+        ["Lucky Block"]     = 6,
+    }
+
+    local PermOreList             = {
+        "Crimson Crystal",
+        "Cyan Crystal",
+        "Earth Crystal",
+        "Light Crystal",
+        "Volcanic Rock",
+        "Basalt Vein",
+        "Basalt Core",
+    }
+
+    local DefaultEnemyPriority    = {
+        ["Blazing Slime"]           = 1,
+        ["Blight Pyromancer"]       = 2,
+        ["Elite Deathaxe Skeleton"] = 2,
+        ["Reaper"]                  = 3,
+        ["Elite Rogue Skeleton"]    = 4,
+        ["Deathaxe Skeleton"]       = 5,
+        ["Axe Skeleton"]            = 6,
+        ["Skeleton Rogue"]          = 7,
+        ["Bomber"]                  = 8,
+        ["Slime"]                   = 9,
+        ["MinerZombie"]             = 9,
+        ["EliteZombie"]             = 9,
+        ["Zombie"]                  = 9,
+        ["Delver Zombie"]           = 9,
+        ["Brute Zombie"]            = 9,
+    }
+
+    local OrePriority             = {}
+    local EnemyPriority           = {}
+
+    -- start with defaults in memory
+    for k, v in pairs(DefaultOrePriority) do OrePriority[k] = v end
+    for k, v in pairs(DefaultEnemyPriority) do EnemyPriority[k] = v end
+
+    local PriorityConfigFile = "Cerberus/The Forge/PriorityConfig.json"
+
+    local function writeDefaultPriorityConfig()
+        local payload = {
+            Version = PRIORITY_CONFIG_VERSION,
+            Ores    = DefaultOrePriority,
+            Enemies = DefaultEnemyPriority,
+        }
+
+        pcall(function()
+            writefile(PriorityConfigFile, HttpService:JSONEncode(payload))
+        end)
+    end
+
+    local function applyDefaultPriorities()
+        OrePriority   = {}
+        EnemyPriority = {}
+
+        for k, v in pairs(DefaultOrePriority) do OrePriority[k] = v end
+        for k, v in pairs(DefaultEnemyPriority) do EnemyPriority[k] = v end
+    end
+
+    local function loadPriorityConfig()
+        if not isfolder("Cerberus") then makefolder("Cerberus") end
+        if not isfolder("Cerberus/The Forge") then makefolder("Cerberus/The Forge") end
+
+        if not (isfile and readfile and writefile) then
+            return -- API missing
+        end
+
+        if isfile(PriorityConfigFile) then
+            local success, result = pcall(function()
+                return HttpService:JSONDecode(readfile(PriorityConfigFile))
+            end)
+
+            if success and type(result) == "table" then
+                -- Check for Version
+                local fileVersion = tonumber(result.Version)
+
+                -- Legacy/Editor auto-patch logic
+                if not fileVersion then
+                    if (result.Ores and type(result.Ores) == "table") or (result.Enemies and type(result.Enemies) == "table") then
+                        warn("[Config] Legacy format detected. Auto-patching to v" .. PRIORITY_CONFIG_VERSION)
+                        result.Version = PRIORITY_CONFIG_VERSION
+                        pcall(function()
+                            writefile(PriorityConfigFile, HttpService:JSONEncode(result))
+                        end)
+                        fileVersion = PRIORITY_CONFIG_VERSION
+                    else
+                        fileVersion = 0
+                    end
+                end
+
+                -- Check if Outdated
+                if fileVersion < PRIORITY_CONFIG_VERSION then
+                    applyDefaultPriorities()
+                    writeDefaultPriorityConfig()
+                    notify(
+                        "Priority config outdated (v" ..
+                        fileVersion .. " vs v" .. PRIORITY_CONFIG_VERSION .. "). Resetting.",
+                        5)
+                    return
+                end
+
+                -- Load Ores
+                if type(result.Ores) == "table" then
+                    OrePriority = {}
+                    for k, v in pairs(result.Ores) do
+                        OrePriority[k] = tonumber(v) or 999
+                    end
+                else
+                    for k, v in pairs(DefaultOrePriority) do OrePriority[k] = v end
+                end
+
+                -- Load Enemies
+                if type(result.Enemies) == "table" then
+                    EnemyPriority = {}
+                    for k, v in pairs(result.Enemies) do
+                        EnemyPriority[k] = tonumber(v) or 999
+                    end
+                else
+                    for k, v in pairs(DefaultEnemyPriority) do EnemyPriority[k] = v end
+                end
+            else
+                -- Decode failed
+                applyDefaultPriorities()
+                writeDefaultPriorityConfig()
+                notify("Config corrupted. Reset to defaults.", 5)
+            end
+        else
+            -- No file exists
+            applyDefaultPriorities()
+            writeDefaultPriorityConfig()
+        end
+    end
+
+    loadPriorityConfig()
+
+    local function getTargetPriorityForMode(modeName, baseName)
+        if modeName == "Ores" then
+            return (OrePriority[baseName]) or (DefaultOrePriority[baseName]) or 999
+        elseif modeName == "Enemies" then
+            return (EnemyPriority[baseName]) or (DefaultEnemyPriority[baseName]) or 999
+        end
+        return 999
+    end
+
+    -- ====================================================================
+    --  FARM STATE + FLAGS
+    -- ====================================================================
+
+    local AvoidLava            = false
+    local AvoidPlayers         = false
+    local DamageDitchEnabled   = false
+    local DamageDitchThreshold = 100
+    local TargetFullHealth     = false
+    local PlayerAvoidRadius    = 40
+
+    local AttackNearbyMobs     = false
+    local NearbyMobRange       = 40
+
+    local OreWhitelistEnabled  = false
+    local WhitelistedOres      = {}
+    local WhitelistAppliesTo   = {}
+
+    local ZoneWhitelistEnabled = false
+    local WhitelistedZones     = {}
+
+    local TargetBlacklist      = {}
 
     local FarmState            = {
         enabled             = false,
         mode                = "Ores",
         nameMap             = {},
-        -- Potion interop
+
+        -- Potion Interop
         restocking          = false,
         potionThread        = nil,
-        -- Current target data
+
         currentTarget       = nil,
-        tempMobTarget       = nil,
-        attached            = false,
         moveCleanup         = nil,
         farmThread          = nil,
         noclipConn          = nil,
+
+        attached            = false,
         lastHit             = 0,
         detourActive        = false,
         detourNotified      = false,
+
         lastTargetRef       = nil,
         lastTargetHealth    = 0,
         stuckStartTime      = 0,
+
         lastMovePos         = Vector3.zero,
         lastMoveTime        = 0,
+
         LastLocalHealth     = 100,
+        tempMobTarget       = nil,
         avoidingPlayer      = false,
         lastAvoidMoveTime   = 0,
         lastAvoidNoticeTime = 0,
     }
 
-    local BossState            = {
-        enabled          = false,
-        spawnInProgress  = false,
-        bossTarget       = nil,
-        lastTimerText    = nil,
-        lastReadyAttempt = 0,
-        lastFailedAttempt = 0,
-        initialSpawnAttempted = false,
-        watchThread      = nil,
-        lastSpawnAttempt = 0,
-        spawnThread      = nil,
-        prevOffset       = nil,
-        multiBossActive  = false,
-        lastBossSeen     = 0,
-    }
-
-    local BOSS_READY_TEXT      = "30:00"
-    local BOSS_SPAWN_TIMEOUT   = 5
-    local BOSS_RETRY_COOLDOWN  = 10
-    local BOSS_ATTACH_WINDOW   = 900
-    local BOSS_DUPE_ITERATIONS = 120
-    local BOSS_DUPE_YIELD_EVERY = 8
-    local BOSS_CLEAR_TIMEOUT   = 8
-
-    ----------------------------------------------------------------
-    -- MODULE LOADER (file -> GitHub fallback)
-    ----------------------------------------------------------------
-    local function loadModule(moduleName)
-        local path = "Cerberus/The Forge/" .. moduleName .. ".lua"
-        local chunk
-        if isfile and isfile(path) then
-            chunk = readfile(path)
-        else
-            chunk = game:HttpGet(
-                "https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/the-forge/auto-farm-modules/" ..
-                moduleName .. ".lua"
-            )
-        end
-
-        local loader, err = loadstring(chunk)
-        if not loader then
-            error("Error loading module " .. moduleName .. ": " .. tostring(err))
-        end
-
-        local moduleFunc = loader()
-        if typeof(moduleFunc) ~= "function" then
-            error("Module " .. moduleName .. " did not return a function!")
-        end
-        return moduleFunc
-    end
-
-    -- Load each module with context
-    local Helpers = loadModule("AF_Helpers")({
-        References          = References,
-        Library             = Library,
-        Services            = Services,
-        VirtualInputManager = VirtualInputManager,
-    })
-
-    local Remotes = loadModule("AF_Remotes")({
-        Services = Services,
-    })
-
-    local Priority = loadModule("AF_Priority")({
-        HttpService = HttpService,
-        notify      = function(msg, t)
-            Helpers.notify(msg, t)
-        end,
-    })
-
-    local QuestTargets = loadModule("AF_QuestTargets")({
-        Services     = Services,
-        RefreshDelay = 4,
-    })
-
-    local Ores = loadModule("AF_Ores")({
-        Services    = Services,
-        References  = References,
-        AttachPanel = AttachPanel,
-        Players     = Players,
-        AF_Config   = AF_Config,
-    })
-
-    local Mobs = loadModule("AF_Mobs")({
-        Services    = Services,
-        getLocalHRP = Helpers.getLocalHRP,
-        AF_Config   = AF_Config,
-    })
-
-    local Movement = loadModule("AF_Movement")({
-        AttachPanel = AttachPanel,
-        MoveToPos   = MoveToPos,
-        getLocalHRP = Helpers.getLocalHRP,
-        FarmState   = FarmState,
-        AF_Config   = AF_Config,
-        Services    = Services,
-        References  = References,
-    })
-
-    local Avoidance = loadModule("AF_Avoidance")({
-        Services    = Services,
-        References  = References,
-        getLocalHRP = Helpers.getLocalHRP,
-        MoveToPos   = MoveToPos,
-        stopMoving  = function()
-            if Movement.stopMoving then
-                Movement.stopMoving()
-            end
-        end,
-        FarmState   = FarmState,
-        AF_Config   = AF_Config,
-    })
-
-    local Potions = loadModule("AF_Potions")({
-        Services        = Services,
-        Options         = Options,
-        Toggles         = Toggles,
-        FarmState       = FarmState,
-        PurchaseRF      = Remotes.PurchaseRF,
-        ToolActivatedRF = Remotes.ToolActivatedRF,
-        notify          = Helpers.notify,
-        AttachPanel     = AttachPanel,
-        stopMoving      = function()
-            if Movement.stopMoving then
-                Movement.stopMoving()
-            end
-        end,
-    })
-
-    local Tracker = loadModule("AF_Tracker")({
-        Services       = Services,
-        HttpService    = HttpService,
-        notify         = Helpers.notify,
-        getLocalHRP    = Helpers.getLocalHRP,
-        rockHealth     = Ores.rockHealth,
-        getRocksFolder = Ores.getRocksFolder,
-        ConfigFile     = "Cerberus/The Forge/HudConfig.json",
-    })
-
-    -- NEW: Autofarm Dashboard (standalone HUD)
-    local Dashboard = nil
-    local okDash, errDash = pcall(function()
-        Dashboard = loadModule("AF_Dashboard")({
-            Services   = Services,
-            References = References,
-            Library    = Library,
-            META       = META,
-        })
-    end)
-    if not okDash then
-        warn("[AutoFarm] Failed to load AF_Dashboard:", errDash)
-        Dashboard = nil
-    end
-
-    -- Helper: is dashboard toggle actually ON?
-    local function dashboardEnabled()
-        return Dashboard
-            and Toggles
-            and Toggles.AF_DashboardEnabled
-            and Toggles.AF_DashboardEnabled.Value
-    end
-
-    ----------------------------------------------------------------
-    -- Alias commonly used module functions for clarity
-    ----------------------------------------------------------------
-    local getLocalHRP                = Helpers.getLocalHRP
-    local notify                     = Helpers.notify
-    local swingTool                  = Remotes.swingTool
-    local stopMoving                 = Movement.stopMoving
-    local startMovingToTarget        = Movement.startMovingToTarget
-    local attachToTarget             = Movement.attachToTarget
-    local realignAttach              = Movement.realignAttach
-    local saveAttachSettings         = Movement.saveAttachSettings
-    local restoreAttachSettings      = Movement.restoreAttachSettings
-    local isPointInHazard            = Avoidance.isPointInHazard
-    local isAnyPlayerNearHRP         = Avoidance.isAnyPlayerNearHRP
-    local isAnyPlayerNearPosition    = Avoidance.isAnyPlayerNearPosition
-    local moveAwayFromNearbyPlayers  = Avoidance.moveAwayFromNearbyPlayers
-    local isRockLastHitByOther       = Ores.isRockLastHitByOther
-    local isMobAlive                 = Mobs.isMobAlive
-    local getMobRoot                 = Mobs.getMobRoot
-    local findNearbyEnemy            = Mobs.findNearbyEnemy
-    local questTargets               = QuestTargets
-
-    local PartyActivateRF            = nil
-    local ProximityFunctionalsRF     = nil
-
-    local function isAttachActive()
-        local state = AttachPanel and AttachPanel.State
-        if not state then
-            return true
-        end
-        local attach = state._attachA1
-        return attach and attach.Parent ~= nil
-    end
-
-    local function isBossModel(model)
-        return model
-            and model:IsA("Model")
-            and tostring(model.Name):match("^Golem%d+$")
-    end
-
-    local function findAliveGolem()
-        local living = (Workspace and Workspace:FindFirstChild("Living")) or workspace:FindFirstChild("Living")
-        if not living then
-            return nil
-        end
-
-        local hrp = getLocalHRP()
-        local best, bestDist
-        for _, model in ipairs(living:GetChildren()) do
-            if isBossModel(model) and isMobAlive(model) then
-                if not hrp then
-                    local root = getMobRoot(model)
-                    if root then
-                        return model
-                    end
-                    continue
-                end
-                local root = getMobRoot(model)
-                if not root then
-                    continue
-                end
-                local dist = root and (root.Position - hrp.Position).Magnitude or math.huge
-                if not bestDist or dist < bestDist then
-                    bestDist = dist
-                    best     = model
-                end
-            end
-        end
-
-        return best
-    end
-
-    local function getBossCreateParty()
-        local proximity = Workspace and Workspace:FindFirstChild("Proximity")
-        return proximity and proximity:FindFirstChild("CreateParty")
-    end
-
-    local function getBossTimerLabel()
-        local createParty = getBossCreateParty()
-        local golem       = createParty and createParty:FindFirstChild("Golem")
-        local timer       = golem and golem:FindFirstChild("Timer")
-        local container   = timer and timer:FindFirstChild("Container")
-        local label       = container and container:FindFirstChild("Label")
-        return label
-    end
-
-    local function getBossPrompt()
-        local createParty = getBossCreateParty()
-        return createParty and createParty:FindFirstChild("ProximityPrompt")
-    end
-
-    local function resolveBossPromptPart(prompt)
-        if not prompt then
-            return nil
-        end
-
-        local parent = prompt.Parent
-        if parent and parent:IsA("Attachment") then
-            parent = parent.Parent
-        end
-        if parent and parent:IsA("BasePart") then
-            return parent
-        end
-
-        local ok, adornee = pcall(function()
-            return prompt.Adornee
-        end)
-        if ok and adornee and adornee:IsA("BasePart") then
-            return adornee
-        end
-
-        return nil
-    end
-
-    local function isDoBossesToggleOn()
-        return Toggles and Toggles.AF_DoBosses and Toggles.AF_DoBosses.Value == true
-    end
-
-    local function isBossDupeToggleOn()
-        return Toggles and Toggles.AF_BossDupe and Toggles.AF_BossDupe.Value == true
-    end
-
-    local function isBossAttachWindowOpen()
-        local lastAttempt = BossState.lastSpawnAttempt or 0
-        if lastAttempt <= 0 then
-            return false
-        end
-        return (os.clock() - lastAttempt) <= BOSS_ATTACH_WINDOW
-    end
-
-    local function isBossCleanupActive()
-        return isBossAttachWindowOpen() or BossState.multiBossActive == true
-    end
-
-    local function markBossSeen(boss)
-        if boss then
-            BossState.lastBossSeen = os.clock()
-            BossState.multiBossActive = true
-        end
-    end
-
-    local function isBossReady()
-        local label = getBossTimerLabel()
-        local text = label and tostring(label.Text) or BossState.lastTimerText
-        return text == BOSS_READY_TEXT
-    end
-
-    local function getBossPromptTimeout(targetPart)
-        local hrp = getLocalHRP()
-        if not hrp or not targetPart then
-            return 6
-        end
-        if AF_Config.MovementMode == "Teleport" then
-            return 2
-        end
-
-        local dist = (hrp.Position - targetPart.Position).Magnitude
-        local speed = tonumber(AF_Config.FarmSpeed) or 80
-        local travel = dist / math.max(speed, 1)
-        return math.clamp(travel + 3, 6, 30)
-    end
-
-    local function resolveBossActivateRF()
-        if PartyActivateRF and PartyActivateRF.Parent then
-            return PartyActivateRF
-        end
-
-        local ok, result = pcall(function()
-            return game:GetService("ReplicatedStorage")
-                :WaitForChild("Shared")
-                :WaitForChild("Packages")
-                :WaitForChild("Knit")
-                :WaitForChild("Services")
-                :WaitForChild("PartyService")
-                :WaitForChild("RF")
-                :WaitForChild("Activate")
-        end)
-
-        if ok then
-            PartyActivateRF = result
-        end
-
-        return PartyActivateRF
-    end
-
-    local function resolveProximityFunctionalsRF()
-        if ProximityFunctionalsRF and ProximityFunctionalsRF.Parent then
-            return ProximityFunctionalsRF
-        end
-
-        local ok, result = pcall(function()
-            return game:GetService("ReplicatedStorage")
-                :WaitForChild("Shared")
-                :WaitForChild("Packages")
-                :WaitForChild("Knit")
-                :WaitForChild("Services")
-                :WaitForChild("ProximityService")
-                :WaitForChild("RF")
-                :WaitForChild("Functionals")
-        end)
-
-        if ok then
-            ProximityFunctionalsRF = result
-        end
-
-        return ProximityFunctionalsRF
-    end
-
-    local function tryBossDupe(prompt)
-        if not (isBossDupeToggleOn() and prompt and fireproximityprompt) then
-            return false
-        end
-
-        local createParty = getBossCreateParty()
-        local proximityRF = resolveProximityFunctionalsRF()
-        local activateRF  = resolveBossActivateRF()
-        if not (createParty and proximityRF and activateRF) then
-            return false
-        end
-
-        local function fireProximity()
-            pcall(function()
-                proximityRF:InvokeServer(createParty)
-            end)
-        end
-
-        local function fireActivate()
-            pcall(function()
-                activateRF:InvokeServer()
-            end)
-        end
-
-        for i = 1, BOSS_DUPE_ITERATIONS do
-            if not BossState.enabled then
-                break
-            end
-            task.spawn(fireProximity)
-            task.spawn(fireActivate)
-            pcall(fireproximityprompt, prompt)
-            if (i % BOSS_DUPE_YIELD_EVERY) == 0 then
-                task.wait()
-            end
-        end
-
-        return true
-    end
-
-    local function moveToBossPrompt(prompt)
-        local hrp = getLocalHRP()
-        if not hrp or not prompt then
-            return nil
-        end
-
-        local targetPart = resolveBossPromptPart(prompt)
-        if not targetPart then
-            return nil
-        end
-
-        stopMoving()
-        if AttachPanel.DestroyAttach then
-            pcall(AttachPanel.DestroyAttach)
-        end
-        FarmState.attached      = false
-        FarmState.tempMobTarget = nil
-
-        local targetPos = targetPart.Position + Vector3.new(0, 3, 0)
-        if AF_Config.MovementMode == "Teleport" then
-            hrp.CFrame = CFrame.new(targetPos)
-            hrp.AssemblyLinearVelocity = Vector3.zero
-            hrp.AssemblyAngularVelocity = Vector3.zero
-        else
-            FarmState.moveCleanup = MoveToPos(targetPos, AF_Config.FarmSpeed)
-        end
-
-        return targetPart
-    end
-
-    local function waitForBossPromptReach(targetPart, timeout)
-        local hrp = getLocalHRP()
-        if not hrp or not targetPart then
-            return false
-        end
-
-        local start = os.clock()
-        while os.clock() - start < (timeout or 4) do
-            if not BossState.enabled then
-                return false
-            end
-            local dist = (hrp.Position - targetPart.Position).Magnitude
-            if dist <= 8 then
-                return true
-            end
-            task.wait(0.05)
-        end
-
-        return false
-    end
-
-    local function attemptBossSpawn(reason)
-        if not BossState.enabled or BossState.spawnInProgress then
-            return
-        end
-
-        local existingBoss = findAliveGolem()
-        if existingBoss then
-            markBossSeen(existingBoss)
-            if isBossCleanupActive() then
-                BossState.bossTarget = existingBoss
-            end
-            return
-        end
-
-        local now = os.clock()
-        local lastFail = BossState.lastFailedAttempt or 0
-        if (now - lastFail) < BOSS_RETRY_COOLDOWN then
-            return
-        end
-        if (now - (BossState.lastSpawnAttempt or 0)) < 2 then
-            return
-        end
-        BossState.lastSpawnAttempt = now
-        BossState.spawnInProgress  = true
-        BossState.multiBossActive  = true
-        BossState.lastBossSeen     = now
-
-        BossState.spawnThread = task.spawn(function()
-            local spawned = false
-            local ok, err = pcall(function()
-                if not BossState.enabled then
-                    return
-                end
-
-                stopMoving()
-                if AttachPanel.DestroyAttach then
-                    pcall(AttachPanel.DestroyAttach)
-                end
-                FarmState.currentTarget = nil
-                FarmState.tempMobTarget = nil
-                FarmState.attached      = false
-                FarmState.detourActive  = false
-
-                local prompt = getBossPrompt()
-                if not prompt then
-                    BossState.lastFailedAttempt = os.clock()
-                    return
-                end
-
-                local targetPart = moveToBossPrompt(prompt)
-                if not targetPart then
-                    BossState.lastFailedAttempt = os.clock()
-                    return
-                end
-
-                local reached = waitForBossPromptReach(targetPart, getBossPromptTimeout(targetPart))
-                if not reached then
-                    BossState.lastFailedAttempt = os.clock()
-                    return
-                end
-                stopMoving()
-                if not BossState.enabled then
-                    return
-                end
-
-                local preDupeWait = isBossDupeToggleOn() and 0.1 or 1
-                task.wait(preDupeWait)
-                local duped = tryBossDupe(prompt)
-                if not duped then
-                    if prompt and fireproximityprompt then
-                        pcall(fireproximityprompt, prompt)
-                    end
-                    if not BossState.enabled then
-                        return
-                    end
-
-                    task.wait(1)
-                    local activateRF = resolveBossActivateRF()
-                    if activateRF then
-                        pcall(function()
-                            activateRF:InvokeServer()
-                        end)
-                    end
-                end
-
-                local start = os.clock()
-                while BossState.enabled and (os.clock() - start) < BOSS_SPAWN_TIMEOUT do
-                    local golem = findAliveGolem()
-                    if golem then
-                        spawned = true
-                        BossState.lastFailedAttempt = 0
-                        markBossSeen(golem)
-                        BossState.bossTarget      = golem
-                        FarmState.currentTarget   = golem
-                        FarmState.attached        = false
-                        FarmState.tempMobTarget   = nil
-                        FarmState.lastTargetRef   = nil
-                        FarmState.lastTargetHealth = 0
-                        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                            Dashboard.setCurrentTarget(golem.Name)
-                        end
-                        return
-                    end
-                    task.wait(0.2)
-                end
-
-                if not spawned then
-                    BossState.lastFailedAttempt = os.clock()
-                end
-            end)
-
-            if not ok then
-                warn("[AutoFarm] Boss spawn error:", err)
-            end
-
-            BossState.spawnInProgress = false
-            BossState.spawnThread     = nil
-        end)
-    end
-
-    local function bossWatchLoop()
-        while BossState.enabled do
-            local label = getBossTimerLabel()
-            local text  = label and tostring(label.Text) or nil
-            if text == BOSS_READY_TEXT then
-                local now = os.clock()
-                local shouldAttempt = (BossState.lastTimerText ~= BOSS_READY_TEXT)
-                    or ((now - (BossState.lastReadyAttempt or 0)) >= BOSS_RETRY_COOLDOWN)
-                if shouldAttempt then
-                    BossState.lastReadyAttempt = now
-                    attemptBossSpawn("timer")
-                end
-            end
-
-            if text ~= BossState.lastTimerText then
-                BossState.lastTimerText = text
-                if text ~= BOSS_READY_TEXT then
-                    BossState.lastReadyAttempt = 0
-                end
-            end
-            task.wait(0.1)
-        end
-    end
-
-    local function startBossWatcher()
-        if BossState.watchThread then
-            return
-        end
-        BossState.lastTimerText = nil
-        BossState.lastReadyAttempt = 0
-        BossState.watchThread   = task.spawn(bossWatchLoop)
-    end
-
-    local function stopBossWatcher()
-        BossState.watchThread = nil
-        BossState.lastTimerText = nil
-        BossState.lastReadyAttempt = 0
-    end
-
-    local function applyBossOffset()
-        if BossState.prevOffset == nil then
-            BossState.prevOffset = AF_Config.ExtraYOffset
-        end
-        local bossOffset = tonumber(AF_Config.BossExtraYOffset) or -15
-        if AF_Config.ExtraYOffset ~= bossOffset then
-            AF_Config.ExtraYOffset = bossOffset
-            if FarmState.enabled and FarmState.currentTarget and FarmState.attached then
-                Movement.realignAttach(FarmState.currentTarget)
-            end
-        end
-    end
-
-    local function restoreBossOffset()
-        if BossState.prevOffset ~= nil then
-            AF_Config.ExtraYOffset = BossState.prevOffset
-            BossState.prevOffset = nil
-            if FarmState.enabled and FarmState.currentTarget and FarmState.attached then
-                Movement.realignAttach(FarmState.currentTarget)
-            end
-        end
-    end
-
-    local AUTO_QUEST_SCAN_INTERVAL   = 5
-    local AUTO_QUEST_REPEAT_INTERVAL = 60
-
-    local RunCommandRemote           = nil
-    local QuestServiceRemote         = nil
-    local autoQuestMissingWarn       = false
-    local AutoQuestState             = {
-        running         = false,
-        thread          = nil,
-        lastCommandTime = {},
-    }
-
-    local function resolveRunCommandRemote()
-        if RunCommandRemote then
-            return RunCommandRemote
-        end
-
-        local storage = Services.ReplicatedStorage or game:GetService("ReplicatedStorage")
-        if not storage then
-            return nil
-        end
-
-        -- Safe child resolver with fallback to WaitForChild and a timeout
-        local function safeGetChild(parent, name, timeout)
-            if not parent then return nil end
-
-            local child = parent:FindFirstChild(name)
-            if child then return child end
-
-            timeout = timeout or 10
-            local ok, result = pcall(function()
-                return parent:WaitForChild(name, timeout)
-            end)
-
-            if ok then
-                return result
-            else
-                return nil
-            end
-        end
-
-        local function findServicesFolder()
-            local shared     = safeGetChild(storage, "Shared")
-            local packages   = safeGetChild(shared, "Packages") or safeGetChild(storage, "Packages")
-            local knitFolder = safeGetChild(packages, "Knit")
-            local services   = safeGetChild(knitFolder, "Services") or safeGetChild(packages, "Services")
-            if services then
-                return services
-            end
-            return safeGetChild(shared, "Services")
-        end
-
-        local services   = findServicesFolder()
-        local dialogue   = safeGetChild(services, "DialogueService")
-        local rf         = safeGetChild(dialogue, "RF")
-        local runCommand = safeGetChild(rf, "RunCommand")
-
-        if not runCommand then
-            for _, inst in ipairs(storage:GetDescendants()) do
-                if inst:IsA("RemoteFunction") and inst.Name == "RunCommand" then
-                    runCommand = inst
-                    break
-                end
-            end
-        end
-
-        if runCommand then
-            RunCommandRemote = runCommand
-        end
-
-        return RunCommandRemote
-    end
-
-    local function resolveQuestService()
-        if QuestServiceRemote then
-            return QuestServiceRemote
-        end
-
-        local storage = Services.ReplicatedStorage or game:GetService("ReplicatedStorage")
-        if not storage then
-            return nil
-        end
-
-        local function safeGetChild(parent, name, timeout)
-            if not parent then return nil end
-
-            local child = parent:FindFirstChild(name)
-            if child then return child end
-
-            timeout = timeout or 10
-            local ok, result = pcall(function()
-                return parent:WaitForChild(name, timeout)
-            end)
-
-            if ok then
-                return result
-            else
-                return nil
-            end
-        end
-
-        local shared     = safeGetChild(storage, "Shared")
-        local packages   = safeGetChild(shared, "Packages") or safeGetChild(storage, "Packages")
-        local knitHolder = safeGetChild(packages, "Knit") or safeGetChild(shared, "Knit") or safeGetChild(storage, "Knit")
-        local knitModule = knitHolder
-        if knitModule and knitModule:IsA("Folder") then
-            knitModule = safeGetChild(knitModule, "Knit")
-        end
-        if not knitModule or not knitModule:IsA("ModuleScript") then
-            return nil
-        end
-
-        local okKnit, Knit = pcall(require, knitModule)
-        if not okKnit or type(Knit) ~= "table" or type(Knit.GetService) ~= "function" then
-            return nil
-        end
-
-        local okService, service = pcall(Knit.GetService, Knit, "QuestService")
-        if okService and service then
-            QuestServiceRemote = service
-        end
-        return QuestServiceRemote
-    end
-
-    local function tryQuestServiceFinish(service, questId)
-        if not service or not questId then
-            return false
-        end
-        local methods = {
-            "CompleteQuest",
-            "FinishQuest",
-            "TurnInQuest",
-            "ClaimQuest",
+    -- ====================================================================
+    --  CONFIG SYSTEM (HUD)
+    -- ====================================================================
+
+    local ConfigFolder         = "Cerberus/The Forge"
+    local ConfigFile           = ConfigFolder .. "/HudConfig.json"
+
+    local function saveHudConfig(position, size)
+        if not isfolder("Cerberus") then makefolder("Cerberus") end
+        if not isfolder("Cerberus/The Forge") then makefolder("Cerberus/The Forge") end
+
+        local data = {
+            X = position.X.Offset,
+            Y = position.Y.Offset,
+            SX = size.X.Offset,
+            SY = size.Y.Offset
         }
-        for _, methodName in ipairs(methods) do
-            local fn = service[methodName]
-            if type(fn) == "function" then
-                local ok = pcall(fn, service, questId)
-                if ok then
-                    return true
-                end
-            end
-        end
-        return false
+        writefile(ConfigFile, HttpService:JSONEncode(data))
     end
 
-    local function collectQuestListFrames()
-        local player = Players.LocalPlayer
-        if not player then
-            return {}
-        end
-        local gui = player:FindFirstChild("PlayerGui")
-        if not gui then
-            return {}
-        end
-        local main = gui:FindFirstChild("Main")
-        if not main then
-            return {}
-        end
-        local screen = main:FindFirstChild("Screen")
-        local quests = screen and screen:FindFirstChild("Quests")
-        local listFolder = quests and quests:FindFirstChild("List")
-        if not listFolder then
-            return {}
-        end
-        local questFrames = {}
-        for _, child in ipairs(listFolder:GetChildren()) do
-            if child:IsA("Frame") and child.Name:match("List$") then
-                table.insert(questFrames, child)
-            end
-        end
-        return questFrames
-    end
-
-    local function buildQuestFinishCommand(listName)
-        if not listName or listName == "" then
-            return nil
-        end
-        local questIndex = listName:match("Quest(%d+)List$")
-        if questIndex then
-            return "FinishQuest" .. questIndex
-        end
-        local base = listName
-        if #base > 4 and base:sub(-4) == "List" then
-            base = base:sub(1, -5)
-        end
-        if base == "" then
-            return nil
-        end
-        return "Finish" .. base
-    end
-
-    local function invokeQuestCommand(commandName, remote)
-        if not commandName or not remote then
-            return false
-        end
-        local ok, err = pcall(function()
-            remote:InvokeServer(commandName)
-        end)
-        if not ok then
-            warn("[AutoFarm] Quest Autocomplete failed for " .. commandName .. ": " .. tostring(err))
-        end
-        return ok
-    end
-
-    local function runAutoQuestLoop()
-        while AutoQuestState.running do
-            local questData = questTargets and questTargets.getQuestData and questTargets.getQuestData()
-            local questIds = questTargets and questTargets.getActiveQuestIds and questTargets.getActiveQuestIds()
-            local questService = resolveQuestService()
-            local remote = resolveRunCommandRemote()
-
-            if questData and questIds and questTargets and questTargets.isQuestCompleted then
-                if not questService and not remote then
-                    if not autoQuestMissingWarn then
-                        warn("[AutoFarm] Cannot find QuestService or RunCommand for quest autocomplete.")
-                        autoQuestMissingWarn = true
-                    end
-                else
-                    autoQuestMissingWarn = false
-                    local now = os.clock()
-                    for _, questId in ipairs(questIds) do
-                        if questTargets.isQuestCompleted(questId) then
-                            local key = "QuestFinish:" .. questId
-                            local lastTime = AutoQuestState.lastCommandTime[key]
-                            if not lastTime or (now - lastTime) >= AUTO_QUEST_REPEAT_INTERVAL then
-                                local finished = false
-                                if questService then
-                                    finished = tryQuestServiceFinish(questService, questId)
-                                end
-                                if not finished and remote then
-                                    local command = "Finish" .. questId
-                                    finished = invokeQuestCommand(command, remote)
-                                    if not finished and questTargets.getQuestSlot then
-                                        local slot = questTargets.getQuestSlot(questId)
-                                        if slot then
-                                            finished = invokeQuestCommand("FinishQuest" .. tostring(slot), remote)
-                                        end
-                                    end
-                                end
-                                if finished then
-                                    AutoQuestState.lastCommandTime[key] = now
-                                end
-                            end
-                        end
-                    end
-                end
-            else
-                if not remote then
-                    if not autoQuestMissingWarn then
-                        warn("[AutoFarm] Cannot find RunCommand RF for quest autocomplete.")
-                        autoQuestMissingWarn = true
-                    end
-                else
-                    autoQuestMissingWarn = false
-                    local now = os.clock()
-                    local frames = collectQuestListFrames()
-                    for _, frame in ipairs(frames) do
-                        local command = buildQuestFinishCommand(frame.Name)
-                        if command then
-                            local lastTime = AutoQuestState.lastCommandTime[command]
-                            if not lastTime or (now - lastTime) >= AUTO_QUEST_REPEAT_INTERVAL then
-                                if invokeQuestCommand(command, remote) then
-                                    AutoQuestState.lastCommandTime[command] = now
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-
-            local elapsed = 0
-            while AutoQuestState.running and elapsed < AUTO_QUEST_SCAN_INTERVAL do
-                task.wait(0.05)
-                elapsed = elapsed + 0.05
-            end
-        end
-    end
-
-    local function startAutoQuestLoop()
-        if AutoQuestState.running then
-            return
-        end
-        AutoQuestState.lastCommandTime = {}
-        AutoQuestState.running = true
-        AutoQuestState.thread = task.spawn(runAutoQuestLoop)
-    end
-
-    local function stopAutoQuestLoop()
-        AutoQuestState.running = false
-        AutoQuestState.thread = nil
-    end
-
-    ----------------------------------------------------------------
-    -- MODE DEFINITIONS (for target scanning and hitting)
-    ----------------------------------------------------------------
-    local FARM_MODE_ORES    = "Ores"
-    local FARM_MODE_ENEMIES = "Enemies"
-
-    local ModeDefs          = {
-        [FARM_MODE_ORES] = {
-            name          = FARM_MODE_ORES,
-            scan          = Ores.scanRocks,
-            isAlive       = Ores.isRockAlive,
-            getPos        = Ores.rockPosition,
-            getRoot       = Ores.rockRoot,
-            getHealth     = Ores.rockHealth,
-            attachMode    = "Aligned",
-            attachBaseY   = -8,
-            attachHoriz   = 0,
-            hitInterval   = 0.15,
-            hitDistance   = 20,
-            toolName      = "Pickaxe",
-            toolRemoteArg = "Pickaxe",
-        },
-
-        [FARM_MODE_ENEMIES] = {
-            name          = FARM_MODE_ENEMIES,
-            scan          = Mobs.scanMobs,
-            isAlive       = Mobs.isMobAlive,
-            getPos        = Mobs.mobPosition,
-            getRoot       = Mobs.getMobRoot,
-            getHealth     = Mobs.getMobHealth,
-            attachMode    = "Aligned",
-            attachBaseY   = -7,
-            attachHoriz   = 0,
-            hitInterval   = 0.15,
-            hitDistance   = 20,
-            toolName      = "Weapon",
-            toolRemoteArg = "Weapon",
-        },
-    }
-
-    ----------------------------------------------------------------
-    -- CORE HELPER FUNCTIONS (Blacklisting & target selection)
-    ----------------------------------------------------------------
-    local function isTargetBlacklisted(model)
-        if not model then
-            return false
-        end
-
-        local expiry = AF_Config.TargetBlacklist[model]
-        if not expiry then
-            return false
-        end
-
-        if (not model.Parent) or os.clock() >= expiry then
-            AF_Config.TargetBlacklist[model] = nil
-            return false
-        end
-
-        return true
-    end
-
-    local function blacklistTarget(model, duration)
-        if not model then
-            return
-        end
-        AF_Config.TargetBlacklist[model] = os.clock() + (duration or 60)
-    end
-
-    local function hasWhitelistSelections()
-        if not AF_Config.OreWhitelistEnabled then
-            return false
-        end
-
-        local whitelisted = AF_Config.WhitelistedOres or {}
-        return next(whitelisted) ~= nil
-    end
-
-    local function shouldHoldTargetForWhitelist(model)
-        if not model or not hasWhitelistSelections() then
-            return false
-        end
-
-        local appliesTo = AF_Config.WhitelistAppliesTo or {}
-        if not appliesTo[model.Name] then
-            return false
-        end
-
-        local whitelisted = AF_Config.WhitelistedOres or {}
-        for _, child in ipairs(model:GetChildren()) do
-            if child.Name == "Ore" then
-                local oreType = child:GetAttribute("Ore")
-                if oreType and whitelisted[oreType] then
-                    return true
-                end
-            end
-        end
-
-        return false
-    end
-
-    local function ensureAltDataFolder()
-        if not makefolder then
-            return
-        end
-        pcall(makefolder, "Cerberus")
-        pcall(makefolder, "Cerberus/The Forge")
-    end
-
-    local function applyAltNamesList(list)
-        local cleaned = {}
-        local seen = {}
-        for _, name in ipairs(list or {}) do
-            local normalized = tostring(name):match("^%s*(.-)%s*$")
-            if normalized ~= "" then
-                local key = normalized:lower()
-                if not seen[key] then
-                    seen[key] = true
-                    table.insert(cleaned, normalized)
-                end
-            end
-        end
-        AF_Config.AltNames   = cleaned
-        AF_Config.AltNameSet = {}
-        for _, name in ipairs(cleaned) do
-            AF_Config.AltNameSet[name:lower()] = true
-        end
-    end
-
-    local function loadAltNamesFromFile()
-        if not (isfile and isfile(ALT_FARM_DATA_FILE)) then
-            return {}
-        end
-
-        local ok, contents = pcall(readfile, ALT_FARM_DATA_FILE)
-        if not ok or not contents then
-            return {}
-        end
-
-        local result = {}
-        for line in tostring(contents):gmatch("[^\r\n]+") do
-            local normalized = line:match("^%s*(.-)%s*$")
-            if normalized ~= "" then
-                table.insert(result, normalized)
-            end
-        end
-        return result
-    end
-
-    local function saveAltNamesToFile()
-        if not writefile then
-            return
-        end
-        ensureAltDataFolder()
-        local serialized = table.concat(AF_Config.AltNames or {}, "\n")
-        pcall(writefile, ALT_FARM_DATA_FILE, serialized)
-    end
-
-    local function addAltName(name)
-        local normalized = tostring(name or ""):match("^%s*(.-)%s*$")
-        if normalized == "" then
-            return false, "Name is empty"
-        end
-        if AF_Config.AltNameSet[normalized:lower()] then
-            return false, "Already tracking " .. normalized
-        end
-        local list = { table.unpack(AF_Config.AltNames or {}) }
-        table.insert(list, normalized)
-        applyAltNamesList(list)
-        saveAltNamesToFile()
-        return true
-    end
-
-    local function notifyAltRoster()
-        local names = AF_Config.AltNames or {}
-        local msg
-        if #names == 0 then
-            msg = "No saved alts yet."
-        else
-            msg = "Alts: " .. table.concat(names, ", ")
-        end
-        notify("Alt Farm enabled. " .. msg, 3)
-    end
-
-    ensureAltDataFolder()
-    applyAltNamesList(loadAltNamesFromFile())
-
-    local function updateDashboardPlayers()
-        if not dashboardEnabled() or not Dashboard or not Dashboard.setNearbyPlayers then
-            return
-        end
-
-        local hrp = getLocalHRP()
-        if not hrp then
-            return
-        end
-
-        -- extra safety: if for some reason Players wasn’t bound, grab it now
-        local playersService = Players or game:GetService("Players")
-        if not playersService then return end
-
-        local data        = {}
-        local localPlayer = References.player or playersService.LocalPlayer
-
-        for _, plr in ipairs(playersService:GetPlayers()) do
-            if plr ~= localPlayer then
-                local char = plr.Character
-                local root = char and char:FindFirstChild("HumanoidRootPart")
-                if root then
-                    local dist = (root.Position - hrp.Position).Magnitude
-                    table.insert(data, {
-                        Player   = plr,
-                        Name     = (plr.DisplayName or plr.Name) .. " (" .. plr.Name .. ")",
-                        Distance = dist,
-                    })
-                end
-            end
-        end
-
-        table.sort(data, function(a, b)
-            return a.Distance < b.Distance
-        end)
-
-        Dashboard.setNearbyPlayers(data)
-    end
-
-    local function isHelperAltEnabled()
-        return AF_Config.AltFarmEnabled
-            and AF_Config.AltFarmMode == ALT_FARM_MODE_HELPER
-            and hasWhitelistSelections()
-    end
-
-    local function isMainAltEnabled()
-        return AF_Config.AltFarmEnabled
-            and AF_Config.AltFarmMode == ALT_FARM_MODE_MAIN
-            and hasWhitelistSelections()
-            and next(AF_Config.AltNameSet or {}) ~= nil
-    end
-
-    local function rockLastHitWasAlt(model)
-        if not model then
-            return false
-        end
-        local lastHit = model:GetAttribute("LastHitPlayer")
-        if not lastHit then
-            return false
-        end
-        local altSet = AF_Config.AltNameSet or {}
-        return altSet[tostring(lastHit):lower()] == true
-    end
-
-    local function getAltRockZone(model)
-        local rocksFolder = Ores.getRocksFolder()
-        if not rocksFolder or not model then
-            return nil
-        end
-        local current = model.Parent
-        while current and current ~= game do
-            if current.Parent == rocksFolder then
-                return current.Name
-            end
-            if current == rocksFolder then
-                return nil
-            end
-            current = current.Parent
+    local function loadHudConfig()
+        if isfile(ConfigFile) then
+            local success, result = pcall(function()
+                return HttpService:JSONDecode(readfile(ConfigFile))
+            end)
+            if success then return result end
         end
         return nil
     end
 
-    local function rockIsInAllowedZone(model)
-        if not AF_Config.ZoneWhitelistEnabled then
-            return true
-        end
-        local zone = getAltRockZone(model)
-        if not zone then
-            return false
-        end
-        return AF_Config.WhitelistedZones[zone] == true
-    end
+    -- ====================================================================
+    --  NOCLIP SYSTEM
+    -- ====================================================================
 
-    local function findAltWhitelistRock(hrp)
-        if not hrp then
-            return nil
-        end
-        local altSet = AF_Config.AltNameSet or {}
-        if next(altSet) == nil then
-            return nil
-        end
-
-        local rocksFolder = Ores.getRocksFolder()
-        if not rocksFolder then
-            return nil
-        end
-
-        local bestRock, bestDist = nil, math.huge
-        for _, inst in ipairs(rocksFolder:GetDescendants()) do
-            if inst:IsA("Model") then
-                local parent = inst.Parent
-                local isNested = (parent and parent ~= rocksFolder and parent:IsA("Model"))
-                if not isNested
-                    and Ores.rockHealth(inst)
-                    and shouldHoldTargetForWhitelist(inst) then
-                    if not rockIsInAllowedZone(inst) then
-                        continue
-                    end
-                    if isTargetBlacklisted(inst) then
-                        continue
-                    end
-                    local lastHit = inst:GetAttribute("LastHitPlayer")
-                    if lastHit and altSet[tostring(lastHit):lower()] then
-                        local pos = Ores.rockPosition(inst)
-                        if pos then
-                            local dist = (pos - hrp.Position).Magnitude
-                            if dist < bestDist then
-                                bestDist = dist
-                                bestRock = inst
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        return bestRock
-    end
-
-    -- CHANGED: chooseNearestTarget now feeds data into dashboard (if enabled)
-    local function chooseNearestTarget()
-        local hrp = getLocalHRP()
-        if not hrp then
-            return nil
-        end
-
-        local def = ModeDefs[FarmState.mode]
-        if not def or not def.scan then
-            return nil
-        end
-
-        if BossState.enabled and def.name == FARM_MODE_ENEMIES then
-            local boss = BossState.bossTarget
-            if boss and isMobAlive(boss) then
-                markBossSeen(boss)
-                if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                    Dashboard.setCurrentTarget(boss.Name)
-                end
-                return boss
-            end
-            if isBossCleanupActive() then
-                boss = findAliveGolem()
-                if boss then
-                    markBossSeen(boss)
-                    BossState.bossTarget = boss
-                    if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                        Dashboard.setCurrentTarget(boss.Name)
-                    end
-                    return boss
-                end
-            end
-        end
-
-        local helperAltActive = isHelperAltEnabled()
-        local mainAltActive   = isMainAltEnabled()
-        local questOverrideActive = AF_Config.QuestPriorityOverrideEnabled and questTargets
-
-        if questOverrideActive and questTargets.refresh then
-            questTargets.refresh()
-        end
-
-        local nameMap, uniqueNames = def.scan()
-        FarmState.nameMap          = nameMap or {}
-
-        local bestTarget, bestDist
-        local bestPriority         = math.huge
-
-        local wantDashboard        = dashboardEnabled()
-        local allList              = wantDashboard and {} or nil
-        local availList            = wantDashboard and {} or nil
-
-        for name, models in pairs(nameMap or {}) do
-            local priority = Priority.getTargetPriorityForMode(FarmState.mode, name)
-            if questOverrideActive
-                and questTargets.isQuestTarget
-                and questTargets.isQuestTarget(name) then
-                priority = priority - 1000
-            end
-
-            for _, model in ipairs(models) do
-                if model and model.Parent and def.isAlive(model) then
-                    if helperAltActive and shouldHoldTargetForWhitelist(model) then
-                        blacklistTarget(model, 60)
-                        continue
-                    end
-                    -- Count as "total" for dashboard
-                    if allList then
-                        table.insert(allList, model)
-                    end
-
-                    if isTargetBlacklisted(model) then
-                        -- total, but not available
-                        continue
-                    end
-
-                    if def.name == FARM_MODE_ORES and isRockLastHitByOther(model) then
-                        local allowAltRock = mainAltActive
-                            and rockLastHitWasAlt(model)
-                            and shouldHoldTargetForWhitelist(model)
-                        if not allowAltRock then
-                            -- tagged by others; not available
-                            continue
-                        end
-                    end
-
-                    local pos = def.getPos(model)
-                    if pos then
-                        local skip = false
-
-                        -- lava/hazard
-                        if not skip then
-                            local root = def.getRoot(model)
-                            if root then
-                                local offset = (AttachPanel.ComputeOffset and AttachPanel.ComputeOffset(
-                                    root.CFrame,
-                                    def.attachMode,
-                                    def.attachHoriz,
-                                    def.attachBaseY + AF_Config.ExtraYOffset
-                                )) or Vector3.new(0, def.attachBaseY + AF_Config.ExtraYOffset, 0)
-
-                                local attachPos = root.Position
-                                    + (typeof(offset) == "Vector3" and offset or Vector3.new(0, 0, 0))
-
-                                if isPointInHazard(attachPos) then
-                                    skip = true
-                                end
-                            end
-                        end
-
-                        -- player avoidance
-                        if not skip and AF_Config.AvoidPlayers then
-                            local nearTarget, _ = isAnyPlayerNearPosition(pos, AF_Config.PlayerAvoidRadius)
-                            if nearTarget then
-                                skip = true
-                            end
-                        end
-
-                        -- full-health-only (rocks)
-                        if not skip and AF_Config.TargetFullHealth and def.name == FARM_MODE_ORES then
-                            local h    = def.getHealth(model)
-                            local maxH = model:GetAttribute("MaxHealth")
-                            if h and maxH and h < maxH then
-                                skip = true
-                            end
-                        end
-
-                        if not skip then
-                            -- "available" for dashboard
-                            if availList then
-                                table.insert(availList, model)
-                            end
-
-                            local dist = (pos - hrp.Position).Magnitude
-                            if (priority < bestPriority)
-                                or (priority == bestPriority and (not bestDist or dist < bestDist)) then
-                                bestPriority = priority
-                                bestDist     = dist
-                                bestTarget   = model
-                            end
-                        end
-                    end
-                end
-            end
-        end
-
-        -- Send to dashboard
-        if wantDashboard and Dashboard then
-            if def.name == FARM_MODE_ORES and Dashboard.setRockLists then
-                Dashboard.setRockLists(allList or {}, availList or {})
-            elseif def.name == FARM_MODE_ENEMIES and Dashboard.setMobLists then
-                Dashboard.setMobLists(allList or {}, availList or {})
-            end
-
-            -- ADD THIS: Update current target highlight
-            if bestTarget then
-                local targetName = bestTarget:GetAttribute("OreName")
-                    or bestTarget:GetAttribute("MobName")
-                    or bestTarget:GetAttribute("EnemyName")
-                    or bestTarget.Name
-                Dashboard.setCurrentTarget(targetName)
-            else
-                Dashboard.setCurrentTarget(nil)
-            end
-        end
-
-        return bestTarget
-    end
-
-    ----------------------------------------------------------------
-    -- NOCLIP SYSTEM
-    ----------------------------------------------------------------
     local function enableNoclip()
-        if FarmState.noclipConn then
-            return
-        end
-
+        if FarmState.noclipConn then return end
         FarmState.noclipConn = RunService.Stepped:Connect(function()
             local char = References.character
             if char then
@@ -1537,70 +549,1352 @@ return function(ctx)
             FarmState.noclipConn:Disconnect()
             FarmState.noclipConn = nil
         end
-
         local char = References.character
         if char then
             local hrp = char:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                hrp.CanCollide = true
+            if hrp then hrp.CanCollide = true end
+        end
+    end
+
+    -- ====================================================================
+    --  ORE HELPERS
+    -- ====================================================================
+
+    local function getZoneFromDescendant(model)
+        local rocksFolder = getRocksFolder()
+        if not rocksFolder then return nil end
+
+        local current = model.Parent
+        while current and current ~= game do
+            if current.Parent == rocksFolder then return current.Name end
+            if current == rocksFolder then return nil end
+            current = current.Parent
+        end
+        return nil
+    end
+
+    local function scanRocks()
+        local rocksFolder = getRocksFolder()
+        local nameMap = {}
+        local uniqueNames = {}
+
+        if not rocksFolder then return nameMap, uniqueNames end
+
+        for _, inst in ipairs(rocksFolder:GetDescendants()) do
+            if inst:IsA("Model") then
+                local parent = inst.Parent
+                if not (parent and parent ~= rocksFolder and parent:IsA("Model")) then
+                    local passedZone = true
+                    if ZoneWhitelistEnabled then
+                        local zoneName = getZoneFromDescendant(inst)
+                        if not zoneName or not WhitelistedZones[zoneName] then passedZone = false end
+                    end
+
+                    if passedZone and rockHealth(inst) and not isRockLastHitByOther(inst) then
+                        local name = inst.Name
+                        if not nameMap[name] then
+                            nameMap[name] = {}
+                            uniqueNames[#uniqueNames + 1] = name
+                        end
+                        table.insert(nameMap[name], inst)
+                    end
+                end
+            end
+        end
+        table.sort(uniqueNames)
+        return nameMap, uniqueNames
+    end
+
+    local function getGameOreTypes()
+        local assets = Services.ReplicatedStorage:FindFirstChild("Assets")
+        local oresFolder = assets and assets:FindFirstChild("Ores")
+        local list = {}
+        if oresFolder then
+            for _, v in ipairs(oresFolder:GetChildren()) do table.insert(list, v.Name) end
+        end
+        table.sort(list)
+        return list
+    end
+
+    local function scanZones()
+        local rocksFolder = getRocksFolder()
+        local zones = {}
+        if rocksFolder then
+            for _, child in ipairs(rocksFolder:GetChildren()) do
+                if child:IsA("Folder") then table.insert(zones, child.Name) end
+            end
+        end
+        table.sort(zones)
+        return zones
+    end
+
+    -- ====================================================================
+    --  MOB HELPERS
+    -- ====================================================================
+
+    local function getLivingFolder()
+        local living = Services.Workspace:FindFirstChild("Living")
+        return (living and living:IsA("Folder")) and living or nil
+    end
+
+    local function normalizeMobName(name)
+        local base = tostring(name or "")
+        base = base:gsub("%d+$", ""):gsub("%s+$", "")
+        return base == "" and "Mob" or base
+    end
+
+    local function isPlayerModel(model)
+        if not model then return false end
+        for _, pl in ipairs(Services.Players:GetPlayers()) do
+            local char = pl.Character
+            if char and (model == char or model:IsDescendantOf(char)) then return true end
+            if model.Name == pl.Name or model.Name:find(pl.Name, 1, true) then return true end
+        end
+        return false
+    end
+
+    local function getMobRoot(model)
+        if not model or not model.Parent then return nil end
+        local hrp = model:FindFirstChild("HumanoidRootPart")
+        if hrp then return hrp end
+        if model.PrimaryPart then return model.PrimaryPart end
+        return model:FindFirstChildWhichIsA("BasePart")
+    end
+
+    local function mobPosition(model)
+        local root = getMobRoot(model)
+        return root and root.Position or nil
+    end
+
+    local function isMobAlive(model)
+        if not model or not model.Parent then return false end
+        local hum = model:FindFirstChildOfClass("Humanoid")
+        if not hum then return false end
+        if hum.Health <= 0 then return false end
+        if hum:GetState() == Enum.HumanoidStateType.Dead then return false end
+        return true
+    end
+
+    local function getMobHealth(model)
+        if not model or not model.Parent then return nil end
+        local hum = model:FindFirstChildOfClass("Humanoid")
+        return hum and hum.Health or nil
+    end
+
+    local function scanMobs()
+        local nameMap = {}
+        local names   = {}
+        local living  = getLivingFolder()
+        if not living then return nameMap, names end
+
+        for _, m in ipairs(living:GetChildren()) do
+            if m:IsA("Model") then
+                local hum = m:FindFirstChildOfClass("Humanoid")
+                if hum and not isPlayerModel(m) then
+                    local baseName = normalizeMobName(m.Name)
+                    local bucket = nameMap[baseName]
+                    if not bucket then
+                        bucket = {}
+                        nameMap[baseName] = bucket
+                        table.insert(names, baseName)
+                    end
+                    table.insert(bucket, m)
+                end
+            end
+        end
+        table.sort(names)
+        return nameMap, names
+    end
+
+    local function findNearbyEnemy()
+        local hrp = getLocalHRP()
+        if not hrp then return nil end
+
+        local living = getLivingFolder()
+        if not living then return nil end
+
+        local myPos = hrp.Position
+        local bestMob = nil
+        local bestDist = NearbyMobRange
+
+        for _, m in ipairs(living:GetChildren()) do
+            if m:IsA("Model") and not isPlayerModel(m) and isMobAlive(m) then
+                local root = getMobRoot(m)
+                if root then
+                    local dist = (root.Position - myPos).Magnitude
+                    if dist <= bestDist then
+                        bestDist = dist
+                        bestMob = m
+                    end
+                end
+            end
+        end
+        return bestMob
+    end
+
+    -- ====================================================================
+    --  ATTACH CONFIG
+    -- ====================================================================
+
+    local ORE_ATTACH_MODE   = "Aligned"
+    local ORE_ATTACH_Y_BASE = -8
+    local ORE_ATTACH_HORIZ  = 0
+    local ORE_HIT_INTERVAL  = 0.15
+    local ORE_HIT_DIST      = 20
+
+    local MOB_ATTACH_MODE   = "Aligned"
+    local MOB_ATTACH_Y_BASE = -7
+    local MOB_ATTACH_HORIZ  = 0
+    local MOB_HIT_INTERVAL  = 0.15
+    local MOB_HIT_DIST      = 20
+
+    local ExtraYOffset      = 0
+    local FarmSpeed         = 80
+
+    local FARM_MODE_ORES    = "Ores"
+    local FARM_MODE_ENEMIES = "Enemies"
+
+    local MaxTargetHeight   = 100
+
+    local ModeDefs          = {
+        [FARM_MODE_ORES] = {
+            name          = FARM_MODE_ORES,
+            scan          = scanRocks,
+            isAlive       = isRockAlive,
+            getPos        = rockPosition,
+            getRoot       = rockRoot,
+            getHealth     = rockHealth,
+            attachMode    = ORE_ATTACH_MODE,
+            attachBaseY   = ORE_ATTACH_Y_BASE,
+            attachHoriz   = ORE_ATTACH_HORIZ,
+            hitInterval   = ORE_HIT_INTERVAL,
+            hitDistance   = ORE_HIT_DIST,
+            toolName      = "Pickaxe",
+            toolRemoteArg = "Pickaxe",
+        },
+
+        [FARM_MODE_ENEMIES] = {
+            name          = FARM_MODE_ENEMIES,
+            scan          = scanMobs,
+            isAlive       = isMobAlive,
+            getPos        = mobPosition,
+            getRoot       = getMobRoot,
+            getHealth     = getMobHealth,
+            attachMode    = MOB_ATTACH_MODE,
+            attachBaseY   = MOB_ATTACH_Y_BASE,
+            attachHoriz   = MOB_ATTACH_HORIZ,
+            hitInterval   = MOB_HIT_INTERVAL,
+            hitDistance   = MOB_HIT_DIST,
+            toolName      = "Weapon",
+            toolRemoteArg = "Weapon",
+        },
+    }
+
+    local function configureAttachForMode(modeName)
+        local def = ModeDefs[modeName]
+        if not def then return end
+
+        local y = def.attachBaseY + ExtraYOffset
+
+        if AttachPanel.SetMode then AttachPanel.SetMode(def.attachMode) end
+        if AttachPanel.SetYOffset then AttachPanel.SetYOffset(y) end
+        if AttachPanel.SetHorizDist then AttachPanel.SetHorizDist(def.attachHoriz) end
+        if AttachPanel.SetMovement then AttachPanel.SetMovement("Approach") end
+        if AttachPanel.EnableAutoYOffset then AttachPanel.EnableAutoYOffset(false) end
+        if AttachPanel.EnableDodge then AttachPanel.EnableDodge(false) end
+    end
+
+    local SavedAttach = nil
+
+    local function saveAttachSettings()
+        local state = AttachPanel.State or {}
+        SavedAttach = {
+            mode        = state.mode,
+            yOffset     = state.yOffset,
+            horizDist   = state.horizDist,
+            movement    = state.movement,
+            autoYOffset = state.autoYOffset,
+            dodgeMode   = state.dodgeMode,
+            dodgeRange  = state.dodgeRange,
+        }
+    end
+
+    local function restoreAttachSettings()
+        if not SavedAttach then return end
+        if AttachPanel.SetMode then AttachPanel.SetMode(SavedAttach.mode) end
+        if AttachPanel.SetYOffset then AttachPanel.SetYOffset(SavedAttach.yOffset) end
+        if AttachPanel.SetHorizDist then AttachPanel.SetHorizDist(SavedAttach.horizDist) end
+        if AttachPanel.SetMovement then AttachPanel.SetMovement(SavedAttach.movement) end
+        if AttachPanel.EnableAutoYOffset then AttachPanel.EnableAutoYOffset(SavedAttach.autoYOffset) end
+        if AttachPanel.EnableDodge then AttachPanel.EnableDodge(SavedAttach.dodgeMode) end
+        local state = AttachPanel.State
+        if state then state.dodgeRange = SavedAttach.dodgeRange end
+        SavedAttach = nil
+    end
+
+    local function stopMoving()
+        if FarmState.moveCleanup then
+            pcall(FarmState.moveCleanup)
+            FarmState.moveCleanup = nil
+        end
+    end
+
+    -- ====================================================================
+    --  BLACKLIST HELPERS
+    -- ====================================================================
+
+    local function isTargetBlacklisted(model)
+        if not model then return false end
+        local expiry = TargetBlacklist[model]
+        if not expiry then return false end
+        if not model.Parent or os.clock() >= expiry then
+            TargetBlacklist[model] = nil
+            return false
+        end
+        return true
+    end
+
+    local function blacklistTarget(model, duration)
+        if not model then return end
+        TargetBlacklist[model] = os.clock() + (duration or 60)
+    end
+
+    -- ====================================================================
+    --  SAFE OFFSET WRAPPER
+    -- ====================================================================
+
+    local function safeComputeOffset(rootCFrame, def)
+        if not AttachPanel or not AttachPanel.ComputeOffset then
+            return Vector3.new(0, def.attachBaseY + ExtraYOffset, 0)
+        end
+        local ok, result = pcall(
+            AttachPanel.ComputeOffset,
+            rootCFrame,
+            def.attachMode,
+            def.attachHoriz,
+            def.attachBaseY + ExtraYOffset
+        )
+        if ok and typeof(result) == "Vector3" then return result end
+        return Vector3.new(0, def.attachBaseY + ExtraYOffset, 0)
+    end
+
+    -- ====================================================================
+    --  LAVA & HAZARD AVOIDANCE
+    -- ====================================================================
+
+    local LavaParts = {}
+
+    local function refreshHazards()
+        table.clear(LavaParts)
+        local ws = Services.Workspace
+        if not ws then return end
+
+        local assets = ws:FindFirstChild("Assets")
+        if assets then
+            local cave = assets:FindFirstChild("Cave Area [2]")
+            if cave then
+                local folder = cave:FindFirstChild("Folder")
+                if folder then
+                    for _, inst in ipairs(folder:GetDescendants()) do
+                        if inst:IsA("BasePart") and inst.Name == "Lava" then
+                            table.insert(LavaParts, inst)
+                        end
+                    end
+                end
+            end
+        end
+
+        local debris = ws:FindFirstChild("Debris")
+        if debris then
+            local lavaZone = debris:FindFirstChild("LavaDamageZone")
+            if lavaZone and lavaZone:IsA("BasePart") then
+                table.insert(LavaParts, lavaZone)
             end
         end
     end
 
-    ----------------------------------------------------------------
-    -- MAIN FARM LOOP
-    ----------------------------------------------------------------
-    local lastPlayerUpdate = 0
+    local function pointInsidePart(point, part)
+        if not part or not part.Parent then return false end
+        local relative = part.CFrame:PointToObjectSpace(point)
+        local half = part.Size / 2
+        return math.abs(relative.X) <= half.X
+            and math.abs(relative.Y) <= half.Y
+            and math.abs(relative.Z) <= half.Z
+    end
+
+    local function isPointInHazard(point)
+        if #LavaParts == 0 then refreshHazards() end
+        if AvoidLava then
+            for _, part in ipairs(LavaParts) do
+                if pointInsidePart(point, part) then return true end
+            end
+        end
+        return false
+    end
+
+    -- ====================================================================
+    --  PLAYER AVOIDANCE HELPERS
+    -- ====================================================================
+
+    local function isAnyPlayerNearHRP(radius)
+        local hrp = getLocalHRP()
+        if not hrp then return false, nil end
+        local myPlayer = References.player
+        for _, plr in ipairs(Services.Players:GetPlayers()) do
+            if plr ~= myPlayer then
+                local char = plr.Character
+                local phrp = char and char:FindFirstChild("HumanoidRootPart")
+                if phrp then
+                    local dist = (phrp.Position - hrp.Position).Magnitude
+                    if dist <= radius then return true, plr end
+                end
+            end
+        end
+        return false, nil
+    end
+
+    local function isAnyPlayerNearPosition(position, radius)
+        if not position then return false, nil end
+        local myPlayer = References.player
+        for _, plr in ipairs(Services.Players:GetPlayers()) do
+            if plr ~= myPlayer then
+                local char = plr.Character
+                local phrp = char and char:FindFirstChild("HumanoidRootPart")
+                if phrp then
+                    local dist = (phrp.Position - position).Magnitude
+                    if dist <= radius then return true, plr end
+                end
+            end
+        end
+        return false, nil
+    end
+
+    local function moveAwayFromNearbyPlayers()
+        if not AvoidPlayers then return end
+
+        local hrp = getLocalHRP()
+        if not hrp then return end
+
+        local now = os.clock()
+        -- THROTTLE: don't recompute / reissue movement more than ~0.75s
+        if FarmState.avoidingPlayer and (now - (FarmState.lastAvoidMoveTime or 0)) < 0.75 then
+            return
+        end
+
+        local myPlayer    = References.player
+        local hrpPos      = hrp.Position
+
+        local closestDist = math.huge
+        local closestPos  = nil
+
+        for _, plr in ipairs(Services.Players:GetPlayers()) do
+            if plr ~= myPlayer then
+                local char = plr.Character
+                local phrp = char and char:FindFirstChild("HumanoidRootPart")
+                if phrp then
+                    local dist = (phrp.Position - hrpPos).Magnitude
+                    if dist <= PlayerAvoidRadius and dist < closestDist then
+                        closestDist = dist
+                        closestPos  = phrp.Position
+                    end
+                end
+            end
+        end
+
+        if closestPos then
+            local away = hrpPos - closestPos
+            away = Vector3.new(away.X, 0, away.Z)
+            local mag = away.Magnitude
+            if mag < 1 then
+                away = Vector3.new(1, 0, 0)
+            else
+                away = away / mag
+            end
+
+            local targetPos = hrpPos + away * (PlayerAvoidRadius + 10)
+            targetPos = Vector3.new(targetPos.X, hrpPos.Y, targetPos.Z)
+
+            stopMoving()
+            FarmState.moveCleanup       = MoveToPos(targetPos, FarmSpeed)
+
+            FarmState.avoidingPlayer    = true
+            FarmState.lastMovePos       = hrpPos
+            FarmState.lastMoveTime      = now
+            FarmState.lastAvoidMoveTime = now
+        end
+    end
+
+    local function buildPathAroundPlayers(startPos, endPos)
+        if not AvoidPlayers then return { endPos } end
+        local ab = endPos - startPos
+        if ab.Magnitude < 5 then return { endPos } end
+
+        local myPlayer = References.player
+        local hitPlayerPos = nil
+        local closestHitDist = math.huge
+
+        for _, plr in ipairs(Services.Players:GetPlayers()) do
+            if plr ~= myPlayer then
+                local char = plr.Character
+                local phrp = char and char:FindFirstChild("HumanoidRootPart")
+                if phrp then
+                    local p = phrp.Position
+                    local ap = p - startPos
+                    local t = 0
+                    local abDot = ab:Dot(ab)
+                    if abDot > 0 then t = math.clamp(ap:Dot(ab) / abDot, 0, 1) end
+                    local closestPoint = startPos + ab * t
+                    local dist = (p - closestPoint).Magnitude
+
+                    if dist <= PlayerAvoidRadius and dist < closestHitDist then
+                        closestHitDist = dist
+                        hitPlayerPos   = p
+                    end
+                end
+            end
+        end
+
+        if not hitPlayerPos then return { endPos } end
+
+        local sideDir = ab:Cross(Vector3.yAxis)
+        if sideDir.Magnitude < 1e-3 then sideDir = Vector3.new(1, 0, 0) else sideDir = sideDir.Unit end
+
+        local offsetDist = PlayerAvoidRadius + 8
+        local mid = hitPlayerPos + sideDir * offsetDist
+        mid = Vector3.new(mid.X, startPos.Y, mid.Z)
+
+        return { mid, endPos }
+    end
+
+    -- ====================================================================
+    --  SIMPLE TARGET SELECTION
+    -- ====================================================================
+
+    local function chooseNearestTarget()
+        local hrp = getLocalHRP()
+        if not hrp then return nil end
+
+        local def = ModeDefs[FarmState.mode]
+        if not def or not def.scan then return nil end
+
+        local nameMap, _ = def.scan()
+        FarmState.nameMap = nameMap or {}
+
+        local bestTarget
+        local bestDist
+        local bestPriority = math.huge
+
+        for name, models in pairs(nameMap) do
+            local priority = getTargetPriorityForMode(FarmState.mode, name)
+
+            if models then
+                for _, model in ipairs(models) do
+                    if model and model.Parent and def.isAlive(model) and not isTargetBlacklisted(model) then
+                        -- extra guard: if this is an ore and someone else last-hit it, skip it
+                        if def.name == FARM_MODE_ORES and isRockLastHitByOther(model) then
+                            continue
+                        end
+
+                        local pos = def.getPos(model)
+                        if pos then
+                            local skip = false
+                            if pos.Y > MaxTargetHeight then skip = true end
+
+                            if not skip then
+                                local root = def.getRoot(model)
+                                if root then
+                                    local offset = safeComputeOffset(root.CFrame, def)
+                                    local attachPos = root.Position + offset
+                                    if isPointInHazard(attachPos) then skip = true end
+                                end
+                            end
+
+                            if not skip and AvoidPlayers then
+                                local nearTarget, _ = isAnyPlayerNearPosition(pos, PlayerAvoidRadius)
+                                if nearTarget then skip = true end
+                            end
+
+                            if not skip and TargetFullHealth and def.name == FARM_MODE_ORES then
+                                local h = def.getHealth(model)
+                                local m = model:GetAttribute("MaxHealth")
+                                if h and m and h < m then skip = true end
+                            end
+
+                            if not skip then
+                                local dist = (pos - hrp.Position).Magnitude
+                                if (priority < bestPriority)
+                                    or (priority == bestPriority and (not bestDist or dist < bestDist)) then
+                                    bestPriority = priority
+                                    bestDist     = dist
+                                    bestTarget   = model
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return bestTarget
+    end
+
+    -- ====================================================================
+    --  ATTACH + MOVEMENT
+    -- ====================================================================
+
+    local DETOUR_ENABLED = (game.PlaceId == 129009554587176)
+
+    local function realignAttach(target, overrideDef)
+        if not target then return end
+        local def = overrideDef or ModeDefs[FarmState.mode]
+        if not def then return end
+        local state = AttachPanel.State
+        if not state then return end
+        local attachA1 = state._attachA1
+        local alignOri = state._alignOri
+        local hrp      = getLocalHRP()
+        local root     = def.getRoot(target)
+        if not (attachA1 and alignOri and hrp and root) then return end
+
+        local cf = root.CFrame
+        local offsetWorld = safeComputeOffset(cf, def)
+        attachA1.Position = cf:VectorToObjectSpace(offsetWorld)
+        alignOri.CFrame = CFrame.lookAt(hrp.Position, root.Position, Vector3.yAxis)
+    end
+
+    local function attachToTarget(target, overrideDef)
+        if not target then return end
+        if overrideDef then
+            if AttachPanel.SetMode then AttachPanel.SetMode(overrideDef.attachMode) end
+            if AttachPanel.SetYOffset then AttachPanel.SetYOffset(overrideDef.attachBaseY + ExtraYOffset) end
+            if AttachPanel.SetHorizDist then AttachPanel.SetHorizDist(overrideDef.attachHoriz) end
+        else
+            configureAttachForMode(FarmState.mode)
+        end
+
+        if AttachPanel.SetTarget then AttachPanel.SetTarget(target) end
+        if AttachPanel.CreateAttach then AttachPanel.CreateAttach(target) end
+        realignAttach(target, overrideDef)
+    end
+
+    -- === DETOUR PATH WHEN X < -120 ======================================
+
+    local DETOUR_THRESHOLD_X = -120
+    local DETOUR_POINTS = {
+        Vector3.new(-259.431091, 21.436172, -129.926697),
+        Vector3.new(-417.186188, 31.620274, -246.402084),
+        Vector3.new(-138.949982, 30.126343, -497.266479),
+        Vector3.new(-43.032295, 32.220428, -583.377686),
+        Vector3.new(118.466454, 32.614773, -567.964050),
+        Vector3.new(400.246185, 135.009399, -349.578552),
+        Vector3.new(336.205627, 142.614944, -237.229599),
+        Vector3.new(359.745148, 74.859268, -224.669601),
+    }
+
+    local function startMovingToTarget(target, overrideDef)
+        -- FIXED: Force detach whenever we start moving.
+        -- This fixes the issue where you "Swing at the rock" when trying to go to a mob.
+        if AttachPanel.DestroyAttach then
+            pcall(AttachPanel.DestroyAttach)
+        end
+
+        stopMoving()
+
+        local hrp = getLocalHRP()
+        local def = overrideDef or ModeDefs[FarmState.mode]
+        if not (hrp and def and def.getRoot) then return end
+
+        local function getFinalPos()
+            if not target or not target.Parent then return nil end
+            local root = def.getRoot(target)
+            if not root then return nil end
+            local offset = safeComputeOffset(root.CFrame, def)
+            return root.Position + offset
+        end
+
+        local startPos = hrp.Position
+        local finalPos = getFinalPos()
+        if not finalPos then return end
+
+        FarmState.lastMovePos = startPos
+        FarmState.lastMoveTime = os.clock()
+
+        local useDetour = DETOUR_ENABLED and (startPos.X < DETOUR_THRESHOLD_X)
+
+        if not useDetour then
+            local waypoints = { finalPos }
+            if AvoidPlayers then
+                waypoints = buildPathAroundPlayers(startPos, finalPos)
+            end
+
+            if #waypoints == 1 then
+                FarmState.moveCleanup = MoveToPos(finalPos, FarmSpeed, getFinalPos)
+            else
+                local active = true
+                local currentCleanup = nil
+
+                local function globalCleanup()
+                    active = false
+                    if currentCleanup then
+                        pcall(currentCleanup)
+                        currentCleanup = nil
+                    end
+                end
+
+                FarmState.moveCleanup = globalCleanup
+
+                task.spawn(function()
+                    for _, waypoint in ipairs(waypoints) do
+                        if not active then return end
+
+                        currentCleanup = MoveToPos(waypoint, FarmSpeed)
+                        local wpStart = os.clock()
+
+                        while active do
+                            local h = getLocalHRP()
+                            if not h then
+                                if currentCleanup then
+                                    pcall(currentCleanup)
+                                    currentCleanup = nil
+                                end
+                                return
+                            end
+
+                            if (h.Position - waypoint).Magnitude <= 3 then
+                                if currentCleanup then
+                                    pcall(currentCleanup)
+                                    currentCleanup = nil
+                                end
+                                break
+                            end
+
+                            -- FIXED: Add Timeout for waypoint stuck (Avoid Players Freeze Fix)
+                            if (os.clock() - wpStart) > 5 then
+                                if currentCleanup then
+                                    pcall(currentCleanup)
+                                    currentCleanup = nil
+                                end
+                                break
+                            end
+
+                            task.wait(0.05)
+                        end
+                    end
+                    if active then FarmState.moveCleanup = nil end
+                end)
+            end
+            return
+        end
+
+        -- Detour path logic
+        local active = true
+        local currentCleanup = nil
+
+        local function globalCleanup()
+            active = false
+            if currentCleanup then
+                pcall(currentCleanup)
+                currentCleanup = nil
+            end
+        end
+
+        FarmState.moveCleanup = globalCleanup
+
+        task.spawn(function()
+            for _, waypoint in ipairs(DETOUR_POINTS) do
+                if not active then return end
+                currentCleanup = MoveToPos(waypoint, FarmSpeed)
+                local wpStart = os.clock()
+
+                while active do
+                    local h = getLocalHRP()
+                    if not h then
+                        if currentCleanup then
+                            pcall(currentCleanup)
+                            currentCleanup = nil
+                        end
+                        return
+                    end
+                    if (h.Position - waypoint).Magnitude <= 3 then
+                        if currentCleanup then
+                            pcall(currentCleanup)
+                            currentCleanup = nil
+                        end
+                        break
+                    end
+                    -- Detour timeout
+                    if (os.clock() - wpStart) > 8 then
+                        if currentCleanup then
+                            pcall(currentCleanup)
+                            currentCleanup = nil
+                        end
+                        break
+                    end
+                    task.wait(0.05)
+                end
+            end
+
+            if not active then return end
+            local fp = getFinalPos()
+            if not fp then
+                globalCleanup()
+                return
+            end
+            local function dynFinalPos() return getFinalPos() end
+            currentCleanup = MoveToPos(fp, FarmSpeed, dynFinalPos)
+        end)
+    end
+
+    -- ====================================================================
+    --  RESTOCK LOGIC
+    -- ====================================================================
+
+    local function restockPotions(doFreeze)
+        local selected = Options.AutoPotions_List.Value
+        local didSomething = false
+
+        -- ensure something is selected
+        local any = false
+        for _, sel in pairs(selected) do
+            if sel then
+                any = true
+                break
+            end
+        end
+        if not any then
+            return
+        end
+
+        local player = Players.LocalPlayer
+        local char = player.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+
+        FarmState.restocking = true
+
+        -- Detach/Stop farm movement
+        stopMoving()
+        if AttachPanel.DestroyAttach then pcall(AttachPanel.DestroyAttach) end
+        FarmState.attached = false
+        FarmState.currentTarget = nil
+
+        -- Instead of freezing, just kill momentum so we don't slide
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
+
+        -- Teleport
+        root.CFrame = RESTOCK_CFRAME
+        task.wait(0.15) -- Small wait for replication
+
+        -- Buy potions
+        for displayName, isOn in pairs(selected) do
+            if isOn then
+                local current = getPotionCount(displayName)
+                local needed = 10 - current
+                local toolId = PotionDisplayToToolId[displayName]
+
+                if needed > 0 and toolId then
+                    pcall(function()
+                        PurchaseRF:InvokeServer(toolId, needed)
+                    end)
+                    didSomething = true
+                    task.wait(0.05) -- Increased slightly to ensure server registers purchase
+                end
+            end
+        end
+
+        -- Release control back to farm loop
+        FarmState.restocking = false
+
+        if didSomething then
+            notify("Potions restocked.", 2)
+        end
+    end
+
+    local function needsRestock(threshold)
+        threshold = threshold or 2
+        local selected = Options.AutoPotions_List and Options.AutoPotions_List.Value
+        if type(selected) ~= "table" then return false end
+
+        for name, isOn in pairs(selected) do
+            if isOn and getPotionCount(name) < threshold then
+                return true
+            end
+        end
+        return false
+    end
+
+    -- ====================================================================
+    --  POTION LOOP (RUNS IN PARALLEL)
+    -- ====================================================================
+
+    local function startPotionLoop()
+        if FarmState.potionThread then return end
+
+        FarmState.potionThread = task.spawn(function()
+            local lastUse = 0
+            while true do
+                task.wait(1)
+
+                if not (Toggles.AutoPotions_Enable and Toggles.AutoPotions_Enable.Value) then
+                    continue
+                end
+
+                -- >>> CHECK RESTOCK FIRST <<<
+                if Toggles.AutoPotions_AutoRestock.Value and needsRestock(2) then
+                    -- Signal restocking so farm loop pauses
+                    FarmState.restocking = true
+
+                    local success, err = pcall(function()
+                        restockPotions(false)
+                    end)
+
+                    if not success then warn("Restock failed:", err) end
+
+                    -- Wait a moment to ensure inventory updates
+                    task.wait(1)
+
+                    -- Release lock
+                    FarmState.restocking = false
+                end
+
+                -- >>> USE POTIONS <<<
+                local interval = Options.AutoPotions_Interval.Value
+                if os.clock() - lastUse < interval then continue end
+
+                lastUse = os.clock()
+
+                local selected = Options.AutoPotions_List.Value
+                local player = Players.LocalPlayer
+
+                if player and player.Character then
+                    local char = player.Character
+                    local hum = char:FindFirstChild("Humanoid")
+                    local backpack = player:FindFirstChild("Backpack")
+
+                    if hum and backpack then
+                        -- 1. Save currently equipped tool (Pickaxe/Weapon)
+                        local previouslyEquipped = char:FindFirstChildOfClass("Tool")
+
+                        for displayName, isOn in pairs(selected) do
+                            if isOn then
+                                local toolId = PotionDisplayToToolId[displayName]
+
+                                -- Find the potion in Backpack or Character
+                                local tool = backpack:FindFirstChild(displayName) or char:FindFirstChild(displayName)
+
+                                -- Fallback: check by internal Tool ID if Display Name failed
+                                if not tool and toolId then
+                                    tool = backpack:FindFirstChild(toolId) or char:FindFirstChild(toolId)
+                                end
+
+                                if tool then
+                                    -- Equip Potion
+                                    hum:EquipTool(tool)
+                                    task.wait(0.3) -- Wait for server to register equip
+
+                                    -- Drink
+                                    if toolId then
+                                        pcall(function()
+                                            ToolActivatedRF:InvokeServer(toolId)
+                                        end)
+                                    else
+                                        tool:Activate() -- Fallback if remote ID missing
+                                    end
+
+                                    task.wait(0.5) -- Small delay between drinks
+                                end
+                            end
+                        end
+
+                        -- 2. Restore previous weapon so farming works
+                        if previouslyEquipped and previouslyEquipped.Parent == backpack then
+                            hum:EquipTool(previouslyEquipped)
+                        end
+                    end
+                end
+            end
+        end)
+    end
+
+    -- ====================================================================
+    --  PROXIMITY TRACKER
+    -- ====================================================================
+
+    local TrackerState = {
+        Enabled = false,
+        Gui = nil,
+        Container = nil,
+        TargetName = nil,
+        HealthBar = nil,
+        HealthText = nil,
+        DropList = nil,
+        CachedMaxHp = 100,
+        CurrentDrops = {},
+        ActiveTarget = nil,
+        LastCheckHealth = {},
+    }
+
+    local function createTrackerGui()
+        if TrackerState.Gui then return end
+        local sg = Instance.new("ScreenGui")
+        sg.Name = "ProximityTrackerHUD"
+        sg.ResetOnSpawn = false
+        pcall(function() sg.Parent = Services.Players.LocalPlayer:WaitForChild("PlayerGui") end)
+
+        local savedConfig = loadHudConfig()
+        local initialPos = UDim2.new(0.5, 0, 0.2, 0)
+        local initialSize = UDim2.new(0, 320, 0, 180)
+        if savedConfig then
+            initialPos = UDim2.new(0, savedConfig.X, 0, savedConfig.Y)
+            initialSize = UDim2.new(0, savedConfig.SX, 0, savedConfig.SY)
+        end
+
+        local mainFrame = Instance.new("Frame")
+        mainFrame.Name = "MainFrame"
+        mainFrame.Size = initialSize
+        mainFrame.Position = initialPos
+        mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+        mainFrame.BorderSizePixel = 0
+        mainFrame.Parent = sg
+
+        local dragging, dragInput, dragStart, startPos
+        mainFrame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                dragStart = input.Position
+                startPos = mainFrame.Position
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                        saveHudConfig(mainFrame.Position, mainFrame.Size)
+                    end
+                end)
+            end
+        end)
+
+        mainFrame.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
+        end)
+
+        UserInputService.InputChanged:Connect(function(input)
+            if input == dragInput and dragging then
+                local delta = input.Position - dragStart
+                mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale,
+                    startPos.Y.Offset + delta.Y)
+            end
+        end)
+
+        local uiCorner = Instance.new("UICorner")
+        uiCorner.CornerRadius = UDim.new(0, 8)
+        uiCorner.Parent = mainFrame
+
+        local uiStroke = Instance.new("UIStroke")
+        uiStroke.Color = Color3.fromRGB(60, 60, 70)
+        uiStroke.Thickness = 2
+        uiStroke.Transparency = 0.2
+        uiStroke.Parent = mainFrame
+
+        local resizeHandle = Instance.new("ImageButton")
+        resizeHandle.Name = "ResizeHandle"
+        resizeHandle.Size = UDim2.new(0, 20, 0, 20)
+        resizeHandle.Position = UDim2.new(1, -20, 1, -20)
+        resizeHandle.BackgroundTransparency = 1
+        resizeHandle.Image = "rbxassetid://3570695787"
+        resizeHandle.ImageColor3 = Color3.fromRGB(150, 150, 150)
+        resizeHandle.Parent = mainFrame
+
+        local resizing, resizeStart, startSize
+        resizeHandle.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                resizing = true
+                resizeStart = input.Position
+                startSize = mainFrame.AbsoluteSize
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        resizing = false
+                        saveHudConfig(mainFrame.Position, mainFrame.Size)
+                    end
+                end)
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement and resizing then
+                local delta = input.Position - resizeStart
+                mainFrame.Size = UDim2.new(0, startSize.X + delta.X, 0, startSize.Y + delta.Y)
+            end
+        end)
+
+        local tName = Instance.new("TextLabel")
+        tName.Name = "TargetName"
+        tName.Size = UDim2.new(1, -20, 0, 26)
+        tName.Position = UDim2.new(0, 10, 0, 10)
+        tName.BackgroundTransparency = 1
+        tName.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tName.Font = Enum.Font.GothamBold
+        tName.TextSize = 18
+        tName.Text = "🎯 Searching..."
+        tName.TextXAlignment = Enum.TextXAlignment.Left
+        tName.TextTruncate = Enum.TextTruncate.AtEnd
+        tName.Parent = mainFrame
+
+        local barBg = Instance.new("Frame")
+        barBg.Name = "BarBG"
+        barBg.Size = UDim2.new(1, -20, 0, 18)
+        barBg.Position = UDim2.new(0, 10, 0, 40)
+        barBg.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+        barBg.BorderSizePixel = 0
+        barBg.Parent = mainFrame
+
+        local barCorner = Instance.new("UICorner")
+        barCorner.CornerRadius = UDim.new(0, 5)
+        barCorner.Parent = barBg
+
+        local barFill = Instance.new("Frame")
+        barFill.Name = "Fill"
+        barFill.Size = UDim2.new(1, 0, 1, 0)
+        barFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        barFill.BorderSizePixel = 0
+        barFill.Parent = barBg
+
+        local fillCorner = Instance.new("UICorner")
+        fillCorner.CornerRadius = UDim.new(0, 5)
+        fillCorner.Parent = barFill
+
+        local gradient = Instance.new("UIGradient")
+        gradient.Color = ColorSequence.new {
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(85, 255, 120)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 170, 120))
+        }
+        gradient.Parent = barFill
+
+        local hpText = Instance.new("TextLabel")
+        hpText.Size = UDim2.new(1, 0, 1, 0)
+        hpText.BackgroundTransparency = 1
+        hpText.TextColor3 = Color3.fromRGB(255, 255, 255)
+        hpText.Font = Enum.Font.GothamBold
+        hpText.TextSize = 12
+        hpText.TextStrokeTransparency = 0.5
+        hpText.Text = "100 / 100"
+        hpText.ZIndex = 2
+        hpText.Parent = barBg
+
+        local dLabel = Instance.new("TextLabel")
+        dLabel.Name = "DropsLabel"
+        dLabel.Size = UDim2.new(1, -20, 0, 20)
+        dLabel.Position = UDim2.new(0, 10, 0, 68)
+        dLabel.BackgroundTransparency = 1
+        dLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        dLabel.Font = Enum.Font.Gotham
+        dLabel.TextSize = 14
+        dLabel.Text = "💎 Drops Detected:"
+        dLabel.TextXAlignment = Enum.TextXAlignment.Left
+        dLabel.Parent = mainFrame
+
+        local dropContainer = Instance.new("Frame")
+        dropContainer.Name = "DropContainer"
+        dropContainer.Size = UDim2.new(1, 0, 1, -95)
+        dropContainer.Position = UDim2.new(0, 0, 0, 95)
+        dropContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+        dropContainer.BorderSizePixel = 0
+        dropContainer.Parent = mainFrame
+
+        local dropCorner = Instance.new("UICorner")
+        dropCorner.CornerRadius = UDim.new(0, 6)
+        dropCorner.Parent = dropContainer
+
+        local dList = Instance.new("ScrollingFrame")
+        dList.Name = "DropList"
+        dList.Size = UDim2.new(1, -10, 1, -10)
+        dList.Position = UDim2.new(0, 5, 0, 5)
+        dList.BackgroundTransparency = 1
+        dList.BorderSizePixel = 0
+        dList.ScrollBarThickness = 4
+        dList.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
+        dList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        dList.CanvasSize = UDim2.new(0, 0, 0, 0)
+        dList.Parent = dropContainer
+
+        local layout = Instance.new("UIListLayout")
+        layout.Parent = dList
+        layout.SortOrder = Enum.SortOrder.LayoutOrder
+        layout.Padding = UDim.new(0, 4)
+
+        TrackerState.Gui = sg
+        TrackerState.Container = mainFrame
+        TrackerState.TargetName = tName
+        TrackerState.HealthBar = barFill
+        TrackerState.HealthText = hpText
+        TrackerState.DropList = dList
+        sg.Enabled = false
+    end
+
+    local function resetTrackerData(newTarget)
+        if not TrackerState.Gui then return end
+        for _, c in ipairs(TrackerState.DropList:GetChildren()) do
+            if c:IsA("TextLabel") then c:Destroy() end
+        end
+        table.clear(TrackerState.CurrentDrops)
+        if newTarget then
+            local hp = rockHealth(newTarget) or 100
+            local attrMax = newTarget:GetAttribute("MaxHealth")
+            TrackerState.CachedMaxHp = attrMax or hp
+        end
+    end
+
+    local function updateTrackerUi()
+        if not TrackerState.Enabled or not TrackerState.Gui then
+            if TrackerState.Gui then TrackerState.Gui.Enabled = false end
+            return
+        end
+        TrackerState.Gui.Enabled = true
+
+        local target = TrackerState.ActiveTarget
+        if not target or not target.Parent then
+            TrackerState.TargetName.Text = "🎯 Searching..."
+            TrackerState.HealthBar:TweenSize(UDim2.new(0, 0, 1, 0), "Out", "Quad", 0.3, true)
+            TrackerState.HealthText.Text = "0 / 0"
+            return
+        end
+
+        TrackerState.TargetName.Text = "🎯 " .. target.Name
+
+        local hp = rockHealth(target) or 0
+        local maxHp = math.max(TrackerState.CachedMaxHp, 1)
+
+        local pct = math.clamp(hp / maxHp, 0, 1)
+        TrackerState.HealthBar:TweenSize(UDim2.new(pct, 0, 1, 0), "Out", "Quad", 0.15, true)
+        TrackerState.HealthText.Text = math.floor(hp) .. " / " .. math.floor(maxHp)
+
+        local children = target:GetChildren()
+        for _, c in ipairs(children) do
+            if c.Name == "Ore" and not TrackerState.CurrentDrops[c] then
+                local oreType = c:GetAttribute("Ore")
+                if oreType then
+                    TrackerState.CurrentDrops[c] = true
+                    local lbl = Instance.new("TextLabel")
+                    lbl.Size = UDim2.new(1, 0, 0, 20)
+                    lbl.BackgroundTransparency = 1
+                    lbl.TextColor3 = Color3.fromRGB(255, 215, 0)
+                    lbl.Font = Enum.Font.GothamMedium
+                    lbl.TextSize = 14
+                    lbl.Text = "  ✨ " .. tostring(oreType)
+                    lbl.TextXAlignment = Enum.TextXAlignment.Left
+                    lbl.Parent = TrackerState.DropList
+                    TrackerState.DropList.CanvasPosition = Vector2.new(0, 9999)
+                end
+            end
+        end
+    end
+
+    task.spawn(function()
+        while true do
+            if not TrackerState.Enabled then
+                if TrackerState.Gui then TrackerState.Gui.Enabled = false end
+                task.wait(1)
+                continue
+            end
+
+            local hrp = getLocalHRP()
+            if not hrp then
+                task.wait(0.5)
+                continue
+            end
+
+            local rocks = {}
+            local folder = getRocksFolder()
+
+            if folder then
+                for _, desc in ipairs(folder:GetDescendants()) do
+                    if desc:IsA("Model") and desc:GetAttribute("Health") then
+                        if (desc:GetPivot().Position - hrp.Position).Magnitude <= 15 then
+                            table.insert(rocks, desc)
+                        end
+                    end
+                end
+            end
+
+            for _, rock in ipairs(rocks) do
+                local currentHp = rockHealth(rock) or 0
+                local oldHp = TrackerState.LastCheckHealth[rock]
+
+                if oldHp and currentHp < oldHp then
+                    if TrackerState.ActiveTarget ~= rock then
+                        TrackerState.ActiveTarget = rock
+                        resetTrackerData(rock)
+                    end
+                end
+                TrackerState.LastCheckHealth[rock] = currentHp
+            end
+
+            for r, _ in pairs(TrackerState.LastCheckHealth) do
+                if not r.Parent or (r:GetPivot().Position - hrp.Position).Magnitude > 20 then
+                    TrackerState.LastCheckHealth[r] = nil
+                end
+            end
+
+            if TrackerState.ActiveTarget then
+                local t = TrackerState.ActiveTarget
+                if not t.Parent or (rockHealth(t) or 0) <= 0 or (t:GetPivot().Position - hrp.Position).Magnitude > 20 then
+                    TrackerState.ActiveTarget = nil
+                end
+            end
+
+            updateTrackerUi()
+            task.wait(0.1)
+        end
+    end)
+
+    -- ====================================================================
+    --  MAIN FARM LOOP (FIXED)
+    -- ====================================================================
 
     local function farmLoop()
+        -- Init health to current so we don't instant-ditch if low
         if References.humanoid then
             FarmState.LastLocalHealth = References.humanoid.Health
         end
 
         while FarmState.enabled do
+            -- >>> RESTOCK CHECK: If restocking, pause the farm logic completely <<<
             if FarmState.restocking then
                 task.wait(0.5)
                 continue
             end
 
+            -- >>> CRASH PROTECTION: Wrap loop body in pcall <<<
             local loopSuccess, loopError = pcall(function()
                 local hrp = getLocalHRP()
                 local hum = References.humanoid
 
-                -- Dashboard: update nearby players at ~2x per second max
-                local nowLoop = os.clock()
-                if dashboardEnabled() and Dashboard and Dashboard.setNearbyPlayers then
-                    if (nowLoop - lastPlayerUpdate) > 0.5 then
-                        lastPlayerUpdate = nowLoop
-                        updateDashboardPlayers()
-                    end
-                end
-
+                -- death / no char handling (safe)
                 if not hrp or not hum then
                     stopMoving()
                     FarmState.currentTarget = nil
-                    if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                        Dashboard.setCurrentTarget(nil)
-                    end
                     FarmState.attached      = false
                     FarmState.detourActive  = false
                     FarmState.tempMobTarget = nil
                     task.wait(0.3)
-                    return
+                    return -- acts as continue inside pcall
                 end
 
-                local humState        = hum:GetState()
-                local humHealth       = hum.Health
+                local humHealth
+                local humState
+                local okState, stateOrErr = pcall(function()
+                    return hum:GetState()
+                end)
 
-                local helperAltActive = isHelperAltEnabled()
-                local mainAltActive   = isMainAltEnabled()
+                if okState then
+                    humState  = stateOrErr
+                    humHealth = hum.Health
+                else
+                    stopMoving()
+                    return
+                end
 
                 if humHealth <= 0 or humState == Enum.HumanoidStateType.Dead then
                     stopMoving()
                     FarmState.currentTarget = nil
-                    if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                        Dashboard.setCurrentTarget(nil)
-                    end
                     FarmState.attached      = false
                     FarmState.detourActive  = false
                     FarmState.tempMobTarget = nil
@@ -1608,110 +1902,38 @@ return function(ctx)
                     return
                 end
 
-                local bossTarget = nil
-                if BossState.enabled then
-                    local bossSeekActive = isBossCleanupActive()
-                    local nowBoss = os.clock()
-                    if BossState.bossTarget and isMobAlive(BossState.bossTarget) then
-                        markBossSeen(BossState.bossTarget)
-                    else
-                        BossState.bossTarget = nil
-                        if bossSeekActive then
-                            local foundBoss = findAliveGolem()
-                            if foundBoss then
-                                markBossSeen(foundBoss)
-                                BossState.bossTarget = foundBoss
-                            end
-                        end
-                    end
+                -- >>> DAMAGE DITCH LOGIC <<<
+                local ditchLimit = hum.MaxHealth * (DamageDitchThreshold / 100)
 
-                    if BossState.multiBossActive and not BossState.bossTarget then
-                        local lastSeen = BossState.lastBossSeen or 0
-                        if (nowBoss - lastSeen) > BOSS_CLEAR_TIMEOUT then
-                            BossState.multiBossActive = false
-                        end
-                    end
-
-                    if not BossState.bossTarget then
-                        if BossState.spawnInProgress then
-                            task.wait(0.1)
-                            return
-                        end
-                        if isBossReady() then
-                            local lastFail = BossState.lastFailedAttempt or 0
-                            if (os.clock() - lastFail) >= BOSS_RETRY_COOLDOWN then
-                                attemptBossSpawn("priority")
-                                task.wait(0.1)
-                                return
-                            end
-                        end
-                    end
-
-                    bossTarget = BossState.bossTarget
-                    if bossTarget and FarmState.currentTarget ~= bossTarget then
-                        stopMoving()
-                        FarmState.currentTarget   = bossTarget
-                        FarmState.attached        = false
-                        FarmState.tempMobTarget   = nil
-                        FarmState.lastTargetRef   = nil
-                        FarmState.lastTargetHealth = 0
-                        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                            Dashboard.setCurrentTarget(bossTarget.Name)
-                        end
-                    end
-                end
-
-                local bossOverride = BossState.enabled and bossTarget and isMobAlive(bossTarget)
-                if bossOverride then
-                    applyBossOffset()
-                else
-                    restoreBossOffset()
-                end
-                if bossOverride and FarmState.attached and not isAttachActive() then
-                    FarmState.attached      = false
-                    FarmState.lastTargetRef = nil
-                end
-
-                -- DAMAGE DITCH LOGIC
-                local ditchLimit = hum.MaxHealth * (AF_Config.DamageDitchThreshold / 100)
-                local protectDamageDitchTarget = shouldHoldTargetForWhitelist(FarmState.currentTarget)
-                    and not helperAltActive
-                if AF_Config.DamageDitchEnabled
-                    and FarmState.currentTarget
-                    and humHealth < FarmState.LastLocalHealth
-                    and humHealth < ditchLimit
-                    and not protectDamageDitchTarget then
+                if DamageDitchEnabled and FarmState.currentTarget and humHealth < FarmState.LastLocalHealth and humHealth < ditchLimit then
                     notify("Took damage! Ditching.", 2)
-                    blacklistTarget(FarmState.currentTarget, 20)
+                    blacklistTarget(FarmState.currentTarget, 60)
                     stopMoving()
                     FarmState.currentTarget   = nil
                     FarmState.attached        = false
                     FarmState.detourActive    = false
                     FarmState.tempMobTarget   = nil
+
                     FarmState.LastLocalHealth = humHealth
                     task.wait(0.15)
                     return
                 end
                 FarmState.LastLocalHealth = humHealth
 
-                -- NEARBY MOB CHECK (when farming ores)
-                local activeTarget        = nil
-                local activeDef           = nil
-                local isDistracted        = false
-                local holdNearbyMobs      = AF_Config.AttackNearbyMobs
-                    and AF_Config.DamageDitchEnabled
-                    and humHealth < ditchLimit
+                -- >>> NEARBY MOB CHECK (Ore Mode Only) <<<
+                local activeTarget = nil
+                local activeDef = nil
+                local isDistracted = false
 
-                if bossOverride then
-                    FarmState.tempMobTarget = nil
-                elseif FarmState.mode == FARM_MODE_ORES and AF_Config.AttackNearbyMobs and not holdNearbyMobs then
+                if FarmState.mode == FARM_MODE_ORES and AttackNearbyMobs then
+                    -- If we already have a focused mob, check if it's still valid
                     if FarmState.tempMobTarget then
                         if FarmState.tempMobTarget.Parent and isMobAlive(FarmState.tempMobTarget) then
                             local root = getMobRoot(FarmState.tempMobTarget)
-                            local dist = root and (root.Position - hrp.Position).Magnitude or math.huge
-                            if dist <= AF_Config.NearbyMobRange + 10 then
+                            local dist = root and (root.Position - hrp.Position).Magnitude or 9999
+                            if dist <= NearbyMobRange + 10 then
                                 activeTarget = FarmState.tempMobTarget
-                                activeDef    = ModeDefs[FARM_MODE_ENEMIES]
+                                activeDef = ModeDefs[FARM_MODE_ENEMIES]
                                 isDistracted = true
                             else
                                 FarmState.tempMobTarget = nil
@@ -1721,43 +1943,30 @@ return function(ctx)
                         end
                     end
 
+                    -- Only scan if attached to Ore (prevents chain killing while travelling)
                     if not FarmState.tempMobTarget and FarmState.attached then
                         local mob = findNearbyEnemy()
                         if mob then
                             local mobRoot = getMobRoot(mob)
-                            local isSafe  = true
-
+                            local isSafe = true
                             if mobRoot and isPointInHazard(mobRoot.Position) then
                                 isSafe = false
                             end
 
                             if isSafe then
                                 FarmState.tempMobTarget = mob
-                                activeTarget            = mob
-                                activeDef               = ModeDefs[FARM_MODE_ENEMIES]
-                                isDistracted            = true
+                                activeTarget = mob
+                                activeDef = ModeDefs[FARM_MODE_ENEMIES]
+                                isDistracted = true
                                 notify("Attacking nearby " .. mob.Name, 1)
-
-                                -- ADD THIS: Update dashboard to show mob
-                                if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                                    Dashboard.setCurrentTarget(mob.Name)
-                                end
                             end
                         end
                     end
-                elseif holdNearbyMobs then
-                    FarmState.tempMobTarget = nil
                 end
 
                 if not isDistracted then
                     activeTarget = FarmState.currentTarget
-                    activeDef    = ModeDefs[FarmState.mode]
-                end
-
-                if bossOverride then
-                    activeTarget = bossTarget
-                    activeDef    = ModeDefs[FARM_MODE_ENEMIES]
-                    isDistracted = false
+                    activeDef = ModeDefs[FarmState.mode]
                 end
 
                 if not activeDef then
@@ -1765,69 +1974,33 @@ return function(ctx)
                     return
                 end
 
-                -- If an ore was tagged by someone else, ditch it immediately
-                if activeTarget and activeDef.name == FARM_MODE_ORES and isRockLastHitByOther(activeTarget) then
-                    local allowAltRock = mainAltActive
-                        and rockLastHitWasAlt(activeTarget)
-                        and shouldHoldTargetForWhitelist(activeTarget)
-                    if not allowAltRock then
-                        if shouldHoldTargetForWhitelist(activeTarget) and not helperAltActive then
-                            task.wait(0.1)
-                            return
-                        end
-
-                        blacklistTarget(activeTarget, 20)
-                        stopMoving()
-                        FarmState.attached     = false
-                        FarmState.detourActive = false
-
-                        if isDistracted then
-                            FarmState.tempMobTarget = nil
-                        else
-                            FarmState.currentTarget = nil
-                            if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                                Dashboard.setCurrentTarget(nil)
-                            end
-                        end
-
-                        task.wait(0.1)
-                        return
-                    end
-                end
-
-                if not bossOverride and FarmState.mode == FARM_MODE_ORES and mainAltActive then
-                    local altCandidate = findAltWhitelistRock(hrp)
-                    if altCandidate
-                        and (not activeTarget or (activeTarget ~= altCandidate and not shouldHoldTargetForWhitelist(activeTarget))) then
-                        stopMoving()
-                        FarmState.attached      = false
-                        FarmState.detourActive  = false
-                        FarmState.tempMobTarget = nil
-                        FarmState.lastTargetRef = nil
-                        FarmState.currentTarget = altCandidate
-                        activeTarget            = altCandidate
-                        activeDef               = ModeDefs[FARM_MODE_ORES]
-                    end
-                end
-
-                local pos   = activeTarget and activeDef.getPos(activeTarget) or nil
-                local alive = activeTarget and activeDef.isAlive(activeTarget)
-                if helperAltActive and activeTarget and shouldHoldTargetForWhitelist(activeTarget) then
-                    notify("Helper Alt: skipping whitelisted rock.", 2)
+                -- If we're on an ore and someone else tagged it, ditch it immediately
+                if activeTarget
+                    and activeDef.name == FARM_MODE_ORES
+                    and isRockLastHitByOther(activeTarget)
+                then
+                    -- Optional: temporarily blacklist so we don't re-pick while it's still owned
                     blacklistTarget(activeTarget, 60)
+
                     stopMoving()
-                    FarmState.currentTarget = nil
-                    if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                        Dashboard.setCurrentTarget(nil)
+                    FarmState.attached     = false
+                    FarmState.detourActive = false
+
+                    if isDistracted then
+                        FarmState.tempMobTarget = nil
+                    else
+                        FarmState.currentTarget = nil
                     end
-                    FarmState.attached      = false
-                    FarmState.detourActive  = false
-                    FarmState.tempMobTarget = nil
+
+                    -- Let next loop iteration choose a new rock
                     task.wait(0.1)
                     return
                 end
 
-                local whitelistHoldTarget = mainAltActive and shouldHoldTargetForWhitelist(activeTarget)
+                local pos   = activeTarget and activeDef.getPos(activeTarget) or nil
+                local alive = activeTarget and activeDef.isAlive(activeTarget)
+
+                -- Pick new target if current is invalid
                 if (not activeTarget)
                     or (not activeTarget.Parent)
                     or (not pos)
@@ -1835,14 +2008,16 @@ return function(ctx)
                     or (not isDistracted and isTargetBlacklisted(activeTarget)) then
                     if isDistracted then
                         FarmState.tempMobTarget = nil
-                        FarmState.attached      = false
+                        FarmState.attached = false
                         stopMoving()
-                        -- fall through to ores
+                        -- Let loop continue to pick new ore
                     end
 
+                    -- Standard Target Selection
                     FarmState.currentTarget    = chooseNearestTarget()
                     FarmState.attached         = false
                     FarmState.detourActive     = false
+
                     FarmState.lastTargetRef    = FarmState.currentTarget
                     FarmState.lastTargetHealth = 0
                     FarmState.stuckStartTime   = os.clock()
@@ -1855,37 +2030,71 @@ return function(ctx)
                         startMovingToTarget(activeTarget, activeDef)
                         pos = activeDef.getPos(activeTarget)
                     else
+                        -- IDLE LOGIC
                         stopMoving()
-                        if hrp and not hrp.Anchored then
+                        if hrp and hrp.Anchored == false then
                             hrp.Anchored = true
                         end
 
-                        if AF_Config.AvoidPlayers then
+                        -- FIX 1: If idle and avoiding players, actually move away
+                        if AvoidPlayers then
                             moveAwayFromNearbyPlayers()
                         end
-
                         task.wait(0.15)
                         return
                     end
                 end
 
-                if hrp.Anchored then
+                if hrp.Anchored == true then
                     hrp.Anchored = false
                 end
 
-                -- DYNAMIC PLAYER AVOIDANCE
-                if AF_Config.AvoidPlayers and not FarmState.detourActive then
-                    local innerRadius = AF_Config.PlayerAvoidRadius
-                    local outerRadius = math.max(AF_Config.PlayerAvoidRadius * 1.2, AF_Config.PlayerAvoidRadius + 5)
-                    local now         = os.clock()
+                -- Height Check
+                if pos and pos.Y > MaxTargetHeight then
+                    notify("Target too high! Ditching.", 2)
+                    blacklistTarget(activeTarget, 60)
+                    stopMoving()
+                    FarmState.currentTarget = nil
+                    FarmState.attached      = false
+                    FarmState.detourActive  = false
 
-                    local nearMe, _   = isAnyPlayerNearHRP(innerRadius)
+                    if not isDistracted then
+                        local newTarget = chooseNearestTarget()
+                        if newTarget then
+                            FarmState.currentTarget    = newTarget
+                            FarmState.attached         = false
+                            FarmState.detourActive     = false
+                            FarmState.lastTargetRef    = newTarget
+                            FarmState.lastTargetHealth = 0
+                            FarmState.stuckStartTime   = os.clock()
+                            startMovingToTarget(newTarget, activeDef)
+                        end
+                    else
+                        FarmState.tempMobTarget = nil
+                    end
+                    task.wait(0.15)
+                    return
+                end
+
+                -- >>> DYNAMIC PLAYER AVOIDANCE (SMOOTHED) <<<
+                if AvoidPlayers and not FarmState.detourActive then
+                    -- Hysteresis radii
+                    local innerRadius = PlayerAvoidRadius                 -- when to start avoiding
+                    local outerRadius = math.max(PlayerAvoidRadius * 1.2, -- when it's "safe" again
+                        PlayerAvoidRadius + 5)
+
+                    local now = os.clock()
+
+                    -- Check if any player is too close to *me*
+                    local nearMe, _ = isAnyPlayerNearHRP(innerRadius)
                     if nearMe then
+                        -- Only show the warning occasionally
                         if (now - (FarmState.lastAvoidNoticeTime or 0)) > 2 then
                             notify("Player too close! Moving.", 2)
                             FarmState.lastAvoidNoticeTime = now
                         end
 
+                        -- If attached, detach so we can run away
                         if FarmState.attached then
                             FarmState.attached = false
                             if AttachPanel.DestroyAttach then
@@ -1893,46 +2102,45 @@ return function(ctx)
                             end
                         end
 
+                        -- Actually move away (throttled inside)
                         moveAwayFromNearbyPlayers()
+                        -- We've chosen to avoid, don't also try to farm on this tick.
                         task.wait(0.2)
                         return
                     else
+                        -- We were in avoid-mode: only clear it once we're *well* outside outerRadius
                         if FarmState.avoidingPlayer then
                             local stillNear, _ = isAnyPlayerNearHRP(outerRadius)
                             if not stillNear then
                                 FarmState.avoidingPlayer    = false
                                 FarmState.lastAvoidMoveTime = 0
+
+                                -- Re-engage movement toward current target (if we have one)
                                 if activeTarget then
                                     stopMoving()
                                     startMovingToTarget(activeTarget, activeDef)
                                 end
                             else
+                                -- Still kind of close – stay in avoid mode, don't re-target yet.
                                 task.wait(0.05)
                                 return
                             end
                         end
                     end
 
+                    -- Check target area (player camping the rock/mob)
                     if pos then
                         local distToTarget = (pos - hrp.Position).Magnitude
                         if distToTarget < 100 then
                             local nearTarget, _ = isAnyPlayerNearPosition(pos, innerRadius)
                             if nearTarget then
-                                if whitelistHoldTarget then
-                                    stopMoving()
-                                    FarmState.attached       = false
-                                    FarmState.avoidingPlayer = false
-                                    task.wait(0.1)
-                                    return
-                                end
-
                                 if (now - (FarmState.lastAvoidNoticeTime or 0)) > 2 then
                                     notify("Player at target! Ditching.", 2)
                                     FarmState.lastAvoidNoticeTime = now
                                 end
 
                                 if not isDistracted then
-                                    blacklistTarget(activeTarget, 20)
+                                    blacklistTarget(activeTarget, 60)
                                 else
                                     FarmState.tempMobTarget = nil
                                 end
@@ -1948,38 +2156,27 @@ return function(ctx)
                     end
                 end
 
-                -- ORE DROP WHITELIST CHECK
-                if not isDistracted
-                    and not bossOverride
-                    and FarmState.mode == FARM_MODE_ORES
-                    and AF_Config.OreWhitelistEnabled
-                    and activeTarget then
-                    if AF_Config.WhitelistAppliesTo[activeTarget.Name] then
-                        local oreParts = {}
+                -- Whitelist Checks (Omitted for brevity, logic remains same)
+                if not isDistracted and FarmState.mode == FARM_MODE_ORES and OreWhitelistEnabled and activeTarget then
+                    if WhitelistAppliesTo[activeTarget.Name] then
+                        local oreChildren = {}
                         for _, c in ipairs(activeTarget:GetChildren()) do
-                            if c.Name == "Ore" then
-                                table.insert(oreParts, c)
-                            end
+                            if c.Name == "Ore" then table.insert(oreChildren, c) end
                         end
-
-                        if #oreParts > 0 then
+                        if #oreChildren > 0 then
                             local matchFound = false
-                            for _, orePart in ipairs(oreParts) do
+                            for _, orePart in ipairs(oreChildren) do
                                 local oreType = orePart:GetAttribute("Ore")
-                                if oreType and AF_Config.WhitelistedOres[oreType] then
+                                if oreType and WhitelistedOres[oreType] then
                                     matchFound = true
                                     break
                                 end
                             end
-
                             if not matchFound then
                                 notify("No whitelisted ore! Ditching.", 2)
-                                blacklistTarget(activeTarget, 20)
+                                blacklistTarget(activeTarget, 60)
                                 stopMoving()
                                 FarmState.currentTarget = nil
-                                if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                                    Dashboard.setCurrentTarget(nil)
-                                end
                                 FarmState.attached = false
                                 return
                             end
@@ -1987,24 +2184,29 @@ return function(ctx)
                     end
                 end
 
-                -- DETOUR LOGIC
+                -- Detour Logic
                 if activeTarget and not FarmState.attached and not isDistracted then
                     local hrpPos = hrp.Position
-                    if (game.PlaceId == 129009554587176) and hrpPos.X < -180 then
+                    if DETOUR_ENABLED and hrpPos.X < DETOUR_THRESHOLD_X then
                         if not FarmState.detourActive then
                             FarmState.detourActive = true
+
+                            -- 🔔 One-time detour notification
                             if not FarmState.detourNotified then
                                 FarmState.detourNotified = true
                                 notify("Detour engaged to avoid lagback chunks and players.", 3)
                             end
+
                             stopMoving()
                             startMovingToTarget(activeTarget, activeDef)
                         end
                     else
+                        -- Left detour zone, clear flags
                         FarmState.detourActive   = false
                         FarmState.detourNotified = false
                     end
                 else
+                    -- No valid target / distracted, ensure detour is off
                     FarmState.detourActive   = false
                     FarmState.detourNotified = false
                 end
@@ -2015,89 +2217,78 @@ return function(ctx)
                     if dist <= activeDef.hitDistance then
                         stopMoving()
 
-                        local needAttach = not FarmState.attached
-                            or (activeTarget ~= FarmState.lastTargetRef)
-                            or (bossOverride and not isAttachActive())
+                        -- FIX 2: Check if we need to swap attachment from Rock to Mob
+                        -- We check if we aren't attached OR if the target reference changed (e.g. Rock -> Mob)
+                        local needAttach = not FarmState.attached or (activeTarget ~= FarmState.lastTargetRef)
+
                         if needAttach then
                             attachToTarget(activeTarget, activeDef)
-                            FarmState.attached         = isAttachActive()
-                            if not FarmState.attached then
-                                FarmState.lastTargetRef = nil
-                                task.wait(0.05)
-                                return
-                            end
-                            FarmState.lastTargetRef    = activeTarget
-                            FarmState.stuckStartTime   = os.clock()
-                            FarmState.lastTargetHealth = activeDef.getHealth(activeTarget) or 0
-                            FarmState.lastHit          = 0
+                            FarmState.attached = true
+                            FarmState.lastTargetRef = activeTarget -- Update ref so we know we are on the mob
+
+                            FarmState.stuckStartTime = os.clock()
+                            local h = activeDef.getHealth(activeTarget)
+                            FarmState.lastTargetHealth = h or 0
+
+                            FarmState.lastHit = 0
                         else
+                            -- Update alignment (LookAt)
                             realignAttach(activeTarget, activeDef)
 
+                            -- Stuck Check (Only if we aren't switching targets constantly)
                             if not isDistracted and FarmState.lastTargetRef == activeTarget then
-                                local currHealth = activeDef.getHealth(activeTarget) or 0
-                                if currHealth < FarmState.lastTargetHealth then
-                                    FarmState.lastTargetHealth = currHealth
-                                    FarmState.stuckStartTime   = os.clock()
+                                local currentH = activeDef.getHealth(activeTarget) or 0
+                                if currentH < FarmState.lastTargetHealth then
+                                    FarmState.lastTargetHealth = currentH
+                                    FarmState.stuckStartTime = os.clock()
                                 else
                                     if (os.clock() - FarmState.stuckStartTime) > 20 then
-                                        if whitelistHoldTarget then
-                                            FarmState.stuckStartTime = os.clock()
-                                            task.wait(0.1)
-                                            return
-                                        end
-
                                         notify("Stuck (20s)! Ditching.", 2)
-                                        blacklistTarget(activeTarget, 20)
+                                        blacklistTarget(activeTarget, 60)
                                         stopMoving()
                                         FarmState.currentTarget = nil
-                                        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                                            Dashboard.setCurrentTarget(nil)
-                                        end
-                                        FarmState.attached = false
+                                        FarmState.attached      = false
                                         return
                                     end
                                 end
                             else
+                                -- Update stuck health ref if distracted so we don't bug out
                                 FarmState.lastTargetHealth = activeDef.getHealth(activeTarget) or 0
-                                FarmState.stuckStartTime   = os.clock()
+                                FarmState.stuckStartTime = os.clock()
                             end
                         end
 
                         local now = os.clock()
                         if now - FarmState.lastHit >= activeDef.hitInterval then
-                            if activeDef.name == FARM_MODE_ORES then
-                                swingTool("Pickaxe")
-                                swingTool("Weapon")
-                            else
-                                swingTool(activeDef.toolRemoteArg)
-                            end
+                            swingTool(activeDef.toolRemoteArg)
                             FarmState.lastHit = now
                         end
                     else
+                        -- Out of range, move
                         if not FarmState.moveCleanup then
                             startMovingToTarget(activeTarget, activeDef)
                         end
-
-                        FarmState.attached       = false
+                        FarmState.attached = false
                         FarmState.stuckStartTime = os.clock()
 
+                        -- Movement Watchdog
                         if (os.clock() - FarmState.lastMoveTime) > 3 then
                             if (hrp.Position - FarmState.lastMovePos).Magnitude < 3 then
                                 notify("Movement Stuck! Resetting.", 2)
                                 stopMoving()
                                 startMovingToTarget(activeTarget, activeDef)
                             end
-                            FarmState.lastMovePos  = hrp.Position
+                            FarmState.lastMovePos = hrp.Position
                             FarmState.lastMoveTime = os.clock()
                         end
                     end
                 end
 
                 task.wait(0.05)
-            end)
+            end) -- end pcall
 
             if not loopSuccess then
-                warn("[AutoFarm] Crash in farmLoop:", loopError)
+                warn("[AutoFarm] Crash detected in loop:", loopError)
                 stopMoving()
                 FarmState.attached = false
                 task.wait(1)
@@ -2106,154 +2297,103 @@ return function(ctx)
 
         stopMoving()
         FarmState.currentTarget = nil
-        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-            Dashboard.setCurrentTarget(nil)
-        end
         FarmState.tempMobTarget = nil
         FarmState.attached      = false
 
         local hrp               = getLocalHRP()
-        if hrp then
-            hrp.Anchored = false
-        end
-
+        if hrp then hrp.Anchored = false end
         disableNoclip()
     end
 
-    ----------------------------------------------------------------
-    -- START/STOP CONTROL
-    ----------------------------------------------------------------
-    local function startFarm()
-        if Toggles.AF_ProximityTracker and Toggles.AF_ProximityTracker.Value then
-            Tracker.setEnabled(true)
-        end
+    -- ====================================================================
+    --  START / STOP
+    -- ====================================================================
 
-        if FarmState.enabled then
-            return
-        end
+    local function startFarm()
+        if TrackerState.Enabled then createTrackerGui() end
+        if FarmState.enabled then return end
 
         local def = ModeDefs[FarmState.mode]
         if not def then
             notify("Invalid farm mode.", 3)
-            if Toggles.AF_Enabled then
-                Toggles.AF_Enabled:SetValue(false)
-            end
+            if Toggles.AF_Enabled then Toggles.AF_Enabled:SetValue(false) end
             return
         end
 
-        if FarmState.mode == FARM_MODE_ORES and not Ores.getRocksFolder() then
+        if FarmState.mode == FARM_MODE_ORES and not getRocksFolder() then
             notify("No workspace.Rocks folder found.", 3)
-            if Toggles.AF_Enabled then
-                Toggles.AF_Enabled:SetValue(false)
-            end
+            if Toggles.AF_Enabled then Toggles.AF_Enabled:SetValue(false) end
             return
         end
 
-        if FarmState.mode == FARM_MODE_ENEMIES and not Services.Workspace:FindFirstChild("Living") then
+        if FarmState.mode == FARM_MODE_ENEMIES and not getLivingFolder() then
             notify("No workspace.Living folder found.", 3)
-            if Toggles.AF_Enabled then
-                Toggles.AF_Enabled:SetValue(false)
-            end
+            if Toggles.AF_Enabled then Toggles.AF_Enabled:SetValue(false) end
             return
         end
 
-        local count = 0
-        for _ in pairs(AF_Config.WhitelistedOres) do
-            count += 1
-        end
-        if FarmState.mode == FARM_MODE_ORES and AF_Config.OreWhitelistEnabled and count == 0 then
+        local whitelistedCount = 0
+        for _ in pairs(WhitelistedOres) do whitelistedCount = whitelistedCount + 1 end
+        if FarmState.mode == FARM_MODE_ORES and OreWhitelistEnabled and whitelistedCount == 0 then
             notify("Warning: Ore Whitelist ON but no ores selected!", 5)
         end
 
         saveAttachSettings()
-        Movement.configureAttachForMode(FarmState.mode)
+        configureAttachForMode(FarmState.mode)
         enableNoclip()
-        stopMoving()
 
+        stopMoving()
         FarmState.currentTarget = nil
-        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-            Dashboard.setCurrentTarget(nil)
-        end
         FarmState.tempMobTarget = nil
         FarmState.attached      = false
         FarmState.lastHit       = 0
         FarmState.detourActive  = false
-        FarmState.restocking    = false
+        FarmState.restocking    = false -- Reset flag
         FarmState.lastMoveTime  = os.clock()
+
         FarmState.enabled       = true
         FarmState.farmThread    = task.spawn(farmLoop)
-
-        if isDoBossesToggleOn() and not BossState.enabled then
-            BossState.enabled = true
-        end
-
-        if BossState.enabled then
-            BossState.lastFailedAttempt = 0
-            BossState.initialSpawnAttempted = false
-            startBossWatcher()
-            if not BossState.initialSpawnAttempted then
-                BossState.initialSpawnAttempted = true
-                attemptBossSpawn("autofarm-start")
-            end
-        end
-
-        Potions.startPotionLoop()
+        startPotionLoop()
     end
 
     local function stopFarm()
         FarmState.enabled = false
         stopMoving()
         FarmState.currentTarget = nil
-        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-            Dashboard.setCurrentTarget(nil)
-        end
         FarmState.tempMobTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
         FarmState.restocking    = false
 
         local hrp               = getLocalHRP()
-        if hrp then
-            hrp.Anchored = false
-        end
-
-        if BossState.enabled then
-            BossState.enabled = false
-            stopBossWatcher()
-            BossState.bossTarget      = nil
-            BossState.spawnInProgress = false
-            BossState.lastSpawnAttempt = 0
-            BossState.multiBossActive  = false
-            BossState.lastBossSeen     = 0
-            restoreBossOffset()
-        end
-
+        if hrp then hrp.Anchored = false end
         disableNoclip()
-        if AttachPanel.DestroyAttach then
-            pcall(AttachPanel.DestroyAttach)
-        end
-        Movement.restoreAttachSettings()
+        if AttachPanel.DestroyAttach then pcall(AttachPanel.DestroyAttach) end
+        restoreAttachSettings()
     end
 
-    ----------------------------------------------------------------
-    -- UI SETUP
-    ----------------------------------------------------------------
+    -- ====================================================================
+    --  UI
+    -- ====================================================================
+
     local AutoTab             = Tabs["Auto"] or Tabs.Main
-    local AutoPotionsGroupbox = AutoTab:AddRightGroupbox("Auto Potions", "flask-round")
+    local AutoPotionsGroupbox = AutoTab:AddRightGroupbox("Auto Potions", "flask-round") -- NEW UI BOX
     local WhitelistGroup      = AutoTab:AddLeftGroupbox("Whitelists", "list")
     local FarmGroup           = AutoTab:AddLeftGroupbox("Auto Farm", "pickaxe")
-    local TrackingGroupbox    = AutoTab:AddRightGroupbox("Tracking", "compass")
+    local TrackingGroupbox    = Tabs.Auto:AddRightGroupbox("Tracking", "compass")
 
-    -- Auto Potions UI
+    -- >>> AUTO POTIONS UI <<<
+    local potionValues        = {
+        "Damage Potion I",
+        "Speed Potion I",
+        "Health Potion I",
+        "Luck Potion I",
+        "Miner Potion I",
+    }
+
     AutoPotionsGroupbox:AddDropdown("AutoPotions_List", {
         Text    = "Potions to Manage",
-        Values  = {
-            "Damage Potion I",
-            "Speed Potion I",
-            "Health Potion I",
-            "Luck Potion I",
-            "Miner Potion I",
-        },
+        Values  = potionValues,
         Default = {},
         Multi   = true,
     })
@@ -2272,9 +2412,9 @@ return function(ctx)
         Default  = false,
         Callback = function(state)
             if state then
-                Potions.startPotionLoop()
+                startPotionLoop()
             end
-        end,
+        end
     })
 
     AutoPotionsGroupbox:AddToggle("AutoPotions_AutoRestock", {
@@ -2283,60 +2423,47 @@ return function(ctx)
     })
 
     AutoPotionsGroupbox:AddButton("Manual Restock", function()
-        Potions.restockPotions(false)
+        restockPotions(false)
     end)
 
-    ----------------------------------------------------------------
-    -- Whitelist & Mode UI
-    ----------------------------------------------------------------
-    local ModeDropdown, OreTypeDropdown, ZoneDropdown, AppliesToDropdown, QuestTargetsDropdown
+    -- >>> AUTO FARM UI <<<
+
+    local ModeDropdown
+    local OreTypeDropdown
+    local ZoneDropdown
+    local AppliesToDropdown
 
     local function refreshAvailableTargets()
         local def = ModeDefs[FarmState.mode]
         if not def or not def.scan then
-            if AppliesToDropdown then
-                AppliesToDropdown:SetValues({})
-            end
+            if AppliesToDropdown then AppliesToDropdown:SetValues({}) end
             return
         end
-
-        local _, uniqueNames = def.scan()
-
+        local nameMap, uniqueNames = def.scan()
         if FarmState.mode == FARM_MODE_ORES then
-            local seen = {}
-            for _, name in ipairs(uniqueNames) do
-                seen[name] = true
-            end
-            for _, perm in ipairs(Priority.PermOreList) do
-                if not seen[perm] then
-                    table.insert(uniqueNames, perm)
-                    seen[perm] = true
+            local set = {}
+            for _, n in ipairs(uniqueNames) do set[n] = true end
+            for _, n in ipairs(PermOreList) do
+                if not set[n] then
+                    table.insert(uniqueNames, n)
+                    set[n] = true
                 end
             end
             table.sort(uniqueNames)
         end
-
-        if AppliesToDropdown then
-            AppliesToDropdown:SetValues(uniqueNames)
-        end
+        if AppliesToDropdown then AppliesToDropdown:SetValues(uniqueNames) end
     end
 
     local function refreshOreTypesDropdown()
-        if OreTypeDropdown then
-            OreTypeDropdown:SetValues(Ores.getGameOreTypes())
-        end
+        if not OreTypeDropdown then return end
+        local types = getGameOreTypes()
+        OreTypeDropdown:SetValues(types)
     end
 
     local function refreshZoneDropdown()
-        if ZoneDropdown then
-            ZoneDropdown:SetValues(Ores.scanZones())
-        end
-    end
-
-    local function refreshQuestTargetsDropdown()
-        if QuestTargetsDropdown and questTargets and questTargets.getQuestNames then
-            QuestTargetsDropdown:SetValues(questTargets.getQuestNames())
-        end
+        if not ZoneDropdown then return end
+        local zones = scanZones()
+        ZoneDropdown:SetValues(zones)
     end
 
     ModeDropdown = WhitelistGroup:AddDropdown("AF_Mode", {
@@ -2344,13 +2471,9 @@ return function(ctx)
         Values   = { FARM_MODE_ORES, FARM_MODE_ENEMIES },
         Default  = FarmState.mode,
         Callback = function(value)
-            if FarmState.mode == value then
-                return
-            end
-
+            if FarmState.mode == value then return end
             FarmState.mode = value
             refreshAvailableTargets()
-
             if FarmState.enabled then
                 stopFarm()
                 startFarm()
@@ -2358,21 +2481,21 @@ return function(ctx)
         end,
     })
 
+    WhitelistGroup:AddLabel(
+        "Mob/Ore selection is now controlled by priorities, use the priority editor below to do this.", true)
+
     WhitelistGroup:AddToggle("AF_TargetFullHealth", {
-        Text     = "Fresh Targets Only",
+        Text     = "Target Full Health Only",
         Default  = false,
-        Callback = function(state)
-            AF_Config.TargetFullHealth = state
-        end,
+        Tooltip  = "Only targets fresh rocks.",
+        Callback = function(state) TargetFullHealth = state end,
     })
 
     WhitelistGroup:AddToggle("AF_ZoneWhitelist", {
         Text     = "Zone Whitelist",
         Default  = false,
-        Tooltip  = "Only target rocks inside specific zones",
-        Callback = function(state)
-            AF_Config.ZoneWhitelistEnabled = state
-        end,
+        Tooltip  = "Only target rocks inside specific Zone folders.",
+        Callback = function(state) ZoneWhitelistEnabled = state end,
     })
 
     ZoneDropdown = WhitelistGroup:AddDropdown("AF_Zones", {
@@ -2380,12 +2503,8 @@ return function(ctx)
         Values   = {},
         Multi    = true,
         Callback = function(selectedTable)
-            AF_Config.WhitelistedZones = {}
-            for name, sel in pairs(selectedTable) do
-                if sel then
-                    AF_Config.WhitelistedZones[name] = true
-                end
-            end
+            WhitelistedZones = {}
+            for name, selected in pairs(selectedTable) do if selected then WhitelistedZones[name] = true end end
         end,
     })
 
@@ -2394,24 +2513,18 @@ return function(ctx)
     WhitelistGroup:AddToggle("AF_OreWhitelist", {
         Text     = "Ore Drop Whitelist",
         Default  = false,
-        Tooltip  = "If enabled, only mine rocks that contain specific ore drops.",
-        Callback = function(state)
-            AF_Config.OreWhitelistEnabled = state
-        end,
+        Tooltip  = "If enabled, checks inside the rock for specific ore drops.",
+        Callback = function(state) OreWhitelistEnabled = state end,
     })
 
     AppliesToDropdown = WhitelistGroup:AddDropdown("AF_AppliesTo", {
         Text     = "Whitelist Applies To",
         Values   = {},
         Multi    = true,
-        Tooltip  = "Select which rocks should be checked for whitelisted drops.",
+        Tooltip  = "Select which rocks require drop checking. Unselected rocks are mined freely.",
         Callback = function(selectedTable)
-            AF_Config.WhitelistAppliesTo = {}
-            for name, sel in pairs(selectedTable) do
-                if sel then
-                    AF_Config.WhitelistAppliesTo[name] = true
-                end
-            end
+            WhitelistAppliesTo = {}
+            for name, selected in pairs(selectedTable) do if selected then WhitelistAppliesTo[name] = true end end
         end,
     })
 
@@ -2419,66 +2532,52 @@ return function(ctx)
         Text     = "Whitelisted Ores",
         Values   = {},
         Multi    = true,
-        Tooltip  = "Select which ore drops are allowed.",
+        Tooltip  = "Select which drops (Iron, Gold, etc) allow mining.",
         Callback = function(selectedTable)
-            AF_Config.WhitelistedOres = {}
-            for name, sel in pairs(selectedTable) do
-                if sel then
-                    AF_Config.WhitelistedOres[name] = true
-                end
-            end
+            WhitelistedOres = {}
+            for name, selected in pairs(selectedTable) do if selected then WhitelistedOres[name] = true end end
         end,
     })
 
     WhitelistGroup:AddDivider()
 
-    WhitelistGroup:AddButton("Launch Priority Editor", function()
-        loadstring(game:HttpGet(
-            "https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/the-forge/editor.lua"
-        ))()
-    end)
-
-    WhitelistGroup:AddButton("Reload Priorities", function()
-        Priority.loadPriorityConfig()
-        notify("Priorities reloaded from config!", 3)
-    end)
-
-    WhitelistGroup:AddButton("Refresh All Whitelists", function()
-        refreshAvailableTargets()
-        Avoidance.refreshHazards()
-        refreshZoneDropdown()
-        refreshOreTypesDropdown()
-    end)
-
-    ----------------------------------------------------------------
-    -- Farm Options UI
-    ----------------------------------------------------------------
-    FarmGroup:AddSlider("AF_OffsetAdjust", {
-        Text     = "Extra Offset",
-        Min      = -15,
-        Max      = 20,
-        Default  = AF_Config.ExtraYOffset,
-        Rounding = 1,
-        Suffix   = " studs",
-        Callback = function(value)
-            AF_Config.ExtraYOffset = tonumber(value) or 0
-            if FarmState.enabled and FarmState.currentTarget and FarmState.attached then
-                Movement.realignAttach(FarmState.currentTarget)
-            end
+    WhitelistGroup:AddButton({
+        Text = "Launch Priority Editor",
+        Func = function()
+            loadstring(game:HttpGet(
+                "https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/the-forge/editor.lua"))()
         end,
     })
 
-    FarmGroup:AddSlider("AF_BossOffsetAdjust", {
-        Text     = "Boss Offset",
-        Min      = -15,
-        Max      = 40,
-        Default  = AF_Config.BossExtraYOffset,
+    WhitelistGroup:AddButton({
+        Text = "Reload Priorities",
+        Func = function()
+            loadPriorityConfig()
+            notify("Priorities reloaded from config!", 3)
+        end,
+    })
+
+    WhitelistGroup:AddButton({
+        Text = "Refresh All Whitelists",
+        Func = function()
+            refreshAvailableTargets()
+            refreshHazards()
+            refreshZoneDropdown()
+            refreshOreTypesDropdown()
+        end,
+    })
+
+    FarmGroup:AddSlider("AF_OffsetAdjust", {
+        Text     = "Extra Offset",
+        Min      = -5,
+        Max      = 15,
+        Default  = 0,
         Rounding = 1,
         Suffix   = " studs",
         Callback = function(value)
-            AF_Config.BossExtraYOffset = tonumber(value) or AF_Config.BossExtraYOffset
-            if BossState.enabled and FarmState.enabled and FarmState.currentTarget and FarmState.attached then
-                applyBossOffset()
+            ExtraYOffset = value or 0
+            if FarmState.enabled and FarmState.currentTarget and FarmState.attached then
+                realignAttach(FarmState.currentTarget)
             end
         end,
     })
@@ -2487,12 +2586,25 @@ return function(ctx)
         Text     = "Flight Speed",
         Min      = 50,
         Max      = 120,
-        Default  = AF_Config.FarmSpeed,
+        Default  = FarmSpeed,
         Rounding = 0,
         Suffix   = " studs/s",
         Callback = function(value)
-            local v = tonumber(value) or AF_Config.FarmSpeed
-            AF_Config.FarmSpeed = math.clamp(v, 5, 120)
+            local v = tonumber(value) or FarmSpeed
+            FarmSpeed = math.clamp(v, 5, 120)
+        end,
+    })
+
+    FarmGroup:AddSlider("AF_MaxTargetHeight", {
+        Text     = "Max Target Height",
+        Min      = 0,
+        Max      = 120,
+        Default  = MaxTargetHeight,
+        Rounding = 0,
+        Suffix   = " studs",
+        Callback = function(value)
+            local v = tonumber(value) or MaxTargetHeight
+            MaxTargetHeight = math.clamp(v, 0, 100)
         end,
     })
 
@@ -2502,372 +2614,161 @@ return function(ctx)
         Text     = "Avoid Lava",
         Default  = false,
         Callback = function(state)
-            AF_Config.AvoidLava = state and true or false
-            if AF_Config.AvoidLava then
-                Avoidance.refreshHazards()
-            end
-        end,
-    })
-
-    FarmGroup:AddToggle("AF_AvoidRedCave", {
-        Text     = "Avoid Red Cave",
-        Default  = false,
-        Callback = function(state)
-            AF_Config.AvoidRedCave = state and true or false
+            AvoidLava = state and true or false
+            if AvoidLava then refreshHazards() end
         end,
     })
 
     FarmGroup:AddToggle("AF_AttackNearbyMobs", {
         Text     = "Attack Nearby Mobs",
         Default  = false,
-        Callback = function(state)
-            AF_Config.AttackNearbyMobs = state
-        end,
+        Callback = function(state) AttackNearbyMobs = state end,
     })
+
 
     FarmGroup:AddToggle("AF_AvoidPlayers", {
         Text     = "Avoid Players",
         Default  = false,
-        Callback = function(state)
-            AF_Config.AvoidPlayers = state
-        end,
+        Callback = function(state) AvoidPlayers = state end,
     })
 
     FarmGroup:AddToggle("AF_DamageDitch", {
         Text     = "Damage Ditch",
         Default  = false,
-        Callback = function(state)
-            AF_Config.DamageDitchEnabled = state
-        end,
+        Callback = function(state) DamageDitchEnabled = state end,
     })
 
     FarmGroup:AddSlider("AF_NearbyMobRange", {
         Text     = "Mob Detect Range",
-        Tooltip  = "Range at which to auto-attack mobs when mining",
+        Tooltip  = "Range we attack mobs at when ore farming",
         Min      = 10,
         Max      = 100,
-        Default  = AF_Config.NearbyMobRange,
+        Default  = NearbyMobRange,
         Rounding = 0,
         Suffix   = " studs",
-        Callback = function(value)
-            AF_Config.NearbyMobRange = tonumber(value) or 40
-        end,
+        Callback = function(value) NearbyMobRange = tonumber(value) or 40 end,
     })
 
     FarmGroup:AddSlider("AF_PlayerAvoidRadius", {
         Text     = "Player Avoid Range",
-        Tooltip  = "Distance to keep away from other players",
+        Tooltip  = "Distance we keep from other players",
         Min      = 10,
         Max      = 100,
-        Default  = AF_Config.PlayerAvoidRadius,
+        Default  = PlayerAvoidRadius,
         Rounding = 0,
         Suffix   = " studs",
-        Callback = function(value)
-            AF_Config.PlayerAvoidRadius = tonumber(value) or AF_Config.PlayerAvoidRadius
-        end,
+        Callback = function(value) PlayerAvoidRadius = tonumber(value) or PlayerAvoidRadius end,
     })
 
     FarmGroup:AddSlider("AF_DitchThreshold", {
         Text     = "Ditch Health %",
-        Tooltip  = "Health percentage threshold to ditch target when hit",
+        Tooltip  = "Level of health we start ditching targets when we take damage",
         Min      = 10,
         Max      = 100,
-        Default  = AF_Config.DamageDitchThreshold,
+        Default  = 100,
         Rounding = 0,
         Suffix   = "%",
-        Callback = function(value)
-            AF_Config.DamageDitchThreshold = tonumber(value) or 100
-        end,
+        Callback = function(value) DamageDitchThreshold = tonumber(value) or 100 end,
     })
 
     FarmGroup:AddDivider()
-
-    FarmGroup:AddDropdown("AF_MovementMode", {
-        Text     = "Movement Method",
-        Values   = { "Tween", "Teleport" },
-        Default  = "Tween",
-        Callback = function(value)
-            AF_Config.MovementMode = value
-        end,
-    })
-
-    FarmGroup:AddToggle("AF_DoBosses", {
-        Text     = "Do Bosses",
-        Default  = false,
-        Callback = function(state)
-            if state then
-                if FarmState.enabled then
-                    BossState.enabled = true
-                    BossState.lastFailedAttempt = 0
-                    BossState.initialSpawnAttempted = false
-                    startBossWatcher()
-                    if not BossState.initialSpawnAttempted then
-                        BossState.initialSpawnAttempted = true
-                        attemptBossSpawn("toggle")
-                    end
-                else
-                    BossState.enabled = false
-                    BossState.initialSpawnAttempted = false
-                end
-            else
-                BossState.enabled = false
-                BossState.initialSpawnAttempted = false
-                stopBossWatcher()
-                BossState.bossTarget      = nil
-                BossState.spawnInProgress = false
-                BossState.lastSpawnAttempt = 0
-                BossState.multiBossActive  = false
-                BossState.lastBossSeen     = 0
-                restoreBossOffset()
-                if FarmState.currentTarget and isBossModel(FarmState.currentTarget) then
-                    stopMoving()
-                    FarmState.currentTarget = nil
-                    FarmState.attached      = false
-                    FarmState.tempMobTarget = nil
-                    if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-                        Dashboard.setCurrentTarget(nil)
-                    end
-                end
-            end
-        end,
-    })
-
-    FarmGroup:AddToggle("AF_BossDupe", {
-        Text     = "Boss Dupe",
-        Default  = false,
-        Tooltip  = "Spawns a ton of bosses.",
-        Callback = function(_)
-        end,
-    })
 
     FarmGroup:AddToggle("AF_Enabled", {
         Text     = "Auto Farm",
         Default  = false,
         Callback = function(state)
-            if state then
-                startFarm()
-            else
-                stopFarm()
-            end
+            if state then startFarm() else stopFarm() end
         end,
     })
-
-    ----------------------------------------------------------------
-    -- ALT FARM UI
-    ----------------------------------------------------------------
-    local AltFarmGroup = AutoTab:AddRightGroupbox("Alt Farm", "bot")
-
-    AltFarmGroup:AddLabel(
-    "To use this you need to set one account as the main alt, and the rest as helper alts. Then in all accounts, select the ores you want the main alt to steal under whitelisted ores. Then whenever one of your alts finds a whitelisted or, it will ditch the rock, and your main will go in to mine it.",
-        true)
-
-    AltFarmGroup:AddToggle("AF_AltFarmEnabled", {
-        Text     = "Enable Alt Farm",
-        Default  = AF_Config.AltFarmEnabled,
-        Callback = function(state)
-            AF_Config.AltFarmEnabled = state
-            if state then
-                notifyAltRoster()
-            end
-        end,
-    })
-
-    AltFarmGroup:AddDropdown("AF_AltFarmMode", {
-        Text     = "Alt Role",
-        Values   = { ALT_FARM_MODE_MAIN, ALT_FARM_MODE_HELPER },
-        Default  = AF_Config.AltFarmMode,
-        Callback = function(value)
-            AF_Config.AltFarmMode = value
-        end,
-    })
-
-    AltFarmGroup:AddLabel("Type an alt username and press Enter to save.", true)
-    AltFarmGroup:AddInput("AF_AltFarmAddAlt", {
-        Text        = "Add Alt",
-        Placeholder = "Alt username",
-        Default     = "",
-        Finished    = true,
-        Callback    = function(value)
-            local trimmed = tostring(value or ""):match("^%s*(.-)%s*$")
-            if trimmed == "" then
-                return
-            end
-            local added, reason = addAltName(trimmed)
-            if added then
-                notify("Added alt: " .. trimmed, 2)
-                if Options and Options.AF_AltFarmAddAlt then
-                    Options.AF_AltFarmAddAlt.Value = ""
-                end
-            else
-                notify(reason or "Alt already tracked.", 2)
-            end
-        end,
-    })
-
-    ----------------------------------------------------------------
-    -- QUEST PRIORITY OVERRIDE UI
-    ----------------------------------------------------------------
-    local QuestGroup = AutoTab:AddLeftGroupbox("Auto Quest", "scroll")
-
-    QuestGroup:AddToggle("AF_QuestPriorityOverride", {
-        Text     = "Quest Priority Override",
-        Default  = AF_Config.QuestPriorityOverrideEnabled,
-        Tooltip  = "Overrides targets with quest objectives.",
-        Callback = function(state)
-            AF_Config.QuestPriorityOverrideEnabled = state
-        end,
-    })
-
-    QuestTargetsDropdown = QuestGroup:AddDropdown("AF_QuestTargetFilter", {
-        Text     = "Quest Target Filter",
-        Values   = {},
-        Default  = {},
-        Multi    = true,
-        Tooltip  = "Only prioritize targets from selected quests.",
-        Callback = function(selectedTable)
-            AF_Config.QuestTargetFilter = {}
-            for name, sel in pairs(selectedTable) do
-                if sel then
-                    AF_Config.QuestTargetFilter[name] = true
-                end
-            end
-            if questTargets and questTargets.setQuestFilter then
-                questTargets.setQuestFilter(AF_Config.QuestTargetFilter)
-            end
-        end,
-    })
-
-    QuestGroup:AddButton("Refresh Quest List", function()
-        refreshQuestTargetsDropdown()
-    end)
-
-    QuestGroup:AddToggle("AF_QuestAutoComplete", {
-        Text     = "Quest Autocomplete",
-        Default  = AF_Config.QuestAutoCompleteEnabled,
-        Tooltip  = "Automatically finishes some quests.",
-        Callback = function(state)
-            AF_Config.QuestAutoCompleteEnabled = state
-            if state then
-                startAutoQuestLoop()
-            else
-                stopAutoQuestLoop()
-            end
-        end,
-    })
-
-    if AF_Config.QuestAutoCompleteEnabled then
-        startAutoQuestLoop()
-    end
 
     refreshAvailableTargets()
-    Avoidance.refreshHazards()
+    refreshHazards()
     refreshOreTypesDropdown()
     refreshZoneDropdown()
-    refreshQuestTargetsDropdown()
-    if questTargets and questTargets.setQuestFilter then
-        questTargets.setQuestFilter(AF_Config.QuestTargetFilter)
-    end
 
     TrackingGroupbox:AddToggle("AF_ProximityTracker", {
         Text     = "Progress Tracker",
         Default  = false,
         Callback = function(state)
-            Tracker.setEnabled(state)
-        end,
-    })
-
-    -- Autofarm Dashboard toggle (standalone HUD, like Tracker)
-    TrackingGroupbox:AddToggle("AF_DashboardEnabled", {
-        Text     = "Autofarm Dashboard",
-        Default  = false,
-        Callback = function(state)
-            if Dashboard and Dashboard.setEnabled then
-                Dashboard.setEnabled(state)
+            TrackerState.Enabled = state
+            if state then
+                createTrackerGui()
+            elseif TrackerState.Gui then
+                -- optional: hide when turned off
+                TrackerState.Gui.Enabled = false
             end
         end,
     })
 
     TrackingGroupbox:AddButton({
-        Text    = "Reset Progress Tracker",
-        Tooltip = "Use if the tracker HUD misbehaves",
-        Func    = function()
-            Tracker.reset()
+        Text = "Reset Progress Tracker",
+        Tooltip = "Use this if tracker becomes bugged",
+        Func = function()
+            -- Kill current HUD so we can rebuild cleanly
+            if TrackerState.Gui then
+                pcall(function()
+                    TrackerState.Gui:Destroy()
+                end)
+                TrackerState.Gui = nil
+                TrackerState.Container = nil
+                TrackerState.TargetName = nil
+                TrackerState.HealthBar = nil
+                TrackerState.HealthText = nil
+                TrackerState.DropList = nil
+                TrackerState.ActiveTarget = nil
+                TrackerState.CurrentDrops = {}
+                TrackerState.LastCheckHealth = {}
+            end
+
+            local okDelete = false
+
+            if typeof(isfile) == "function"
+                and typeof(delfile) == "function"
+                and typeof(ConfigFile) == "string"
+            then
+                local ok, err = pcall(function()
+                    if isfile(ConfigFile) then
+                        delfile(ConfigFile)
+                    end
+                end)
+                okDelete = ok and true or false
+                if not ok then
+                    warn("[Forge] Failed to delete HUD config:", err)
+                end
+            end
+
+            if okDelete then
+                notify("Tracker HUD layout reset. Toggle Progress Tracker back on to rebuild.", 4)
+            else
+                notify("Could not delete HUD config (executor may not support delfile).", 4)
+            end
         end,
     })
 
     ----------------------------------------------------------------
-    -- MODULE HANDLE RETURN
+    -- MODULE HANDLE
     ----------------------------------------------------------------
+
     local H = {}
+    function H.Start() startFarm() end
 
-    function H.Start()
-        startFarm()
-    end
-
-    function H.Stop()
-        stopFarm()
-    end
+    function H.Stop() stopFarm() end
 
     function H.Unload()
         FarmState.enabled = false
         stopMoving()
         FarmState.currentTarget = nil
-        if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
-            Dashboard.setCurrentTarget(nil)
-        end
         FarmState.tempMobTarget = nil
         FarmState.attached      = false
         FarmState.detourActive  = false
         disableNoclip()
-
-        if Tracker and Tracker.destroy then
-            pcall(Tracker.destroy)
+        if TrackerState.Gui then
+            TrackerState.Gui:Destroy()
+            TrackerState.Gui = nil
         end
-
-        if Dashboard and Dashboard.destroy then
-            pcall(Dashboard.destroy)
-        elseif Dashboard and Dashboard.setEnabled then
-            pcall(Dashboard.setEnabled, false)
-        end
-
-        if Toggles.AF_Enabled then
-            pcall(function()
-                Toggles.AF_Enabled:SetValue(false)
-            end)
-        end
-
-        BossState.enabled         = false
-        BossState.bossTarget      = nil
-        BossState.spawnInProgress = false
-        BossState.lastSpawnAttempt = 0
-        BossState.multiBossActive  = false
-        BossState.lastBossSeen     = 0
-        stopBossWatcher()
-        restoreBossOffset()
-        if Toggles.AF_DoBosses and Toggles.AF_DoBosses.SetValue then
-            pcall(function()
-                Toggles.AF_DoBosses:SetValue(false)
-            end)
-        end
-        if Toggles.AF_BossDupe and Toggles.AF_BossDupe.SetValue then
-            pcall(function()
-                Toggles.AF_BossDupe:SetValue(false)
-            end)
-        end
-
-        stopAutoQuestLoop()
-        AF_Config.QuestAutoCompleteEnabled = false
-        if Toggles.AF_QuestAutoComplete and Toggles.AF_QuestAutoComplete.SetValue then
-            pcall(function()
-                Toggles.AF_QuestAutoComplete:SetValue(false)
-            end)
-        end
-
-        if AttachPanel.DestroyAttach then
-            pcall(AttachPanel.DestroyAttach)
-        end
-
-        Movement.restoreAttachSettings()
+        if Toggles.AF_Enabled then pcall(function() Toggles.AF_Enabled:SetValue(false) end) end
+        if AttachPanel.DestroyAttach then pcall(AttachPanel.DestroyAttach) end
+        restoreAttachSettings()
     end
 
     return H
