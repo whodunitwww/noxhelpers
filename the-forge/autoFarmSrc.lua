@@ -96,6 +96,8 @@ return function(ctx)
         lastSpawnAttempt = 0,
         spawnThread      = nil,
         prevOffset       = nil,
+        multiBossActive  = false,
+        lastBossSeen     = 0,
     }
 
     local BOSS_READY_TEXT      = "30:00"
@@ -104,6 +106,7 @@ return function(ctx)
     local BOSS_ATTACH_WINDOW   = 900
     local BOSS_DUPE_ITERATIONS = 120
     local BOSS_DUPE_YIELD_EVERY = 8
+    local BOSS_CLEAR_TIMEOUT   = 8
 
     ----------------------------------------------------------------
     -- MODULE LOADER (file -> GitHub fallback)
@@ -373,6 +376,17 @@ return function(ctx)
         return (os.clock() - lastAttempt) <= BOSS_ATTACH_WINDOW
     end
 
+    local function isBossCleanupActive()
+        return isBossAttachWindowOpen() or BossState.multiBossActive == true
+    end
+
+    local function markBossSeen(boss)
+        if boss then
+            BossState.lastBossSeen = os.clock()
+            BossState.multiBossActive = true
+        end
+    end
+
     local function isBossReady()
         local label = getBossTimerLabel()
         local text = label and tostring(label.Text) or BossState.lastTimerText
@@ -537,7 +551,8 @@ return function(ctx)
 
         local existingBoss = findAliveGolem()
         if existingBoss then
-            if isBossAttachWindowOpen() then
+            markBossSeen(existingBoss)
+            if isBossCleanupActive() then
                 BossState.bossTarget = existingBoss
             end
             return
@@ -553,6 +568,8 @@ return function(ctx)
         end
         BossState.lastSpawnAttempt = now
         BossState.spawnInProgress  = true
+        BossState.multiBossActive  = true
+        BossState.lastBossSeen     = now
 
         BossState.spawnThread = task.spawn(function()
             local spawned = false
@@ -618,6 +635,7 @@ return function(ctx)
                     if golem then
                         spawned = true
                         BossState.lastFailedAttempt = 0
+                        markBossSeen(golem)
                         BossState.bossTarget      = golem
                         FarmState.currentTarget   = golem
                         FarmState.attached        = false
@@ -1340,14 +1358,16 @@ return function(ctx)
         if BossState.enabled and def.name == FARM_MODE_ENEMIES then
             local boss = BossState.bossTarget
             if boss and isMobAlive(boss) then
+                markBossSeen(boss)
                 if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
                     Dashboard.setCurrentTarget(boss.Name)
                 end
                 return boss
             end
-            if isBossAttachWindowOpen() then
+            if isBossCleanupActive() then
                 boss = findAliveGolem()
                 if boss then
+                    markBossSeen(boss)
                     BossState.bossTarget = boss
                     if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
                         Dashboard.setCurrentTarget(boss.Name)
@@ -1590,14 +1610,25 @@ return function(ctx)
 
                 local bossTarget = nil
                 if BossState.enabled then
-                    local bossWindowOpen = isBossAttachWindowOpen()
-                    if BossState.bossTarget and not isMobAlive(BossState.bossTarget) then
+                    local bossSeekActive = isBossCleanupActive()
+                    local nowBoss = os.clock()
+                    if BossState.bossTarget and isMobAlive(BossState.bossTarget) then
+                        markBossSeen(BossState.bossTarget)
+                    else
                         BossState.bossTarget = nil
+                        if bossSeekActive then
+                            local foundBoss = findAliveGolem()
+                            if foundBoss then
+                                markBossSeen(foundBoss)
+                                BossState.bossTarget = foundBoss
+                            end
+                        end
                     end
-                    if not BossState.bossTarget and bossWindowOpen then
-                        local foundBoss = findAliveGolem()
-                        if foundBoss then
-                            BossState.bossTarget = foundBoss
+
+                    if BossState.multiBossActive and not BossState.bossTarget then
+                        local lastSeen = BossState.lastBossSeen or 0
+                        if (nowBoss - lastSeen) > BOSS_CLEAR_TIMEOUT then
+                            BossState.multiBossActive = false
                         end
                     end
 
@@ -2192,6 +2223,8 @@ return function(ctx)
             BossState.bossTarget      = nil
             BossState.spawnInProgress = false
             BossState.lastSpawnAttempt = 0
+            BossState.multiBossActive  = false
+            BossState.lastBossSeen     = 0
             restoreBossOffset()
         end
 
@@ -2583,6 +2616,8 @@ return function(ctx)
                 BossState.bossTarget      = nil
                 BossState.spawnInProgress = false
                 BossState.lastSpawnAttempt = 0
+                BossState.multiBossActive  = false
+                BossState.lastBossSeen     = 0
                 restoreBossOffset()
                 if FarmState.currentTarget and isBossModel(FarmState.currentTarget) then
                     stopMoving()
@@ -2805,6 +2840,8 @@ return function(ctx)
         BossState.bossTarget      = nil
         BossState.spawnInProgress = false
         BossState.lastSpawnAttempt = 0
+        BossState.multiBossActive  = false
+        BossState.lastBossSeen     = 0
         stopBossWatcher()
         restoreBossOffset()
         if Toggles.AF_DoBosses and Toggles.AF_DoBosses.SetValue then
