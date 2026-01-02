@@ -53,7 +53,7 @@ return function(ctx)
         QuestPriorityOverrideEnabled = false,
         QuestAutoCompleteEnabled     = false,
         QuestTargetFilter            = {},
-        MovementMode                 = "Teleport",
+        MovementMode                 = "Tween",
     }
 
     local FarmState            = {
