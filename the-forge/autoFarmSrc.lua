@@ -53,6 +53,7 @@ return function(ctx)
         QuestPriorityOverrideEnabled = false,
         QuestAutoCompleteEnabled     = false,
         QuestTargetFilter            = {},
+        TPDelayMultiplier            = 1,
         MovementMode                 = "Tween",
     }
 
@@ -2626,6 +2627,20 @@ return function(ctx)
         Default  = "Tween",
         Callback = function(value)
             AF_Config.MovementMode = value
+        end,
+    })
+
+    FarmGroup:AddSlider("AF_TPDelay", {
+        Text     = "TP Delay",
+        Tooltip  = "Scales waits between teleport actions.",
+        Min      = 10,
+        Max      = 300,
+        Default  = math.floor((AF_Config.TPDelayMultiplier or 1) * 100 + 0.5),
+        Rounding = 0,
+        Suffix   = "%",
+        Callback = function(value)
+            local v = tonumber(value) or 100
+            AF_Config.TPDelayMultiplier = math.clamp(v, 10, 300) / 100
         end,
     })
 
