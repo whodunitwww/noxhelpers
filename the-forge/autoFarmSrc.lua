@@ -2282,6 +2282,7 @@ return function(ctx)
     local WhitelistGroup      = AutoTab:AddLeftGroupbox("Whitelists", "list")
     local FarmGroup           = AutoTab:AddLeftGroupbox("Auto Farm", "pickaxe")
     local TrackingGroupbox    = AutoTab:AddRightGroupbox("Tracking", "compass")
+    local CombatGroup         = AutoTab:AddRightGroupbox("Combat & Avoidance", "shield")
 
     -- Auto Potions UI
     AutoPotionsGroupbox:AddDropdown("AutoPotions_List", {
@@ -2535,9 +2536,7 @@ return function(ctx)
         end,
     })
 
-    FarmGroup:AddDivider()
-
-    FarmGroup:AddToggle("AF_AvoidLava", {
+    CombatGroup:AddToggle("AF_AvoidLava", {
         Text     = "Avoid Lava",
         Default  = false,
         Callback = function(state)
@@ -2548,7 +2547,7 @@ return function(ctx)
         end,
     })
 
-    FarmGroup:AddToggle("AF_AvoidRedCave", {
+    CombatGroup:AddToggle("AF_AvoidRedCave", {
         Text     = "Avoid Red Cave",
         Default  = false,
         Callback = function(state)
@@ -2556,7 +2555,7 @@ return function(ctx)
         end,
     })
 
-    FarmGroup:AddToggle("AF_AttackNearbyMobs", {
+    CombatGroup:AddToggle("AF_AttackNearbyMobs", {
         Text     = "Attack Nearby Mobs",
         Default  = false,
         Callback = function(state)
@@ -2564,7 +2563,7 @@ return function(ctx)
         end,
     })
 
-    FarmGroup:AddToggle("AF_AvoidPlayers", {
+    CombatGroup:AddToggle("AF_AvoidPlayers", {
         Text     = "Avoid Players",
         Default  = false,
         Callback = function(state)
@@ -2572,7 +2571,7 @@ return function(ctx)
         end,
     })
 
-    FarmGroup:AddToggle("AF_DamageDitch", {
+    CombatGroup:AddToggle("AF_DamageDitch", {
         Text     = "Damage Ditch",
         Default  = false,
         Callback = function(state)
@@ -2580,7 +2579,9 @@ return function(ctx)
         end,
     })
 
-    FarmGroup:AddSlider("AF_NearbyMobRange", {
+    CombatGroup:AddDivider()
+
+    CombatGroup:AddSlider("AF_NearbyMobRange", {
         Text     = "Mob Detect Range",
         Tooltip  = "Range at which to auto-attack mobs when mining",
         Min      = 10,
@@ -2593,7 +2594,7 @@ return function(ctx)
         end,
     })
 
-    FarmGroup:AddSlider("AF_PlayerAvoidRadius", {
+    CombatGroup:AddSlider("AF_PlayerAvoidRadius", {
         Text     = "Player Avoid Range",
         Tooltip  = "Distance to keep away from other players",
         Min      = 10,
@@ -2606,7 +2607,7 @@ return function(ctx)
         end,
     })
 
-    FarmGroup:AddSlider("AF_DitchThreshold", {
+    CombatGroup:AddSlider("AF_DitchThreshold", {
         Text     = "Ditch Health %",
         Tooltip  = "Health percentage threshold to ditch target when hit",
         Min      = 10,
