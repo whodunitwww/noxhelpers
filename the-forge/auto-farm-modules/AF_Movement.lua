@@ -111,6 +111,15 @@ return function(env)
         if AttachPanel.EnableDodge then AttachPanel.EnableDodge(false) end
     end
 
+    local function tpWait(base)
+        local mult = tonumber(AF_Config.TPDelayMultiplier)
+        if not mult or mult <= 0 then
+            mult = 1
+        end
+        local delay = (base ~= nil) and base or 0.03
+        task.wait(math.max(delay * mult, 0))
+    end
+
     local function stopMoving()
         if FarmState.moveCleanup then
             pcall(FarmState.moveCleanup)
@@ -187,7 +196,7 @@ return function(env)
                 if stableCount >= 1 then
                     break
                 end
-                task.wait(0.03)
+                tpWait(0.03)
             end
         end)
     end
@@ -234,13 +243,13 @@ return function(env)
                     hrp.CFrame = cannonPart.CFrame
                     hrp.AssemblyLinearVelocity = Vector3.zero
                     hrp.AssemblyAngularVelocity = Vector3.zero
-                    task.wait(0.2)
+                    tpWait(0.2)
 
                     if prompt and fireproximityprompt then
                         fireproximityprompt(prompt)
                     end
 
-                    task.wait(0.1)
+                    tpWait(0.1)
                     hrp.CFrame = targetCFrame
                     hrp.AssemblyLinearVelocity = Vector3.zero
                     hrp.AssemblyAngularVelocity = Vector3.zero
@@ -261,7 +270,7 @@ return function(env)
                 task.spawn(function()
                     while active do
                         if prompt then fireproximityprompt(prompt) end
-                        task.wait(0.1)
+                        tpWait(0.1)
                     end
                 end)
 
@@ -271,11 +280,11 @@ return function(env)
                     -- Repeatedly force CFrame to ensure we stay at cannon to trigger prompt
                     hrp.CFrame = cannonPart.CFrame
                     hrp.AssemblyLinearVelocity = Vector3.zero
-                    task.wait()
+                    tpWait()
                 until (hrp.Position - cannonPart.Position).Magnitude < 10 or (os.clock() - startWait > 2)
                 
                 -- 3. Interaction Buffer
-                task.wait(0.55) 
+                tpWait(0.55) 
 
                 -- 4. Stop Spamming BEFORE we leave
                 active = false 
@@ -298,7 +307,7 @@ return function(env)
                     -- Keep unsitting just in case
                     if hum then hum.Sit = false end
                     
-                    task.wait(0.05)
+                    tpWait(0.05)
                 end
                 
                 hrp.Anchored = false 
