@@ -280,6 +280,36 @@ return function(ctx)
         return attach and attach.Parent ~= nil
     end
 
+    local function nudgeBossAttach(boss, def)
+        if not (boss and def) then
+            return
+        end
+        local hrp = getLocalHRP()
+        if not hrp then
+            return
+        end
+        local root = (def.getRoot and def.getRoot(boss)) or getMobRoot(boss)
+        if not root then
+            return
+        end
+        local baseY = def.attachBaseY or 0
+        local horiz = def.attachHoriz or 0
+        local mode  = def.attachMode or "Aligned"
+        local offset = Vector3.new(0, baseY + AF_Config.ExtraYOffset, 0)
+        if AttachPanel and AttachPanel.ComputeOffset then
+            local ok, result = pcall(AttachPanel.ComputeOffset, root.CFrame, mode, horiz, baseY + AF_Config.ExtraYOffset)
+            if ok and typeof(result) == "Vector3" then
+                offset = result
+            end
+        end
+        local targetPos = root.Position + offset
+        if (hrp.Position - targetPos).Magnitude > 6 then
+            hrp.CFrame = CFrame.new(targetPos, root.Position)
+            hrp.AssemblyLinearVelocity = Vector3.zero
+            hrp.AssemblyAngularVelocity = Vector3.zero
+        end
+    end
+
     local function isBossModel(model)
         return model
             and model:IsA("Model")
@@ -1547,8 +1577,8 @@ return function(ctx)
         end
     end
 
-    ----------------------------------------------------------------
-    -- MAIN FARM LOOP
+----------------------------------------------------------------
+    -- MAIN FARM LOOP (FIXED)
     ----------------------------------------------------------------
     local lastPlayerUpdate = 0
 
@@ -1650,10 +1680,10 @@ return function(ctx)
                     bossTarget = BossState.bossTarget
                     if bossTarget and FarmState.currentTarget ~= bossTarget then
                         stopMoving()
-                        FarmState.currentTarget   = bossTarget
-                        FarmState.attached        = false
-                        FarmState.tempMobTarget   = nil
-                        FarmState.lastTargetRef   = nil
+                        FarmState.currentTarget    = bossTarget
+                        FarmState.attached         = false
+                        FarmState.tempMobTarget    = nil
+                        FarmState.lastTargetRef    = nil
                         FarmState.lastTargetHealth = 0
                         if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
                             Dashboard.setCurrentTarget(bossTarget.Name)
@@ -1667,10 +1697,17 @@ return function(ctx)
                 else
                     restoreBossOffset()
                 end
+                
                 if bossOverride and FarmState.attached and not isAttachActive() then
                     FarmState.attached      = false
                     FarmState.lastTargetRef = nil
                 end
+
+                -- [[ FIX START: Disabled aggressive nudge to prevent Void Flinging ]]
+                -- if bossOverride and FarmState.attached and AF_Config.MovementMode == "Tween" then
+                --     nudgeBossAttach(bossTarget, ModeDefs[FARM_MODE_ENEMIES])
+                -- end
+                -- [[ FIX END ]]
 
                 -- DAMAGE DITCH LOGIC
                 local ditchLimit = hum.MaxHealth * (AF_Config.DamageDitchThreshold / 100)
@@ -1684,10 +1721,10 @@ return function(ctx)
                     notify("Took damage! Ditching.", 2)
                     blacklistTarget(FarmState.currentTarget, 20)
                     stopMoving()
-                    FarmState.currentTarget   = nil
-                    FarmState.attached        = false
-                    FarmState.detourActive    = false
-                    FarmState.tempMobTarget   = nil
+                    FarmState.currentTarget    = nil
+                    FarmState.attached         = false
+                    FarmState.detourActive     = false
+                    FarmState.tempMobTarget    = nil
                     FarmState.LastLocalHealth = humHealth
                     task.wait(0.15)
                     return
@@ -1738,7 +1775,6 @@ return function(ctx)
                                 isDistracted            = true
                                 notify("Attacking nearby " .. mob.Name, 1)
 
-                                -- ADD THIS: Update dashboard to show mob
                                 if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
                                     Dashboard.setCurrentTarget(mob.Name)
                                 end
@@ -1778,7 +1814,7 @@ return function(ctx)
 
                         blacklistTarget(activeTarget, 20)
                         stopMoving()
-                        FarmState.attached     = false
+                        FarmState.attached      = false
                         FarmState.detourActive = false
 
                         if isDistracted then
@@ -1837,7 +1873,6 @@ return function(ctx)
                         FarmState.tempMobTarget = nil
                         FarmState.attached      = false
                         stopMoving()
-                        -- fall through to ores
                     end
 
                     FarmState.currentTarget    = chooseNearestTarget()
@@ -1879,7 +1914,7 @@ return function(ctx)
                     local outerRadius = math.max(AF_Config.PlayerAvoidRadius * 1.2, AF_Config.PlayerAvoidRadius + 5)
                     local now         = os.clock()
 
-                    local nearMe, _   = isAnyPlayerNearHRP(innerRadius)
+                    local nearMe, _    = isAnyPlayerNearHRP(innerRadius)
                     if nearMe then
                         if (now - (FarmState.lastAvoidNoticeTime or 0)) > 2 then
                             notify("Player too close! Moving.", 2)
@@ -2011,6 +2046,9 @@ return function(ctx)
 
                 if pos then
                     local dist = (pos - hrp.Position).Magnitude
+                    if bossOverride and FarmState.attached and activeTarget == bossTarget then
+                        dist = 0
+                    end
 
                     if dist <= activeDef.hitDistance then
                         stopMoving()
