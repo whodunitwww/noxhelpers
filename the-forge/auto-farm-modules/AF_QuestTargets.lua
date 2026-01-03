@@ -9,39 +9,66 @@ return function(env)
 
     local PRIORITY_CONFIG_FILE = "Cerberus/The Forge/PriorityConfig.json"
 
-    local DefaultOrePriority = {
-        ["Crimson Crystal"] = true,
-        ["Violet Crystal"]  = true,
-        ["Cyan Crystal"]    = true,
-        ["Earth Crystal"]   = true,
-        ["Light Crystal"]   = true,
-        ["Volcanic Rock"]   = true,
-        ["Basalt Vein"]     = true,
-        ["Basalt Core"]     = true,
-        ["Basalt Rock"]     = true,
-        ["Boulder"]         = true,
-        ["Rock"]            = true,
-        ["Pebble"]          = true,
-        ["Lucky Block"]     = true,
-    }
+local DefaultOrePriority = {
+    ["Crimson Crystal"]       = 1,
+    ["Violet Crystal"]        = 1,
+    ["Cyan Crystal"]          = 1,
+    ["Earth Crystal"]         = 1,
+    ["Light Crystal"]         = 1,
+    ["Floating Crystal"]      = 1,
+    ["Large Red Crystal"]     = 1, -- Added
+    ["Medium Red Crystal"]    = 1, -- Added
+    ["Small Red Crystal"]     = 1, -- Added
+    ["Crimson Ice"]           = 1,
+    ["Large Ice Crystal"]     = 1,
+    ["Medium Ice Crystal"]    = 1,
+    ["Small Ice Crystal"]     = 1,
+    ["Volcanic Rock"]         = 2,
+    ["Lava Rock"]             = 2,
+    ["Basalt Vein"]           = 3,
+    ["Basalt Core"]           = 4,
+    ["Basalt Rock"]           = 5,
+    ["Basalt"]                = 5,
+    ["Boulder"]               = 6,
+    ["Rock"]                  = 6,
+    ["Pebble"]                = 6,
+    ["Icy Boulder"]           = 6,
+    ["Icy Pebble"]            = 6,
+    ["Icy Rock"]              = 6,
+    ["Iceberg"]               = 6,
+    ["Heart Of The Island"]   = 6,
+    ["Lucky Block"]           = 6,
+}
 
-    local DefaultEnemyPriority = {
-        ["Blazing Slime"]           = true,
-        ["Blight Pyromancer"]       = true,
-        ["Elite Deathaxe Skeleton"] = true,
-        ["Reaper"]                  = true,
-        ["Elite Rogue Skeleton"]    = true,
-        ["Deathaxe Skeleton"]       = true,
-        ["Axe Skeleton"]            = true,
-        ["Skeleton Rogue"]          = true,
-        ["Bomber"]                  = true,
-        ["Slime"]                   = true,
-        ["MinerZombie"]             = true,
-        ["EliteZombie"]             = true,
-        ["Zombie"]                  = true,
-        ["Delver Zombie"]           = true,
-        ["Brute Zombie"]            = true,
-    }
+local DefaultEnemyPriority = {
+    ["Demonic Queen Spider"]    = 1,
+    ["Blazing Slime"]           = 1,
+    ["Demonic Spider"]          = 2,
+    ["Crystal Golem"]           = 2,
+    ["Blight Pyromancer"]       = 2,
+    ["Elite Deathaxe Skeleton"] = 2,
+    ["Reaper"]                  = 3,
+    ["Elite Orc"]               = 3,
+    ["Yeti"]                    = 3,
+    ["Diamond Spider"]          = 3,
+    ["Prismarine Spider"]       = 3,
+    ["Crystal Spider"]          = 3,
+    ["Elite Rogue Skeleton"]    = 4,
+    ["Golem"]                   = 4,
+    ["Mini Demonic Spider"]     = 4,
+    ["Deathaxe Skeleton"]       = 5,
+    ["Common Orc"]              = 5,
+    ["Axe Skeleton"]            = 6,
+    ["Skeleton Rogue"]          = 7,
+    ["Bomber"]                  = 8,
+    ["Slime"]                   = 9,
+    ["MinerZombie"]             = 9,
+    ["EliteZombie"]             = 9,
+    ["Zombie"]                  = 9,
+    ["Zombie3"]                 = 9,
+    ["Delver Zombie"]           = 9,
+    ["Brute Zombie"]            = 9,
+}
 
     local function getLocalPlayer()
         return Players.LocalPlayer
