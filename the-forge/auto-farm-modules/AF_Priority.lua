@@ -6,34 +6,37 @@ return function(env)
 
     local PRIORITY_CONFIG_VERSION = 2.0
 
-    local DefaultOrePriority      = {
-        ["Crimson Crystal"]     = 1,
-        ["Violet Crystal"]      = 1,
-        ["Cyan Crystal"]        = 1,
-        ["Earth Crystal"]       = 1,
-        ["Light Crystal"]       = 1,
-        ["Floating Crystal"]    = 1,
-        ["Crimson Ice"]         = 1,
-        ["Large Ice Crystal"]   = 1,
-        ["Medium Ice Crystal"]  = 1,
-        ["Small Ice Crystal"]   = 1,
-        ["Volcanic Rock"]       = 2,
-        ["Lava Rock"]           = 2,
-        ["Basalt Vein"]         = 3,
-        ["Basalt Core"]         = 4,
-        ["Basalt Rock"]         = 5,
-        ["Basalt"]              = 5,
-        ["Boulder"]             = 6,
-        ["Rock"]                = 6,
-        ["Pebble"]              = 6,
-        ["Icy Boulder"]         = 6,
-        ["Icy Pebble"]          = 6,
-        ["Icy Rock"]            = 6,
-        ["Iceberg"]             = 6,
-        ["Heart Of The Island"] = 6,
-        ["Lucky Block"]         = 6,
-    }
-
+local DefaultOrePriority = {
+    ["Crimson Crystal"]       = 1,
+    ["Violet Crystal"]        = 1,
+    ["Cyan Crystal"]          = 1,
+    ["Earth Crystal"]         = 1,
+    ["Light Crystal"]         = 1,
+    ["Floating Crystal"]      = 1,
+    ["Large Red Crystal"]     = 1, -- Added
+    ["Medium Red Crystal"]    = 1, -- Added
+    ["Small Red Crystal"]     = 1, -- Added
+    ["Crimson Ice"]           = 1,
+    ["Large Ice Crystal"]     = 1,
+    ["Medium Ice Crystal"]    = 1,
+    ["Small Ice Crystal"]     = 1,
+    ["Volcanic Rock"]         = 2,
+    ["Lava Rock"]             = 2,
+    ["Basalt Vein"]           = 3,
+    ["Basalt Core"]           = 4,
+    ["Basalt Rock"]           = 5,
+    ["Basalt"]                = 5,
+    ["Boulder"]               = 6,
+    ["Rock"]                  = 6,
+    ["Pebble"]                = 6,
+    ["Icy Boulder"]           = 6,
+    ["Icy Pebble"]            = 6,
+    ["Icy Rock"]              = 6,
+    ["Iceberg"]               = 6,
+    ["Heart Of The Island"]   = 6,
+    ["Lucky Block"]           = 6,
+}
+    
     local PermOreList             = {
         "Crimson Crystal",
         "Violet Crystal",
@@ -41,6 +44,9 @@ return function(env)
         "Earth Crystal",
         "Light Crystal",
         "Floating Crystal",
+        "Large Red Crystal", -- Added
+        "Medium Red Crystal", -- Added
+        "Small Red Crystal", -- Added
         "Crimson Ice",
         "Large Ice Crystal",
         "Medium Ice Crystal",
