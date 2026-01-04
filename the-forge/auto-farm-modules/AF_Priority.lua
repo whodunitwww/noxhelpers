@@ -4,7 +4,7 @@ return function(env)
     local HttpService             = env.HttpService
     local notify                  = env.notify
 
-    local PRIORITY_CONFIG_VERSION = 2.0
+    local PRIORITY_CONFIG_VERSION = 3.0
 
 local DefaultOrePriority = {
     ["Crimson Crystal"]       = 1,
