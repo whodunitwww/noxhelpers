@@ -48,6 +48,7 @@ local DefaultOrePriority = {
         "Medium Red Crystal", -- Added
         "Small Red Crystal", -- Added
         "Crimson Ice",
+        "Heart Of The Island",
         "Large Ice Crystal",
         "Medium Ice Crystal",
         "Small Ice Crystal",
