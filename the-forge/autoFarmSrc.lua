@@ -281,17 +281,13 @@ return function(ctx)
         return attach and attach.Parent ~= nil
     end
 
-    local function nudgeBossAttach(boss, def)
-        if not (boss and def) then
-            return
+    local function getAttachPosition(target, def)
+        if not (target and def) then
+            return nil, nil
         end
-        local hrp = getLocalHRP()
-        if not hrp then
-            return
-        end
-        local root = (def.getRoot and def.getRoot(boss)) or getMobRoot(boss)
+        local root = (def.getRoot and def.getRoot(target)) or getMobRoot(target)
         if not root then
-            return
+            return nil, nil
         end
         local baseY = def.attachBaseY or 0
         local horiz = def.attachHoriz or 0
@@ -303,7 +299,21 @@ return function(ctx)
                 offset = result
             end
         end
-        local targetPos = root.Position + offset
+        return root.Position + offset, root
+    end
+
+    local function nudgeBossAttach(boss, def)
+        if not (boss and def) then
+            return
+        end
+        local hrp = getLocalHRP()
+        if not hrp then
+            return
+        end
+        local targetPos, root = getAttachPosition(boss, def)
+        if not (targetPos and root) then
+            return
+        end
         if (hrp.Position - targetPos).Magnitude > 6 then
             hrp.CFrame = CFrame.new(targetPos, root.Position)
             hrp.AssemblyLinearVelocity = Vector3.zero
@@ -415,6 +425,20 @@ return function(ctx)
         if boss then
             BossState.lastBossSeen = os.clock()
             BossState.multiBossActive = true
+        end
+    end
+
+    local function clearBossTarget(previousBoss)
+        if previousBoss and FarmState.currentTarget == previousBoss then
+            stopMoving()
+            FarmState.currentTarget    = nil
+            FarmState.tempMobTarget    = nil
+            FarmState.attached         = false
+            FarmState.lastTargetRef    = nil
+            FarmState.lastTargetHealth = 0
+            if dashboardEnabled() and Dashboard and Dashboard.setCurrentTarget then
+                Dashboard.setCurrentTarget(nil)
+            end
         end
     end
 
@@ -1643,16 +1667,21 @@ return function(ctx)
                 if BossState.enabled then
                     local bossSeekActive = isBossCleanupActive()
                     local nowBoss = os.clock()
-                    if BossState.bossTarget and isMobAlive(BossState.bossTarget) then
-                        markBossSeen(BossState.bossTarget)
+                    local previousBoss = BossState.bossTarget
+                    if previousBoss and isMobAlive(previousBoss) then
+                        markBossSeen(previousBoss)
                     else
                         BossState.bossTarget = nil
+                        local foundBoss = nil
                         if bossSeekActive then
-                            local foundBoss = findAliveGolem()
+                            foundBoss = findAliveGolem()
                             if foundBoss then
                                 markBossSeen(foundBoss)
                                 BossState.bossTarget = foundBoss
                             end
+                        end
+                        if not foundBoss and previousBoss then
+                            clearBossTarget(previousBoss)
                         end
                     end
 
@@ -2047,6 +2076,10 @@ return function(ctx)
 
                 if pos then
                     local dist = (pos - hrp.Position).Magnitude
+                    local attachPos = getAttachPosition(activeTarget, activeDef)
+                    if attachPos then
+                        dist = (attachPos - hrp.Position).Magnitude
+                    end
                     if bossOverride and FarmState.attached and activeTarget == bossTarget then
                         dist = 0
                     end
