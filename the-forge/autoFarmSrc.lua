@@ -326,6 +326,7 @@ return function(ctx)
     local findAliveGolem       = Boss.findAliveGolem
     local isBossModel          = Boss.isBossModel
     local nudgeBossAttach      = Boss.nudgeBossAttach
+    local handleFinalBossReset = Boss.handleFinalBossReset
 
     local function getFarmMovementMode()
         return AF_Config.MovementMode or "Tween"
@@ -1300,6 +1301,13 @@ return function(ctx)
                     FarmState.lastTargetRef = nil
                 end
 
+                if BossState.enabled and not bossOverride then
+                    if handleFinalBossReset and handleFinalBossReset() then
+                        task.wait(0.2)
+                        return
+                    end
+                end
+
                 -- [[ FIX START: Disabled aggressive nudge to prevent Void Flinging ]]
                 -- if bossOverride and FarmState.attached and getBossMovementMode() == "Tween" then
                 --     nudgeBossAttach(bossTarget, ModeDefs[FARM_MODE_ENEMIES])
@@ -1908,6 +1916,8 @@ return function(ctx)
             BossState.lastSpawnAttempt = 0
             BossState.multiBossActive  = false
             BossState.lastBossSeen     = 0
+            BossState.lastConfirmedBossSeen = 0
+            BossState.lastResetTime         = 0
         end
 
         disableNoclip()
@@ -2351,6 +2361,8 @@ return function(ctx)
                 BossState.lastSpawnAttempt = 0
                 BossState.multiBossActive  = false
                 BossState.lastBossSeen     = 0
+                BossState.lastConfirmedBossSeen = 0
+                BossState.lastResetTime         = 0
                 if FarmState.currentTarget and isBossModel(FarmState.currentTarget) then
                     stopMoving()
                     FarmState.currentTarget = nil
@@ -2577,6 +2589,8 @@ return function(ctx)
         BossState.lastSpawnAttempt = 0
         BossState.multiBossActive  = false
         BossState.lastBossSeen     = 0
+        BossState.lastConfirmedBossSeen = 0
+        BossState.lastResetTime         = 0
         stopBossWatcher()
         if Toggles.AF_DoBosses and Toggles.AF_DoBosses.SetValue then
             pcall(function()
