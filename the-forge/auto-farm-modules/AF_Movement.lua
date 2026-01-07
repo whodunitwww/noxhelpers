@@ -68,6 +68,16 @@ return function(env)
 
     local SavedAttach = nil
 
+    local function resolveYOffset(modeName, offsetType)
+        if offsetType == "Boss" then
+            return tonumber(AF_Config.BossExtraYOffset) or 0
+        end
+        if modeName == "Ores" then
+            return tonumber(AF_Config.OreExtraYOffset) or 0
+        end
+        return tonumber(AF_Config.MobExtraYOffset) or 0
+    end
+
     local function saveAttachSettings()
         local state = AttachPanel.State or {}
         SavedAttach = {
@@ -96,12 +106,12 @@ return function(env)
 
     local function configureAttachForMode(modeName)
         if modeName == "Ores" then
-            local y = ORE_ATTACH_Y_BASE + AF_Config.ExtraYOffset
+            local y = ORE_ATTACH_Y_BASE + resolveYOffset("Ores")
             if AttachPanel.SetMode then AttachPanel.SetMode(ORE_ATTACH_MODE) end
             if AttachPanel.SetYOffset then AttachPanel.SetYOffset(y) end
             if AttachPanel.SetHorizDist then AttachPanel.SetHorizDist(ORE_ATTACH_HORIZ) end
         elseif modeName == "Enemies" then
-            local y = MOB_ATTACH_Y_BASE + AF_Config.ExtraYOffset
+            local y = MOB_ATTACH_Y_BASE + resolveYOffset("Enemies")
             if AttachPanel.SetMode then AttachPanel.SetMode(MOB_ATTACH_MODE) end
             if AttachPanel.SetYOffset then AttachPanel.SetYOffset(y) end
             if AttachPanel.SetHorizDist then AttachPanel.SetHorizDist(MOB_ATTACH_HORIZ) end
@@ -127,22 +137,23 @@ return function(env)
         end
     end
 
-    local function safeComputeOffset(rootCFrame, modeName)
+    local function safeComputeOffset(rootCFrame, modeName, offsetType)
         local baseY = (modeName == "Ores") and ORE_ATTACH_Y_BASE or MOB_ATTACH_Y_BASE
+        local offsetY = resolveYOffset(modeName, offsetType)
         if not AttachPanel or not AttachPanel.ComputeOffset then
-            return Vector3.new(0, baseY + AF_Config.ExtraYOffset, 0)
+            return Vector3.new(0, baseY + offsetY, 0)
         end
         local attachMode  = (modeName == "Ores") and ORE_ATTACH_MODE or MOB_ATTACH_MODE
         local attachHoriz = (modeName == "Ores") and ORE_ATTACH_HORIZ or MOB_ATTACH_HORIZ
-        local offsetYBase = baseY + AF_Config.ExtraYOffset
+        local offsetYBase = baseY + offsetY
         local ok, result = pcall(AttachPanel.ComputeOffset, rootCFrame, attachMode, attachHoriz, offsetYBase)
         if ok and typeof(result) == "Vector3" then
             return result 
         end
-        return Vector3.new(0, baseY + AF_Config.ExtraYOffset, 0)
+        return Vector3.new(0, baseY + offsetY, 0)
     end
 
-    local function realignAttach(target, overrideDef)
+    local function realignAttach(target, overrideDef, offsetType)
         if not target then return end
         local modeName = overrideDef and overrideDef.name or FarmState.mode
         local state = AttachPanel.State
@@ -153,26 +164,28 @@ return function(env)
         local rootPart = (overrideDef and overrideDef.getRoot and overrideDef.getRoot(target)) or target:FindFirstChild("HumanoidRootPart") or target.PrimaryPart or target
         if not (attachA1 and alignOri and hrp and rootPart) then return end
 
-        local offsetWorld = safeComputeOffset(rootPart.CFrame, modeName)
+        local offsetWorld = safeComputeOffset(rootPart.CFrame, modeName, offsetType)
         attachA1.Position = rootPart.CFrame:VectorToObjectSpace(offsetWorld)
         alignOri.CFrame = CFrame.lookAt(hrp.Position, rootPart.Position, Vector3.yAxis)
     end
 
-    local function attachToTarget(target, overrideDef)
+    local function attachToTarget(target, overrideDef, offsetType)
         if not target then return end
         if overrideDef then
+            local modeName = overrideDef.name or FarmState.mode
+            local offsetY = resolveYOffset(modeName, offsetType)
             if AttachPanel.SetMode then AttachPanel.SetMode(overrideDef.attachMode) end
-            if AttachPanel.SetYOffset then AttachPanel.SetYOffset(overrideDef.attachBaseY + AF_Config.ExtraYOffset) end
+            if AttachPanel.SetYOffset then AttachPanel.SetYOffset(overrideDef.attachBaseY + offsetY) end
             if AttachPanel.SetHorizDist then AttachPanel.SetHorizDist(overrideDef.attachHoriz) end
         else
             configureAttachForMode(FarmState.mode)
         end
         if AttachPanel.SetTarget then AttachPanel.SetTarget(target) end
         if AttachPanel.CreateAttach then AttachPanel.CreateAttach(target) end
-        realignAttach(target, overrideDef)
+        realignAttach(target, overrideDef, offsetType)
     end
 
-    local function stabilizeTeleportAttach(target, overrideDef, targetCFrame)
+    local function stabilizeTeleportAttach(target, overrideDef, targetCFrame, offsetType)
         if not target then return end
         local hrp = getLocalHRP()
         if not hrp then return end
@@ -192,7 +205,7 @@ return function(env)
                         stableCount = stableCount + 1
                     end
                 end
-                realignAttach(target, overrideDef)
+                realignAttach(target, overrideDef, offsetType)
                 if stableCount >= 1 then
                     break
                 end
@@ -205,12 +218,13 @@ return function(env)
     ------------------------------------------------------------------------------------
     -- MASTER MOVEMENT FUNCTION
     ------------------------------------------------------------------------------------
-    local function startMovingToTarget(target, overrideDef)
+    local function startMovingToTarget(target, overrideDef, movementMode, offsetType)
         if AttachPanel.DestroyAttach then pcall(AttachPanel.DestroyAttach) end
         stopMoving()
         
         local hrp = getLocalHRP()
         local def = overrideDef or nil 
+        local activeMode = movementMode or AF_Config.MovementMode or "Tween"
         if not hrp then return end
 
         local function getFinalPos()
@@ -218,7 +232,7 @@ return function(env)
             local root = (def and def.getRoot and def.getRoot(target)) or target:FindFirstChild("HumanoidRootPart") or target.PrimaryPart or target
             if not root then return nil end
             local modeName = overrideDef and overrideDef.name or FarmState.mode
-            return root.Position + safeComputeOffset(root.CFrame, modeName)
+            return root.Position + safeComputeOffset(root.CFrame, modeName, offsetType)
         end
 
         local function getFinalCFrame()
@@ -226,13 +240,13 @@ return function(env)
             local root = (def and def.getRoot and def.getRoot(target)) or target:FindFirstChild("HumanoidRootPart") or target.PrimaryPart or target
             if not root then return nil end
             local modeName = overrideDef and overrideDef.name or FarmState.mode
-            return root.CFrame * CFrame.new(safeComputeOffset(root.CFrame, modeName))
+            return root.CFrame * CFrame.new(safeComputeOffset(root.CFrame, modeName, offsetType))
         end
 
         --------------------------------------------------------------------------------
         -- METHOD 1: TELEPORT (CANNON BYPASS)
         --------------------------------------------------------------------------------
-        if AF_Config.MovementMode == "Teleport" then
+        if activeMode == "Teleport" then
             local targetCFrame = getFinalCFrame()
 
             if game.PlaceId == 131884594917121 then
@@ -254,8 +268,8 @@ return function(env)
                     hrp.AssemblyLinearVelocity = Vector3.zero
                     hrp.AssemblyAngularVelocity = Vector3.zero
 
-                    attachToTarget(target, overrideDef)
-                    stabilizeTeleportAttach(target, overrideDef, targetCFrame)
+                    attachToTarget(target, overrideDef, offsetType)
+                    stabilizeTeleportAttach(target, overrideDef, targetCFrame, offsetType)
                     return
                 end
             end
@@ -313,8 +327,8 @@ return function(env)
                 hrp.Anchored = false 
 
                 -- 7. Finalize
-                attachToTarget(target, overrideDef)
-                stabilizeTeleportAttach(target, overrideDef, targetCFrame)
+                attachToTarget(target, overrideDef, offsetType)
+                stabilizeTeleportAttach(target, overrideDef, targetCFrame, offsetType)
                 return
             else
                 -- Fallback to standard if cannon not found
@@ -332,7 +346,7 @@ return function(env)
         FarmState.lastMoveTime = os.clock()
 
         -- Only use detour if we are NOT in Teleport mode (prevents detour when falling back)
-        local useDetour = (AF_Config.MovementMode ~= "Teleport") 
+        local useDetour = (activeMode ~= "Teleport") 
                           and DETOUR_ENABLED 
                           and (startPos.X < DETOUR_THRESHOLD_X)
         
