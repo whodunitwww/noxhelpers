@@ -48,6 +48,8 @@ return function(env)
         spawnThread          = nil,
         multiBossActive      = false,
         lastBossSeen         = 0,
+        lastConfirmedBossSeen = 0,
+        lastResetTime        = 0,
     }
 
     local Constants = {
@@ -166,8 +168,72 @@ return function(env)
     local function markBossSeen(boss)
         if boss then
             BossState.lastBossSeen = os.clock()
+            BossState.lastConfirmedBossSeen = BossState.lastBossSeen
             BossState.multiBossActive = true
         end
+    end
+
+    local function quickReset()
+        local players = Services.Players or game:GetService("Players")
+        local player = players and players.LocalPlayer
+        if not player then
+            return
+        end
+
+        local char = player.Character
+        local hum  = char and char:FindFirstChildWhichIsA("Humanoid")
+
+        if replicatesignal and player.Kill then
+            pcall(function()
+                replicatesignal(player.Kill)
+            end)
+        elseif hum then
+            pcall(function()
+                hum:ChangeState(Enum.HumanoidStateType.Dead)
+            end)
+        elseif char then
+            pcall(function()
+                char:BreakJoints()
+            end)
+        end
+    end
+
+    local function handleFinalBossReset()
+        if not BossState.enabled then
+            return false
+        end
+        if BossState.spawnInProgress then
+            return false
+        end
+        if not isBossCleanupActive() then
+            return false
+        end
+        if findAliveGolem() then
+            return false
+        end
+
+        local lastConfirmed = BossState.lastConfirmedBossSeen or 0
+        if lastConfirmed <= 0 then
+            return false
+        end
+        local lastSpawn = BossState.lastSpawnAttempt or 0
+        if lastSpawn > 0 and lastConfirmed < (lastSpawn - 0.1) then
+            return false
+        end
+        if (os.clock() - lastConfirmed) < Constants.CLEAR_TIMEOUT then
+            return false
+        end
+        if (os.clock() - (BossState.lastResetTime or 0)) < 2 then
+            return false
+        end
+
+        BossState.lastResetTime   = os.clock()
+        BossState.multiBossActive = false
+        BossState.bossTarget      = nil
+        BossState.lastBossSeen    = 0
+        BossState.lastConfirmedBossSeen = 0
+        quickReset()
+        return true
     end
 
     local function clearBossTarget(previousBoss)
@@ -558,5 +624,6 @@ return function(env)
         restoreOffset     = restoreBossOffset,
         isDoBossesToggleOn = isDoBossesToggleOn,
         nudgeBossAttach   = nudgeBossAttach,
+        handleFinalBossReset = handleFinalBossReset,
     }
 end
