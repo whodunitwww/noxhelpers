@@ -60,12 +60,17 @@ return function(ctx)
     Autos.ZombieRaidLeftLobby = Autos.ZombieRaidLeftLobby or false
     Autos.LastRaidTypeNotified = Autos.LastRaidTypeNotified or ""
     Autos.LastTeleportTime = Autos.LastTeleportTime or 0
-    Autos.DevilZombieTarget = Autos.DevilZombieTarget or nil
-    Autos.LastDevilTeleportTime = Autos.LastDevilTeleportTime or 0
     Autos.SelectedRaidStart = Autos.SelectedRaidStart or "Katana Man Raid"
+    Autos.LastPlayGameFire = Autos.LastPlayGameFire or 0
+    Autos.ZombieResetting = Autos.ZombieResetting or false
+    Autos.ZombieResetCleanup = Autos.ZombieResetCleanup or nil
+    Autos.ZombieEmptySince = Autos.ZombieEmptySince or nil
+    Autos.ZombieEmptyLastAction = Autos.ZombieEmptyLastAction or 0
 
     local RAID_START_OPTIONS = { "Katana Man Raid", "Zombie Raid" }
     local ZOMBIE_RAID_ENTRANCE_POS = Vector3.new(37.856991, 6.760758, -1441.734375)
+    local ZOMBIE_VOID_POS = Vector3.new(0, -1000, 0)
+    local ZOMBIE_EMPTY_POS = Vector3.new(-448.255676, 60.691345, 512.108337)
 
     local function notify(msg, duration)
         if Autos.LastNotif ~= msg then
@@ -88,11 +93,21 @@ return function(ctx)
         return type(name) == "string" and string.find(string.lower(name), "zombie", 1, true) ~= nil
     end
 
-    local function isDevilZombieName(name)
+    local function isTankZombieName(name)
         if type(name) ~= "string" then return false end
         local lower = string.lower(name)
         return string.find(lower, "zombie", 1, true) ~= nil
-            and string.find(lower, "devil", 1, true) ~= nil
+            and string.find(lower, "tank", 1, true) ~= nil
+    end
+
+    local function isSeaZombieName(name)
+        if type(name) ~= "string" then return false end
+        local lower = string.lower(name)
+        return string.find(lower, "sea", 1, true) ~= nil
+    end
+
+    local function isLeechName(name)
+        return type(name) == "string" and string.find(string.lower(name), "leech", 1, true) ~= nil
     end
 
     local function hasZombieEntity()
@@ -133,6 +148,11 @@ return function(ctx)
             Autos.ZombieRaidActive = true
         end
 
+        if isKatanaRaid() then
+            Autos.RaidType = "Katana Raid"
+            return Autos.RaidType
+        end
+
         if Autos.ZombieRaidActive then
             if not Autos.ZombieRaidLeftLobby and not isLobby() then
                 Autos.ZombieRaidLeftLobby = true
@@ -145,11 +165,6 @@ return function(ctx)
 
         if Autos.ZombieRaidActive then
             Autos.RaidType = "Zombie Raid"
-            return Autos.RaidType
-        end
-
-        if isKatanaRaid() then
-            Autos.RaidType = "Katana Raid"
             return Autos.RaidType
         end
 
@@ -172,6 +187,73 @@ return function(ctx)
         if not References.player:FindFirstChild("PlayerGui") then return false end
 
         return true
+    end
+
+    local function getHealthRatio()
+        local char = References.player.Character
+        local hum = char and char:FindFirstChild("Humanoid")
+        if not hum or hum.MaxHealth <= 0 then return nil end
+        return hum.Health / hum.MaxHealth
+    end
+
+    local function triggerZombieReset()
+        if Autos.ZombieResetting then return end
+        Autos.ZombieResetting = true
+
+        if Autos.IsAttaching then
+            AttachPanel.Stop()
+            Autos.IsAttaching = false
+        end
+
+        local startChar = References.player.Character
+
+        task.spawn(function()
+            while Autos.ZombieResetting do
+                local char = References.player.Character
+                local hum = char and char:FindFirstChild("Humanoid")
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+
+                if not char or not char.Parent then
+                    break
+                end
+                if startChar and char ~= startChar then
+                    break
+                end
+                if hum and hum.Health <= 0 then
+                    break
+                end
+
+                if Autos.ZombieResetCleanup then
+                    pcall(Autos.ZombieResetCleanup)
+                    Autos.ZombieResetCleanup = nil
+                end
+
+                if root then
+                    if MoveToPos then
+                        Autos.ZombieResetCleanup = MoveToPos(ZOMBIE_VOID_POS, 5000)
+                    else
+                        root.CFrame = CFrame.new(ZOMBIE_VOID_POS)
+                        root.AssemblyLinearVelocity = Vector3.zero
+                        root.AssemblyAngularVelocity = Vector3.zero
+                    end
+                end
+                task.wait(1)
+            end
+            if Autos.ZombieResetCleanup then
+                pcall(Autos.ZombieResetCleanup)
+                Autos.ZombieResetCleanup = nil
+            end
+
+            local currentChar = References.player.Character
+            if not currentChar or currentChar == startChar then
+                currentChar = References.player.CharacterAdded:Wait()
+            end
+            if currentChar then
+                currentChar:WaitForChild("HumanoidRootPart", 10)
+                currentChar:WaitForChild("Humanoid", 10)
+            end
+            Autos.ZombieResetting = false
+        end)
     end
 
     local function getSafePosition(instance)
@@ -244,7 +326,7 @@ return function(ctx)
 
     local AutoRaidGroup = Tabs.Auto:AddLeftGroupbox("Auto Raid", "shield")
 
-    AutoRaidGroup:AddLabel("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill enabled.", true)
+    local InfoLabel = AutoRaidGroup:AddLabel("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill enabled. (set range to 20 for Zombie Raid)", true)
     AutoRaidGroup:AddDivider()
 
     local StatusLabel = AutoRaidGroup:AddLabel("Status: Checking...", true)
@@ -289,13 +371,39 @@ return function(ctx)
     Options.AltAccountName:OnChanged(function() UpdateAccountConfig() end)
     Options.RaidStartSelect:OnChanged(function()
         Autos.SelectedRaidStart = Options.RaidStartSelect.Value
+        if Autos.SelectedRaidStart == "Zombie Raid" then
+            InfoLabel:SetText("Info: Zombie Raid - Do NOT use InstaKill. Requires AutoEquip and AutoAttack (M1).")
+        else
+            InfoLabel:SetText("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill enabled.")
+        end
     end)
+
+    if Autos.SelectedRaidStart == "Zombie Raid" then
+        InfoLabel:SetText("Info: Zombie Raid - Do NOT use InstaKill. Requires AutoEquip and AutoAttack (M1).")
+    end
 
     local function getSkipButton()
         local pg = References.player:FindFirstChild("PlayerGui")
         local ls = pg and pg:FindFirstChild("LoadScreen")
         local skip = ls and ls:FindFirstChild("Skip")
         return (skip and skip:IsA("GuiButton")) and skip or nil
+    end
+
+    local function getPlayGameButton()
+        local pg = References.player:FindFirstChild("PlayerGui")
+        local main = pg and pg:FindFirstChild("Main")
+        local menu = main and main:FindFirstChild("Menu")
+        local buttons = menu and menu:FindFirstChild("Buttons")
+        local btn = buttons and buttons:FindFirstChild("PLAY GAME")
+        return (btn and btn:IsA("GuiButton")) and btn or nil
+    end
+
+    local function getCraneDropButton()
+        local pg = References.player:FindFirstChild("PlayerGui")
+        local crane = pg and pg:FindFirstChild("CraneDrop")
+        local frame = crane and crane:FindFirstChild("Frame")
+        local btn = frame and frame:FindFirstChild("Drop")
+        return (btn and btn:IsA("GuiButton")) and btn or nil
     end
 
     local function clickSkipViaGuiNav(btn)
@@ -320,6 +428,14 @@ return function(ctx)
                 local skipBtn = getSkipButton()
                 if skipBtn and skipBtn.Visible then
                     clickSkipViaGuiNav(skipBtn)
+                end
+                local playBtn = getPlayGameButton()
+                if playBtn and playBtn.Visible then
+                    local now = os.clock()
+                    if (now - Autos.LastPlayGameFire) >= 10 then
+                        LoadedRemote:FireServer(1)
+                        Autos.LastPlayGameFire = now
+                    end
                 end
                 if not isPlayerLoaded() then
                     LoadedRemote:FireServer()
@@ -523,31 +639,43 @@ return function(ctx)
             return closest
         end
 
-        local function findDevilZombie(entities)
-            for _, v in ipairs(entities:GetDescendants()) do
-                if isDevilZombieName(v.Name) then
-                    return v
+        local function getNearestPrompt(root)
+            if not root then return nil end
+            local closest = nil
+            local shortestDist = math.huge
+            for _, v in ipairs(Services.Workspace:GetDescendants()) do
+                if v:IsA("ProximityPrompt") and v.Enabled then
+                    local pos = getSafePosition(v.Parent)
+                    if pos then
+                        local dist = (pos - root.Position).Magnitude
+                        if dist < shortestDist then
+                            shortestDist = dist
+                            closest = v
+                        end
+                    end
                 end
             end
-            return nil
-        end
-
-        local TARGET_PLACE_ID = 131079272918660
-
-        local function rejoinServer()
-            pcall(function()
-                Services.TeleportService:Teleport(TARGET_PLACE_ID, References.player)
-            end)
+            return closest
         end
 
         while true do
             task.wait(0.5)
 
             local raidType = getRaidType()
+            if raidType ~= "Zombie Raid" then
+                Autos.ZombieResetting = false
+            end
             if Toggles.AutoClearRaid.Value and raidType then
                 if Autos.LastRaidTypeNotified ~= raidType then
                     notify("AutoClear: " .. raidType .. " detected", 3)
                     Autos.LastRaidTypeNotified = raidType
+                end
+
+                if raidType == "Zombie Raid" then
+                    local ratio = getHealthRatio()
+                    if ratio and ratio <= 0.2 then
+                        triggerZombieReset()
+                    end
                 end
 
                 local world = Services.Workspace:FindFirstChild("World")
@@ -557,48 +685,32 @@ return function(ctx)
                 local shortestDist = math.huge
                 local myRoot = References.player.Character and References.player.Character:FindFirstChild("HumanoidRootPart")
 
-                if raidType == "Zombie Raid" and Autos.RaidEntitiesPath then
-                    if Autos.DevilZombieTarget then
-                        if not Autos.DevilZombieTarget:IsDescendantOf(Autos.RaidEntitiesPath) then
-                            Autos.DevilZombieTarget = nil
-                            Autos.LastDevilTeleportTime = 0
-                            notify("Devil zombie gone. Rejoining...", 3)
-                            rejoinServer()
-                        end
-                    else
-                        Autos.DevilZombieTarget = findDevilZombie(Autos.RaidEntitiesPath)
-                        if Autos.DevilZombieTarget then
-                            Autos.LastDevilTeleportTime = 0
-                        end
-                    end
-                end
-
-                if Autos.DevilZombieTarget then
-                    if Autos.IsAttaching then
-                        AttachPanel.Stop()
-                        Autos.IsAttaching = false
-                    end
-
-                    if myRoot then
-                        local now = os.clock()
-                        if (now - Autos.LastDevilTeleportTime) >= 10 then
-                            local pos = getSafePosition(Autos.DevilZombieTarget)
-                            if pos then
-                                myRoot.CFrame = CFrame.new(pos + Vector3.new(0, 3, 0))
-                                Autos.LastDevilTeleportTime = now
-                            end
-                        end
-                    end
+                if Autos.ZombieResetting then
+                    Autos.LastTeleportTime = os.clock()
                 else
                     if myRoot and Autos.RaidEntitiesPath then
                         for _, v in ipairs(Autos.RaidEntitiesPath:GetChildren()) do
-                            local hum = v:FindFirstChild("Humanoid")
-                            local root = v:FindFirstChild("HumanoidRootPart")
-                            if hum and root and hum.Health > 0 and v ~= References.player.Character then
-                                local dist = (root.Position - myRoot.Position).Magnitude
-                                if dist < shortestDist then
-                                    shortestDist = dist
-                                    target = v
+                            if v ~= References.player.Character then
+                                local isTeleportOnly = isLeechName(v.Name)
+                                    or (raidType == "Zombie Raid" and isSeaZombieName(v.Name))
+                                local pos = nil
+
+                                if isTeleportOnly then
+                                    pos = getSafePosition(v)
+                                else
+                                    local hum = v:FindFirstChild("Humanoid")
+                                    local root = v:FindFirstChild("HumanoidRootPart")
+                                    if hum and root and hum.Health > 0 then
+                                        pos = root.Position
+                                    end
+                                end
+
+                                if pos then
+                                    local dist = (pos - myRoot.Position).Magnitude
+                                    if dist < shortestDist then
+                                        shortestDist = dist
+                                        target = v
+                                    end
                                 end
                             end
                         end
@@ -607,16 +719,42 @@ return function(ctx)
                     if target then
                         Autos.NoEnemyTimer = os.clock()
 
-                        AttachPanel.SetMode("Behind")
-                        AttachPanel.SetHorizDist(4)
-                        AttachPanel.SetYOffset(0)
-                        AttachPanel.EnableDodge(false)
+                        if isLeechName(target.Name) or (raidType == "Zombie Raid" and isSeaZombieName(target.Name)) then
+                            if Autos.IsAttaching then
+                                AttachPanel.Stop()
+                                Autos.IsAttaching = false
+                            end
 
-                        if AttachPanel.GetTarget() ~= target or not Autos.IsAttaching then
-                            AttachPanel.SetTarget(target)
-                            AttachPanel.State.running = true
-                            AttachPanel.GoApproach()
-                            Autos.IsAttaching = true
+                            if myRoot then
+                                local pos = getSafePosition(target)
+                                if pos then
+                                    local delta = myRoot.Position - pos
+                                    local distXZ = Vector3.new(delta.X, 0, delta.Z).Magnitude
+                                    if distXZ > 8 then
+                                        myRoot.CFrame = CFrame.new(pos + Vector3.new(0, 1.5, 0))
+                                    end
+                                end
+                            end
+                        else
+                            AttachPanel.SetMode("Behind")
+                            AttachPanel.SetHorizDist(4)
+                            if raidType == "Zombie Raid" then
+                                if isTankZombieName(target.Name) then
+                                    AttachPanel.SetYOffset(-2)
+                                else
+                                    AttachPanel.SetYOffset(0)
+                                end
+                            else
+                                AttachPanel.SetYOffset(0)
+                            end
+                            AttachPanel.EnableDodge(false)
+
+                            if AttachPanel.GetTarget() ~= target or not Autos.IsAttaching then
+                                AttachPanel.SetTarget(target)
+                                AttachPanel.State.running = true
+                                AttachPanel.GoApproach()
+                                Autos.IsAttaching = true
+                            end
                         end
 
                     else
@@ -625,6 +763,46 @@ return function(ctx)
                             Autos.IsAttaching = false
                             if raidType == "Katana Raid" then
                                 notify("Room Clear. Searching...", 3)
+                            end
+                        end
+
+                        if raidType == "Zombie Raid" then
+                            local nonPlayerFound = false
+                            if Autos.RaidEntitiesPath then
+                                for _, v in ipairs(Autos.RaidEntitiesPath:GetChildren()) do
+                                    if v ~= References.player.Character and v.Name ~= References.player.Name then
+                                        nonPlayerFound = true
+                                        break
+                                    end
+                                end
+                            end
+
+                            if nonPlayerFound then
+                                Autos.ZombieEmptySince = nil
+                                Autos.ZombieEmptyLastAction = 0
+                            else
+                                if not Autos.ZombieEmptySince then
+                                    Autos.ZombieEmptySince = os.clock()
+                                    notify("Zombie Raid: Entities empty, waiting 15s...", 3)
+                                end
+                                if not Autos.ZombieResetting
+                                    and (os.clock() - Autos.ZombieEmptySince) >= 15
+                                    and (os.clock() - Autos.ZombieEmptyLastAction) >= 10 then
+                                    local root = References.player.Character and References.player.Character:FindFirstChild("HumanoidRootPart")
+                                    if root then
+                                        root.CFrame = CFrame.new(ZOMBIE_EMPTY_POS + Vector3.new(0, 3, 0))
+                                        local prompt = getNearestPrompt(root)
+                                        if prompt then
+                                            fireproximityprompt(prompt)
+                                            task.wait(0.5)
+                                            local dropBtn = getCraneDropButton()
+                                            if dropBtn and dropBtn.Visible then
+                                                clickSkipViaGuiNav(dropBtn)
+                                            end
+                                        end
+                                    end
+                                    Autos.ZombieEmptyLastAction = os.clock()
+                                end
                             end
                         end
 
@@ -670,7 +848,6 @@ return function(ctx)
                     AttachPanel.Stop()
                     Autos.IsAttaching = false
                 end
-                Autos.DevilZombieTarget = nil
                 Autos.LastRaidTypeNotified = ""
             end
         end
@@ -679,7 +856,7 @@ return function(ctx)
     task.spawn(function()
         while true do
             task.wait(0.1)
-            if isInRaid() and not Autos.DevilZombieTarget then
+            if isInRaid() then
                 local world = Services.Workspace:FindFirstChild("World")
                 local entities = world and world:FindFirstChild("Entities")
                 local myEntity = entities and entities:FindFirstChild(References.player.Name)
