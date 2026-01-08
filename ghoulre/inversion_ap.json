@@ -1,0 +1,7516 @@
+{
+    "118924333638893": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 118924333638893",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137610205760983": {
+        "distanceAdj": 0,
+        "startSec": 0.19333299999999999,
+        "name": "Slam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119850347232500": {
+        "distanceAdj": 0,
+        "startSec": 0.43,
+        "name": "DevestateInit",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102111024732435": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Skill3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78047711237192": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Steel Shatter",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134057374409225": {
+        "distanceAdj": 0,
+        "startSec": 0.07666699999999999,
+        "name": "Uppercut",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91079297171778": {
+        "distanceAdj": 0,
+        "startSec": 0.10999999999999999,
+        "name": "Swing1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78483043922288": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84180504753078": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Barred_Battement_Action2",
+        "hold": 0.15,
+        "repeats": [
+            0.07666699999999999,
+            0.226667,
+            0.31,
+            0.376667,
+            0.443333,
+            0.51,
+            0.576667,
+            0.626667,
+            0.676667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100558480169185": {
+        "distanceAdj": 0,
+        "startSec": 0.22,
+        "name": "AerialAttack",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "113483328429065": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Vanish",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103629114814061": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "105589945317363": {
+        "distanceAdj": 0,
+        "startSec": 0.53,
+        "name": "Anim 105589945317363",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78367830974282": {
+        "distanceAdj": 0,
+        "startSec": 0.343333,
+        "name": "Steel Ascent",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134969645280314": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111230499786651": {
+        "distanceAdj": 0,
+        "startSec": 0.17,
+        "name": "Uppercut",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134903538230160": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Disorient",
+        "hold": 0.15,
+        "repeats": [
+            0.8
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137780787423425": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Reaper",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "138484657618379": {
+        "distanceAdj": 0,
+        "startSec": 1.01,
+        "name": "Anim 138484657618379",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135872625391687": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Shard Flow",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81847794501615": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Ruthless",
+        "hold": 0.15,
+        "repeats": [
+            0.7666660000000001
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100156113281578": {
+        "distanceAdj": 0,
+        "startSec": 0.76,
+        "name": "Skill2Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "95223978004602": {
+        "distanceAdj": 0,
+        "startSec": 0.45,
+        "name": "RendInit",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131696285162463": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "PunicPuncture-Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "95150289594302": {
+        "distanceAdj": 0,
+        "startSec": 0.27,
+        "name": "AerialAttack",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135114811245269": {
+        "distanceAdj": 0,
+        "startSec": 0.46,
+        "name": "CriticalPierce",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "79945231471600": {
+        "distanceAdj": 0,
+        "startSec": 0.47666699999999997,
+        "name": "NegativeLightningFollowUp",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "96389761265228": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Cleave",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "74476808169846": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124973971979332": {
+        "distanceAdj": 0,
+        "startSec": 0.593333,
+        "name": "KaowareWhiff",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76298165986986": {
+        "distanceAdj": 0,
+        "startSec": 0.96,
+        "name": "Anim 76298165986986",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104463070615470": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98283641519215": {
+        "distanceAdj": 0,
+        "startSec": 0.7,
+        "name": "Critical",
+        "hold": 0.616667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139538950632368": {
+        "distanceAdj": 0,
+        "startSec": 0.093333,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135652259836955": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82130174183873": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing4",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "116045663577221": {
+        "distanceAdj": 0,
+        "startSec": 0.093333,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "94851661153324": {
+        "distanceAdj": 0,
+        "startSec": 1,
+        "name": "Mirage Breaker",
+        "hold": 0.15,
+        "repeats": [
+            1.666667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100108530622112": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135303723032689": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131910414352589": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Critical",
+        "hold": 0.15,
+        "repeats": [
+            0.666667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119527696165308": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "CriticalV2Cast",
+        "hold": 0.583333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "85151867212315": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "EyePatchCast",
+        "hold": 0.733333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124184099417502": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing2",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "105442988085026": {
+        "distanceAdj": 0,
+        "startSec": 0.29,
+        "name": "BarrageSkill",
+        "hold": 0.15,
+        "repeats": [
+            0.5399999999999999,
+            0.823333,
+            1.0899999999999999,
+            1.356666
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "138603645472753": {
+        "distanceAdj": 0,
+        "startSec": 0.29,
+        "name": "Anim 138603645472753",
+        "hold": 0.38999999999999998,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114424436263982": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Swing5",
+        "hold": 0.25,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82184472713821": {
+        "distanceAdj": 0,
+        "startSec": 2,
+        "name": "BossDevour",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "97138435604112": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "94645452715396": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "94540912017073": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "GroundSmash",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128736067362487": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Demon Leg",
+        "hold": 0.15,
+        "repeats": [
+            0.426667,
+            0.61,
+            0.793334,
+            0.96,
+            1.3766669999999999
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114790391954408": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Swing3",
+        "hold": 0.25,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "132485957198673": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Barred_Battement_Action",
+        "hold": 0.15,
+        "repeats": [
+            0.276667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "92559206426916": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 92559206426916",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "117398383198913": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Downslam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82445309969223": {
+        "distanceAdj": 0,
+        "startSec": 0.17666699999999997,
+        "name": "Skill2Execution",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120354402053029": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Swing2",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81458429848274": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Swing1",
+        "hold": 0.202,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110259977619319": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Downslam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "132904283786634": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing3",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "80352356772387": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "PunicPuncture-Action",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136449717558100": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "118774460645493": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Embrace",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72798299659280": {
+        "distanceAdj": 0,
+        "startSec": 0.81,
+        "name": "Clawing Pounce Action",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101613783270135": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Bashful Ballad",
+        "hold": 0.15,
+        "repeats": [
+            0.2,
+            0.31666700000000005,
+            0.416667,
+            0.516667,
+            0.6333329999999999,
+            0.733333,
+            0.8500000000000001,
+            0.95
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106867803794428": {
+        "distanceAdj": 0,
+        "startSec": 0.01999999999999999,
+        "name": "Swing1",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123704785794118": {
+        "distanceAdj": 0,
+        "startSec": 0.51,
+        "name": "Sadistic Dance",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139400282938724": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Swing3",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110240097445732": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "LanceCritP1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125931598281917": {
+        "distanceAdj": 0,
+        "startSec": 0.41,
+        "name": "Anim 125931598281917",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "95010299561530": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102121546231536": {
+        "distanceAdj": 0,
+        "startSec": 0.39,
+        "name": "Critical",
+        "hold": 0.15,
+        "repeats": [
+            0.9233330000000001
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98178166706006": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139055692093180": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 139055692093180",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "113980459737564": {
+        "distanceAdj": 0,
+        "startSec": 0.616667,
+        "name": "Skill 3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120741003942852": {
+        "distanceAdj": 0,
+        "startSec": 0.026666999999999997,
+        "name": "Swing4",
+        "hold": 0.633333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "99254874111919": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 99254874111919",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125354999239510": {
+        "distanceAdj": 0,
+        "startSec": 0.5599999999999999,
+        "name": "DevourBite",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115253803957489": {
+        "distanceAdj": 0,
+        "startSec": 0.56,
+        "name": "Anim 115253803957489",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76212297226977": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "Anim 76212297226977",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "118153538571411": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "CriticalV2Followup",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106505011285566": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 106505011285566",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124819625937751": {
+        "distanceAdj": 0,
+        "startSec": 0.08,
+        "name": "Barrage",
+        "hold": 0.15,
+        "repeats": [
+            0.24666699999999998,
+            0.413333,
+            0.546667,
+            0.713333,
+            0.88
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107299492480314": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Downslam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131653409763212": {
+        "distanceAdj": 0,
+        "startSec": 0.12666699999999998,
+        "name": "Swing5",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91905183076845": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120020227327971": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76002694265538": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "ScentStartup",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103255608932910": {
+        "distanceAdj": 0,
+        "startSec": 0.08000000000000002,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98771209216846": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125273732099482": {
+        "distanceAdj": 0,
+        "startSec": 0.33,
+        "name": "Lunge",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "92943080125846": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Skill 2",
+        "hold": 0.15,
+        "repeats": [
+            0.676666
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108597895691635": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Critical",
+        "hold": 0.15,
+        "repeats": [
+            0.526667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91778889048315": {
+        "distanceAdj": 0,
+        "startSec": 0.76,
+        "name": "Dominate",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101751895166225": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "NoticeAction",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115396662984306": {
+        "distanceAdj": 0,
+        "startSec": 0.24333299999999997,
+        "name": "Sudden Kick Followup",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114986752830080": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111637306541526": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 111637306541526",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125608535553115": {
+        "distanceAdj": 0,
+        "startSec": 0.10999999999999999,
+        "name": "Swing4",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128650604729435": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "SilenceImpact",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84487644688034": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Anim 84487644688034",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102535173492586": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing3",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100434572913975": {
+        "distanceAdj": 0,
+        "startSec": 0.01999999999999999,
+        "name": "Swing2",
+        "hold": 0.45,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86176364287625": {
+        "distanceAdj": 0,
+        "startSec": 0.10999999999999999,
+        "name": "Swing2",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121340566680564": {
+        "distanceAdj": 0,
+        "startSec": 0.04333299999999998,
+        "name": "DesireFeintFollowup",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87246252041045": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104953395388997": {
+        "distanceAdj": 0,
+        "startSec": 0.276667,
+        "name": "NegativeLightning",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131832584163732": {
+        "distanceAdj": 0,
+        "startSec": 0.026666999999999997,
+        "name": "zlkawai",
+        "hold": 0.15,
+        "repeats": [
+            0.226667,
+            0.426667,
+            0.593333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103983671889052": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Segmentation",
+        "hold": 0.15,
+        "repeats": [
+            0.8500000000000001,
+            1.8
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76399640175696": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Anim 76399640175696",
+        "hold": 0.202,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90148096685856": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Swing1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "127801198650810": {
+        "distanceAdj": 0,
+        "startSec": 0.65,
+        "name": "TataraXCast",
+        "hold": 0.566667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76467866872093": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "RangeCritical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84342355042932": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "112735256988079": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 112735256988079",
+        "hold": 0.15,
+        "repeats": [
+            1.15
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "88769676978627": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Anim 88769676978627",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91554414015826": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Grinder",
+        "hold": 0.15,
+        "repeats": [
+            0.366666,
+            0.41666600000000006,
+            0.466666
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "118250904312310": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Anim 118250904312310",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131074884814797": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Swing4",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "105495357971239": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130405818992714": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Pounce",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "113816047037124": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 113816047037124",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "96471996759631": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 96471996759631",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119733843750352": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "ReverseTideAir",
+        "hold": 0.15,
+        "repeats": [
+            0.64
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86536208700676": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Vanquish",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106465773838756": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Downslam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "127376055093534": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "TaciturnityInit",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78407625576237": {
+        "distanceAdj": 0,
+        "startSec": 0.7,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110368664835385": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Swing1",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119562797224144": {
+        "distanceAdj": 0,
+        "startSec": 0.9,
+        "name": "Anim 119562797224144",
+        "hold": 0.4,
+        "repeats": [
+            1.764,
+            2.628
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136183768987616": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Downslam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "112950532323350": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 112950532323350",
+        "hold": 0.29000000000000006,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110920960051584": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Boomerang",
+        "hold": 1.05,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "97110277579383": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "118233181584094": {
+        "distanceAdj": 0,
+        "startSec": 0.04000000000000001,
+        "name": "MercilessLanceAction",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83863429970709": {
+        "distanceAdj": 0,
+        "startSec": 0.10999999999999999,
+        "name": "BFChain4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122371661060085": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110738231926426": {
+        "distanceAdj": 0,
+        "startSec": 0.13,
+        "name": "Swing5",
+        "hold": 0.483333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136761323860583": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "116238600074144": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing2",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81694357273002": {
+        "distanceAdj": 0,
+        "startSec": 0.026666999999999997,
+        "name": "AssassinAction",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137309504999398": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "80342660237834": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Disturbed Blitz Feint",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124557297937019": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "Spinal",
+        "hold": 0.15,
+        "repeats": [
+            0.55
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135309318514442": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Rend",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87277155207058": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "Debilitating",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120986873376194": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 120986873376194",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122933584639527": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Critical",
+        "hold": 0.15,
+        "repeats": [
+            0.06,
+            0.20999999999999997,
+            0.343333,
+            0.443333,
+            0.543333,
+            0.71
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139299396702735": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86916659589852": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115413666205678": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "118125146709269": {
+        "distanceAdj": 0,
+        "startSec": 0.443333,
+        "name": "Skill1Action",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "99157378634706": {
+        "distanceAdj": 0,
+        "startSec": 0.020000000000000005,
+        "name": "RavageM2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124926828571060": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Ghoul bite",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125752021896733": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing2",
+        "hold": 0.516667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86758437969078": {
+        "distanceAdj": 0,
+        "startSec": 0.06,
+        "name": "DominateFollowup",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82528260253305": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "73200908069196": {
+        "distanceAdj": 0,
+        "startSec": 0.020000000000000005,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136330405034599": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76256108008272": {
+        "distanceAdj": 0,
+        "startSec": 0.46,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131297557817293": {
+        "distanceAdj": 0,
+        "startSec": 0.09,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108012620140199": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Swing3",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "79780873512551": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122232190589401": {
+        "distanceAdj": 0,
+        "startSec": 0.49,
+        "name": "Anim 122232190589401",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "74422320699083": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing4",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78797347094985": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121056508765697": {
+        "distanceAdj": 0,
+        "startSec": 0.38333300000000006,
+        "name": "Phantom Cross",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82068830027727": {
+        "distanceAdj": 0,
+        "startSec": 0.2501,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123196114390104": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110340844354677": {
+        "distanceAdj": 0,
+        "startSec": 0.39333299999999996,
+        "name": "Overheat C Action",
+        "hold": 0.15,
+        "repeats": [
+            0.876667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134488256445396": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106604864550431": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 106604864550431",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134132208906469": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104540949438652": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Mutilation",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130687440100798": {
+        "distanceAdj": 0,
+        "startSec": 0.333333,
+        "name": "BarrageCast",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "74706986010083": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77155731069867": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "AerialAttack",
+        "hold": 0.5,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "138044545828371": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Exsanguis",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "109500654652931": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114126220009836": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing2",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "70756375677764": {
+        "distanceAdj": 0,
+        "startSec": 0.9433330000000001,
+        "name": "Skill4",
+        "hold": 0.15,
+        "repeats": [
+            1.1433330000000002,
+            1.476667,
+            4.143333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "95112578766555": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Faultless",
+        "hold": 1.733333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "118446880650671": {
+        "distanceAdj": 0,
+        "startSec": 0.91,
+        "name": "Anim 118446880650671",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136371669168741": {
+        "distanceAdj": 0,
+        "startSec": 0.009999999999999981,
+        "name": "Uppercut",
+        "hold": 0.15,
+        "repeats": [
+            0.293333,
+            0.6433329999999999,
+            0.9600000000000001,
+            1.226667,
+            1.543333,
+            1.8433329999999999,
+            2.1433329999999999,
+            2.56,
+            2.743333,
+            3.076667,
+            3.343333,
+            3.6599999999999999,
+            3.9599999999999997
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "70837816696885": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Anim 70837816696885",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "113373203557133": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Pierce",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "96352906069258": {
+        "distanceAdj": 0,
+        "startSec": 0.12666699999999998,
+        "name": "CriticalFeint",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98821211080909": {
+        "distanceAdj": 0,
+        "startSec": 0.41,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100943833698866": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.566667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71317158793449": {
+        "distanceAdj": 0,
+        "startSec": 0.07666699999999999,
+        "name": "EndlessPersuit",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137072596301637": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114579951667352": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71737025176618": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Downslam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136225630152817": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Rupturing",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125890371919098": {
+        "distanceAdj": 0,
+        "startSec": 0.44,
+        "name": "Anim 125890371919098",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139530979015102": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 139530979015102",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "138228123826571": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 138228123826571",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "112274617911382": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86154752407185": {
+        "distanceAdj": 0,
+        "startSec": 0.276667,
+        "name": "Skill2Activation",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84883984460361": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Reap",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "133676778221315": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 133676778221315",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "75078726065204": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Infiltration",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81633765878584": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing3",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "94585296319676": {
+        "distanceAdj": 0,
+        "startSec": 0.34,
+        "name": "Anim 94585296319676",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119567609934046": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "140176432457093": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 140176432457093",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104193632382850": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Swing4",
+        "hold": 0.25,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76927396984144": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Swing1",
+        "hold": 0.202,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77165655925697": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing4",
+        "hold": 0.516667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120178565844772": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Bite Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139993959708671": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing4",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "112040344210576": {
+        "distanceAdj": 0,
+        "startSec": 0.10999999999999999,
+        "name": "SuppressionCutsceneCast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77453243901864": {
+        "distanceAdj": 0,
+        "startSec": 0.14999999999999998,
+        "name": "Critical",
+        "hold": 0.15,
+        "repeats": [
+            0.25,
+            0.333333,
+            0.416666,
+            0.516666
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139954890188682": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 139954890188682",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "94484323145049": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 94484323145049",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "89743736303858": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "RendHit",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "80346871030944": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Tatara V2 Z1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107532205712495": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Swing2",
+        "hold": 0.25,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87827025136778": {
+        "distanceAdj": 0,
+        "startSec": 0.04333299999999998,
+        "name": "GENJI",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "93902031289683": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134872805405567": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "117033713819488": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 117033713819488",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87070202310860": {
+        "distanceAdj": 0,
+        "startSec": 0.63,
+        "name": "BowCritical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "140472353306379": {
+        "distanceAdj": 0,
+        "startSec": 0.65,
+        "name": "Anim 140472353306379",
+        "hold": 0.6,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "117771212630258": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "Swing3",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "113125178542314": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Downslam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "89588139226485": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Swing4",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "93419864791125": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 93419864791125",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83022911727660": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "92214982692498": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120703912197833": {
+        "distanceAdj": 0,
+        "startSec": 0.020000000000000005,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "109285759428857": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Rending",
+        "hold": 0.15,
+        "repeats": [
+            0.366667,
+            0.416667,
+            0.466667,
+            0.516667,
+            0.5833330000000001,
+            0.6499999999999999,
+            0.7,
+            0.75,
+            0.7833330000000001,
+            0.8333330000000001
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90738122052909": {
+        "distanceAdj": 0,
+        "startSec": 0.009999999999999981,
+        "name": "AerialAttack",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106609775023823": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 106609775023823",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115882469124985": {
+        "distanceAdj": 0,
+        "startSec": 0.11,
+        "name": "Swing3",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106257688932263": {
+        "distanceAdj": 0,
+        "startSec": 0.65,
+        "name": "Gnaw",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121690165844259": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "SufferingAction",
+        "hold": 0.15,
+        "repeats": [
+            0.18333300000000003
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "99782812399254": {
+        "distanceAdj": 0,
+        "startSec": 0.293333,
+        "name": "RavenousFollowup",
+        "hold": 0.15,
+        "repeats": [
+            0.593333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "73163780581936": {
+        "distanceAdj": 0,
+        "startSec": 1.72,
+        "name": "Anim 73163780581936",
+        "hold": 0.53,
+        "repeats": [
+            3.22
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130159145951882": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "CriticalFeint",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115357779842160": {
+        "distanceAdj": 0,
+        "startSec": 1.293333,
+        "name": "CriticalConfirmUser",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83497963716622": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Anim 83497963716622",
+        "hold": 1.8,
+        "repeats": [
+            1
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "92796333738710": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 92796333738710",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77780360064182": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "127076012876251": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Anim 127076012876251",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120259747831957": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Devious Dance",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "89360321484220": {
+        "distanceAdj": 0,
+        "startSec": 0.07666699999999999,
+        "name": "Phezaro Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128288200583021": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "109224647633849": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 109224647633849",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "126485913058460": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Daunting Dance",
+        "hold": 0.15,
+        "repeats": [
+            0.65,
+            0.916667,
+            1.566667,
+            1.8,
+            2.216667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107752838734051": {
+        "distanceAdj": 0,
+        "startSec": 0.8,
+        "name": "Anim 107752838734051",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "97888761442444": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing4",
+        "hold": 0.516667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71491979500146": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Swing4",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104802848622022": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100368720144148": {
+        "distanceAdj": 0,
+        "startSec": 0.343333,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84586700252767": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "SuppressionM2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103430086615689": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102242322759462": {
+        "distanceAdj": 0,
+        "startSec": 0.17,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134473609101433": {
+        "distanceAdj": 0,
+        "startSec": 0.13333300000000004,
+        "name": "Critical",
+        "hold": 0.15,
+        "repeats": [
+            0.7000000000000001,
+            1.133333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "85374473317909": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Skill1Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "127566287157805": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "89513092915984": {
+        "distanceAdj": 0,
+        "startSec": 2,
+        "name": "Anim 89513092915984",
+        "hold": 0.3700000000000001,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "140151698861152": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 140151698861152",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "112467136433884": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Ravage",
+        "hold": 0.15,
+        "repeats": [
+            0.31666700000000005
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121050000257819": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107364098903611": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81387128339630": {
+        "distanceAdj": 0,
+        "startSec": 0.143333,
+        "name": "SerrateZKick",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "85731406314619": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "127813492491875": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "80660577461021": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Anim 80660577461021",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "73760371893091": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83210950678819": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Anim 83210950678819",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134028224591345": {
+        "distanceAdj": 0,
+        "startSec": 0.04333299999999998,
+        "name": "MindbreakAction",
+        "hold": 0.15,
+        "repeats": [
+            0.793333,
+            0.9766670000000001
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129368863744217": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Twin Cleave",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128101625557631": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121934414417829": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "AerialAttack",
+        "hold": 0.5,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137684196851746": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Swing5",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "95789306651549": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Anim 95789306651549",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "92288554612341": {
+        "distanceAdj": 0,
+        "startSec": 0.7,
+        "name": "Critical",
+        "hold": 0.25,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107070912429001": {
+        "distanceAdj": 0,
+        "startSec": 0.66,
+        "name": "Anim 107070912429001",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104337999454796": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104648794624547": {
+        "distanceAdj": 0,
+        "startSec": 0.12666699999999998,
+        "name": "Swing3",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129391517663928": {
+        "distanceAdj": 0,
+        "startSec": 0.65,
+        "name": "TataraZ",
+        "hold": 0.516667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103561209301954": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Swing2",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124496925241237": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing3",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107193409342294": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "RunningAttack",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131065135107159": {
+        "distanceAdj": 0,
+        "startSec": 0.17666699999999997,
+        "name": "FixedDown",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108197299905495": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102642995643169": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Frenzied Feast",
+        "hold": 0.15,
+        "repeats": [
+            0.216667,
+            0.333334,
+            0.416667,
+            0.5,
+            0.6,
+            0.716667,
+            0.8,
+            0.916667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "118816187211996": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing1",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "74834246969439": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "ReapFollowup",
+        "hold": 0.15,
+        "repeats": [
+            0.066667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98385414593823": {
+        "distanceAdj": 0,
+        "startSec": 0.2023121387283237,
+        "name": "Reverse Tide",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83183690291105": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123559289828864": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "GutPunchFollowup",
+        "hold": 0.15,
+        "repeats": [
+            0.5499999999999999
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78213991536260": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "80560734051179": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128769681112635": {
+        "distanceAdj": 0,
+        "startSec": 1.75,
+        "name": "Anim 128769681112635",
+        "hold": 2.25,
+        "repeats": [
+            1.95,
+            2.15
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128839194087258": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Swing4",
+        "hold": 0.533333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "94946484791547": {
+        "distanceAdj": 0,
+        "startSec": 0.13,
+        "name": "Anim 94946484791547",
+        "hold": 0.6,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82259311185179": {
+        "distanceAdj": 0,
+        "startSec": 0.66,
+        "name": "Anim 82259311185179",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110295853822700": {
+        "distanceAdj": 0,
+        "startSec": 0.44,
+        "name": "Anim 110295853822700",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114773679703806": {
+        "distanceAdj": 0,
+        "startSec": 0.17,
+        "name": "Swing1",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87087952781021": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "BFChain3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "132998073977747": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 132998073977747",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129091657218278": {
+        "distanceAdj": 0,
+        "startSec": 0.626667,
+        "name": "CriticalCancel",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139086739426590": {
+        "distanceAdj": 0,
+        "startSec": 0.46,
+        "name": "AerialCancel",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137616314316140": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98841389059878": {
+        "distanceAdj": 0,
+        "startSec": 1,
+        "name": "Anim 98841389059878",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "75375865302458": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Devour",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "85467164225058": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing4",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103934719133771": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102372557046570": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "116706902543424": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "BFChain1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "127010872138675": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 127010872138675",
+        "hold": 2.5,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "127462812873675": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Devourer",
+        "hold": 0.15,
+        "repeats": [
+            0.3,
+            0.566667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123543445163800": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108944058905120": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 108944058905120",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106543246548601": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 106543246548601",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110996177525567": {
+        "distanceAdj": 0,
+        "startSec": 1.0266669999999998,
+        "name": "ThrowCast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91066171406248": {
+        "distanceAdj": 0,
+        "startSec": 0.09999999999999998,
+        "name": "Anim 91066171406248",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135205073126877": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Swing1",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120459951639400": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119065419146950": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 119065419146950",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83637601333131": {
+        "distanceAdj": 0,
+        "startSec": 0.29,
+        "name": "RunningAttack",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82039423935881": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Double Drive",
+        "hold": 0.15,
+        "repeats": [
+            0.55
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78854925472750": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.202,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129264379282304": {
+        "distanceAdj": 0,
+        "startSec": 0.12666699999999998,
+        "name": "Shindasaka",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "96651052503322": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Passive",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "70738136253672": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 70738136253672",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137591780412782": {
+        "distanceAdj": 0,
+        "startSec": 0.009999999999999981,
+        "name": "Bite Action",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72519041274149": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 72519041274149",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "92415288342537": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.49,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "97485727762508": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107003202275371": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100695225844315": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "NoticeAction2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77513027791610": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing3",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111909089248577": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 111909089248577",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110583793495632": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "GrabUser",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106370380659362": {
+        "distanceAdj": 0,
+        "startSec": 0.56,
+        "name": "Anim 106370380659362",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78460284685534": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "80045220727843": {
+        "distanceAdj": 0,
+        "startSec": 0.44,
+        "name": "IXA Crit",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84687276916489": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "80201031269662": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 80201031269662",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124747961486333": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "BladeCrit",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98932916989863": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Concuss",
+        "hold": 0.15,
+        "repeats": [
+            0.9833339999999999
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "96875568331308": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Swing1",
+        "hold": 0.202,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139636612270661": {
+        "distanceAdj": 0,
+        "startSec": 0.41,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "112228610484983": {
+        "distanceAdj": 0,
+        "startSec": 0.46,
+        "name": "NewSkill2",
+        "hold": 0.15,
+        "repeats": [
+            0.576667,
+            0.71,
+            0.826667,
+            1.176667,
+            1.46,
+            1.676667,
+            2.1100000000000005,
+            3.2766669999999999
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100477706909641": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Thunder Clap",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "80282556994586": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128625727833366": {
+        "distanceAdj": 0,
+        "startSec": 0.45,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "94049296655188": {
+        "distanceAdj": 0,
+        "startSec": 0.85,
+        "name": "SplittingDeath",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124861357738478": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Mastication",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130254051363204": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115340718314209": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 115340718314209",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110164563494809": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100153696883802": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "KakujaUser",
+        "hold": 9.75,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98689091133589": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Uppercut",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90675128292011": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 90675128292011",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "97755557274758": {
+        "distanceAdj": 0,
+        "startSec": 0.17666699999999997,
+        "name": "Skill2Action",
+        "hold": 0.15,
+        "repeats": [
+            0.543333,
+            0.86,
+            1.2433329999999999,
+            1.726667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72678012629652": {
+        "distanceAdj": 0,
+        "startSec": 0.37,
+        "name": "Ballistic Ballet",
+        "hold": 0.15,
+        "repeats": [
+            0.603333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "88302343466238": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Overflow",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "113551349815132": {
+        "distanceAdj": 0,
+        "startSec": 0.17666699999999997,
+        "name": "CriticalAerial",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81775282692043": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "Swing5",
+        "hold": 0.233333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124170657036313": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Slam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86293094696257": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 86293094696257",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101726485168893": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Anim 101726485168893",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "99915059516084": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Barred_Battement_Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121746440756349": {
+        "distanceAdj": 0,
+        "startSec": 0.7,
+        "name": "Entrapment",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "117496754196287": {
+        "distanceAdj": 0,
+        "startSec": 0.32,
+        "name": "Anim 117496754196287",
+        "hold": 0.39999999999999999,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123050241928041": {
+        "distanceAdj": 0,
+        "startSec": 0.53,
+        "name": "Anim 123050241928041",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "79981588130961": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Barrage",
+        "hold": 0.15,
+        "repeats": [
+            0.266666,
+            0.31666599999999997,
+            0.383333,
+            0.41666600000000006,
+            0.48333299999999998,
+            0.55,
+            0.6166659999999999,
+            0.7,
+            0.7666660000000001,
+            0.8500000000000001,
+            0.933333,
+            0.983333,
+            1.033333,
+            1.1333330000000002
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "105934996032911": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "AerialAttack",
+        "hold": 0.5,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111924098673967": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Downslam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124913858392981": {
+        "distanceAdj": 0,
+        "startSec": 0.06,
+        "name": "Uppercut",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128968439050740": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "IXA Z",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90783163947634": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "Maul",
+        "hold": 0.15,
+        "repeats": [
+            0.973334,
+            1.39
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "95666706381611": {
+        "distanceAdj": 0,
+        "startSec": 0.7,
+        "name": "Tatara V2 Crit",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "95100443479197": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "CriticalFollowupUser",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84888914033779": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing4",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123727511642989": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 123727511642989",
+        "hold": 0.7,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "75964741374321": {
+        "distanceAdj": 0,
+        "startSec": 0.143333,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81988312529091": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "ReaperFollowup",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131740708909971": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Anim 131740708909971",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130935192288883": {
+        "distanceAdj": 0,
+        "startSec": 0.5333330000000001,
+        "name": "Overpower",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139753135160439": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "CriticalConfirm",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "109810854185369": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "FlickerAction",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "79913467941771": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 79913467941771",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125810707684008": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82475721059715": {
+        "distanceAdj": 0,
+        "startSec": 0.61,
+        "name": "Punctured Lunge Action",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71855162512195": {
+        "distanceAdj": 0,
+        "startSec": 0.56,
+        "name": "Anim 71855162512195",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77386413988341": {
+        "distanceAdj": 0,
+        "startSec": 0.576667,
+        "name": "Overheat3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86208887161745": {
+        "distanceAdj": 0,
+        "startSec": 0.17,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81033259149808": {
+        "distanceAdj": 0,
+        "startSec": 1.583333,
+        "name": "Mind bReaker sane/ normal",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139358065129445": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114919639636573": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 114919639636573",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90222174246856": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing2",
+        "hold": 0.516667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "109083782619351": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "ApproachCast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121339998382547": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing5",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72821387706512": {
+        "distanceAdj": 0,
+        "startSec": 0.093333,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104662503368656": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 104662503368656",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129495651539604": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Swing2",
+        "hold": 0.533333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78143990224156": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 78143990224156",
+        "hold": 0.202,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78103662914105": {
+        "distanceAdj": 0,
+        "startSec": 0.12666699999999998,
+        "name": "CriticalM2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103922501450861": {
+        "distanceAdj": 0,
+        "startSec": 0.093333,
+        "name": "Uppercut",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "99511332362280": {
+        "distanceAdj": 0,
+        "startSec": 1.1833330000000003,
+        "name": "GalacImpact",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120591268956676": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "112387369480518": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78887381717473": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 78887381717473",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125762146808638": {
+        "distanceAdj": 0,
+        "startSec": 0.04333299999999998,
+        "name": "SubversiveAction",
+        "hold": 1.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104722560930205": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135898238795346": {
+        "distanceAdj": 0,
+        "startSec": 0.026666999999999997,
+        "name": "Swing3",
+        "hold": 0.633333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123099788465699": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Anim 123099788465699",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108003485848158": {
+        "distanceAdj": 0,
+        "startSec": 0.143333,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "133200348314646": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139760598014862": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "MaliceUser",
+        "hold": 0.15,
+        "repeats": [
+            0.08,
+            0.163333,
+            0.213333,
+            0.28,
+            0.32999999999999998,
+            0.396667,
+            0.513333,
+            0.546667,
+            0.6633330000000001,
+            0.696667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131164311515928": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 131164311515928",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "75362717367704": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Critical",
+        "hold": 0.483333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "75970657905611": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139919975605872": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134809434589356": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71790033694498": {
+        "distanceAdj": 0,
+        "startSec": 0.56,
+        "name": "NewSkill1",
+        "hold": 0.15,
+        "repeats": [
+            0.81,
+            1.326667,
+            1.343334,
+            1.3766670000000004,
+            1.4100000000000002,
+            1.46,
+            1.493334,
+            1.5100000000000003,
+            1.5433340000000003,
+            1.576667,
+            1.6100000000000004,
+            1.6600000000000002,
+            1.6933340000000002
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98582715122328": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing5",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "70641652722291": {
+        "distanceAdj": 0,
+        "startSec": 0.10999999999999999,
+        "name": "ShindaskaLiver",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125084555032360": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102875021232794": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 102875021232794",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83173971266189": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Cross Reaver",
+        "hold": 0.15,
+        "repeats": [
+            0.916667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106535138040115": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Shredder",
+        "hold": 0.15,
+        "repeats": [
+            0.433334,
+            0.48333399999999995,
+            0.516667,
+            0.5666669999999999,
+            0.616667,
+            0.6499999999999999,
+            0.7,
+            0.75,
+            0.783334,
+            0.833334,
+            0.883334,
+            0.916667,
+            0.9500000000000001,
+            0.983334,
+            0.9999999999999999,
+            1.033334,
+            1.0666669999999999
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "126453556030481": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Anim 126453556030481",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130277667485774": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "InstantLunge",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131594659626313": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114910321493895": {
+        "distanceAdj": 0,
+        "startSec": 0.41000000000000005,
+        "name": "DoubleDriveM2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "105180107860331": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 105180107860331",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "116093431616256": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Frenzy",
+        "hold": 0.15,
+        "repeats": [
+            0.39666700000000007
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111022978492411": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Writhe",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91417655657970": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing2",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130560592953206": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 130560592953206",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122114884655214": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100518651351311": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 100518651351311",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101714150006632": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "RelentlessRavage-Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111787805619609": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71773261520410": {
+        "distanceAdj": 0,
+        "startSec": 1.16,
+        "name": "Anim 71773261520410",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72832638766630": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135552671823399": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "DualSwing",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136182618554502": {
+        "distanceAdj": 0,
+        "startSec": 0.020000000000000005,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87735609876920": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Uppercut",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130077418131222": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Scatter",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77398914569691": {
+        "distanceAdj": 0,
+        "startSec": 0.86,
+        "name": "Tatara V2 Z3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "105025163685810": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 105025163685810",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "105184330766070": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Crusher",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115257561645624": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 115257561645624",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125123147660993": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82642500378212": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 82642500378212",
+        "hold": 1,
+        "repeats": [
+            0.6
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78386126860643": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 78386126860643",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131442938695981": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115294061641691": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "126141375680416": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134639338336004": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91672430450727": {
+        "distanceAdj": 0,
+        "startSec": 0.44999999999999998,
+        "name": "Frenzied FeastM2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139792635036817": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "PyroAerial",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106731070269238": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Indigestion",
+        "hold": 0.15,
+        "repeats": [
+            0.47
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "132363733217055": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "NewSkill3Var2",
+        "hold": 0.15,
+        "repeats": [
+            0.226667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "75168761580156": {
+        "distanceAdj": 0,
+        "startSec": 0.45,
+        "name": "Dragon Kick",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91254008694953": {
+        "distanceAdj": 0,
+        "startSec": 1.043333,
+        "name": "DevourerMassive",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108984564775659": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing4",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "105107078372382": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139986278375552": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Anim 139986278375552",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108646132311038": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing5",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "138176350933335": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Piercing Heel",
+        "hold": 0.15,
+        "repeats": [
+            0.283334,
+            0.766667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "73480352291165": {
+        "distanceAdj": 0,
+        "startSec": 0.026666999999999997,
+        "name": "Swing5",
+        "hold": 0.633333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124766932801835": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "SerrateX",
+        "hold": 0.15,
+        "repeats": [
+            0.033333,
+            0.15,
+            0.25,
+            0.35,
+            0.45,
+            0.55,
+            0.633333,
+            0.733333,
+            0.833333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107379745282989": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 107379745282989",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121109139209671": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107287988363428": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "112595368518116": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "CriticalFollowUp",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106425271118510": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Narukami X Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122049582999621": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "94205575550862": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing2",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "127878009132771": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125415359989914": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "FlareAction",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "99762577752557": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Leg Sweep",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86232832931002": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Ravenous",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87004016130630": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108310725995566": {
+        "distanceAdj": 0,
+        "startSec": 0.66,
+        "name": "SeveranceWaltz",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90460084897725": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Spinny",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "97588046690760": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Crack",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90597596100338": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "96688039185573": {
+        "distanceAdj": 0,
+        "startSec": 0.41,
+        "name": "ThunderClawDash",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135900749451957": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Swing2",
+        "hold": 0.483333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128225558499036": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 128225558499036",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "74212168479379": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 74212168479379",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131385671108953": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Aerial",
+        "hold": 0.15,
+        "repeats": [
+            0.7
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86370715406171": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing4",
+        "hold": 0.383333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125356670919319": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84205613698467": {
+        "distanceAdj": 0,
+        "startSec": 0.6433329999999999,
+        "name": "PhantomCrossM2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134962521082084": {
+        "distanceAdj": 0,
+        "startSec": 0.276667,
+        "name": "TengokuKaidan",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "117550760431415": {
+        "distanceAdj": 0,
+        "startSec": 0.33,
+        "name": "Anim 117550760431415",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121923350369630": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "CriticalFeint",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107117289445392": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "AerialPassive",
+        "hold": 0.15,
+        "repeats": [
+            0.31666700000000005,
+            0.38333300000000006,
+            0.44999999999999998,
+            0.516667,
+            0.583333,
+            0.65,
+            0.716667,
+            0.7833330000000001,
+            0.8666670000000001,
+            0.933333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100483961909371": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 100483961909371",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102683625069547": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing3",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "74706076703053": {
+        "distanceAdj": 0,
+        "startSec": 0.226667,
+        "name": "True Strength Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128527171848225": {
+        "distanceAdj": 0,
+        "startSec": 0.20999999999999997,
+        "name": "Critical",
+        "hold": 0.15,
+        "repeats": [
+            0.326667,
+            0.426667,
+            1.3599999999999999,
+            1.4266670000000002,
+            1.476667,
+            1.5266669999999998
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "94300503125812": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing5",
+        "hold": 0.383333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115126886859402": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135922159585894": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 135922159585894",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71300661887319": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Anim 71300661887319",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111882127396652": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "AxeKick",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124059164261714": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "126923665753961": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Critical",
+        "hold": 1.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130126543409202": {
+        "distanceAdj": 0,
+        "startSec": 0.07666699999999999,
+        "name": "Shadow Drop Cast",
+        "hold": 0.783333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90569570699828": {
+        "distanceAdj": 0,
+        "startSec": 0.143333,
+        "name": "Swing1",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108758788048228": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 108758788048228",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "70667320597389": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98960600377850": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83097071761073": {
+        "distanceAdj": 0,
+        "startSec": 0.78,
+        "name": "MaliceCast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86086892466510": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Subversive",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128879111223712": {
+        "distanceAdj": 0,
+        "startSec": 0.293333,
+        "name": "NoticeGrabUser",
+        "hold": 0.15,
+        "repeats": [
+            1.1433330000000002
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "93121258009683": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72464788731730": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing3",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "75639457722518": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "FollowUp",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131715890525766": {
+        "distanceAdj": 0,
+        "startSec": 0.10999999999999999,
+        "name": "CriticalFeint",
+        "hold": 0.566667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "109153497237538": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86206576218059": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "116952479079386": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Cyclone",
+        "hold": 0.15,
+        "repeats": [
+            0.5,
+            0.7333340000000002,
+            0.9666669999999999,
+            1.216667,
+            1.45,
+            1.7
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "88887567878370": {
+        "distanceAdj": 0,
+        "startSec": 0.65,
+        "name": "Critical",
+        "hold": 0.683333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86146312560589": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 86146312560589",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "105728707511673": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120819611310918": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "YomoGrabAttempt",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131161290739036": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "138545708561292": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Crushing",
+        "hold": 0.15,
+        "repeats": [
+            0.5833330000000001
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84286984142876": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Corsa",
+        "hold": 0.383333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98357517858626": {
+        "distanceAdj": 0,
+        "startSec": 0.55,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124313468183967": {
+        "distanceAdj": 0,
+        "startSec": 0.07666699999999999,
+        "name": "Swing1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "88694211921073": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "75082454798619": {
+        "distanceAdj": 0,
+        "startSec": 0.01999999999999999,
+        "name": "TaciturnitySlam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136641282446354": {
+        "distanceAdj": 0,
+        "startSec": 0.71,
+        "name": "Disturbed Blitz",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137895113211806": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "ShachiX",
+        "hold": 0.15,
+        "repeats": [
+            0.4266669999999999,
+            0.61,
+            0.9933329999999999
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125127055135454": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108769432958516": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing3",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114558724693893": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing2",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122078602988555": {
+        "distanceAdj": 0,
+        "startSec": 0.24333299999999997,
+        "name": "Overheat1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129618429137267": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Triple Kick",
+        "hold": 0.15,
+        "repeats": [
+            0.516667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "140622979921414": {
+        "distanceAdj": 0,
+        "startSec": 0.093333,
+        "name": "Uppercut",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114271583438140": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Swing1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139054968112034": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Anim 139054968112034",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "73319481678482": {
+        "distanceAdj": 0,
+        "startSec": 0.026666999999999997,
+        "name": "Swing1",
+        "hold": 0.65,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122209388478374": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Anim 122209388478374",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76493312726296": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Shield",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103687126805661": {
+        "distanceAdj": 0,
+        "startSec": 0.19,
+        "name": "RunningAttack",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123818970722547": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Barrage",
+        "hold": 0.15,
+        "repeats": [
+            0.6333340000000001,
+            1.066667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "116587381607786": {
+        "distanceAdj": 0,
+        "startSec": 0.093333,
+        "name": "Shadow Drop Action",
+        "hold": 0.15,
+        "repeats": [
+            0.743333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "75292643761800": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111843219064172": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125789367232039": {
+        "distanceAdj": 0,
+        "startSec": 0.093333,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107934946852201": {
+        "distanceAdj": 0,
+        "startSec": 0.026666999999999997,
+        "name": "Swing2",
+        "hold": 0.616667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81012015438327": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102121388644772": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "117824758967146": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Swing2",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101775258669555": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139181141648397": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123728918222864": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Critical",
+        "hold": 0.15,
+        "repeats": [
+            0.333333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104480978725625": {
+        "distanceAdj": 0,
+        "startSec": 0.376667,
+        "name": "GinkuiJump",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125357563633361": {
+        "distanceAdj": 0,
+        "startSec": 0.12666699999999998,
+        "name": "CriticalFeint",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106662330750866": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "ScentActionUser",
+        "hold": 0.15,
+        "repeats": [
+            0.6499999999999999
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86526104440485": {
+        "distanceAdj": 0,
+        "startSec": 0.783333,
+        "name": "Narukami X Action",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71335341504453": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83691818071163": {
+        "distanceAdj": 0,
+        "startSec": 0.333333,
+        "name": "Critical2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107992919085814": {
+        "distanceAdj": 0,
+        "startSec": 0.15000000000000003,
+        "name": "Dropping Spike - 20SP",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136533060945586": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing3",
+        "hold": 0.483333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72719950628740": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "Swing4",
+        "hold": 0.4,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "133772126041906": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "WardRelease",
+        "hold": 0.15,
+        "repeats": [
+            0.216667,
+            0.316667,
+            0.433333,
+            0.516667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87764692704657": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106519942311504": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "109123230222277": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Swing3",
+        "hold": 0.366667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103668941891085": {
+        "distanceAdj": 0,
+        "startSec": 0.333333,
+        "name": "Nishio C",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129838646358073": {
+        "distanceAdj": 0,
+        "startSec": 1.31,
+        "name": "Anim 129838646358073",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135750505225960": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76639298017828": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Swing4",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90448243904946": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Shard Onslaught",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130214291629606": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Anim 130214291629606",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90521401898889": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "Swing4",
+        "hold": 0.45,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "74877124260548": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 74877124260548",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86520696250760": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123961480058444": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "UpperCutPartTwo",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115339339320713": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "92937790229658": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "132182597095300": {
+        "distanceAdj": 0,
+        "startSec": 0.793333,
+        "name": "VanishImpact",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115889394262154": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Flip Kick",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135024148593300": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "IXA X",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134177458585326": {
+        "distanceAdj": 0,
+        "startSec": 0.7,
+        "name": "Tatara V2 Z",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "126029045405951": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "TataraC",
+        "hold": 0.15,
+        "repeats": [
+            0.8166659999999999,
+            1.3
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122819555320047": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107500740429380": {
+        "distanceAdj": 0,
+        "startSec": 0.46,
+        "name": "Demolish",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "109261766138092": {
+        "distanceAdj": 0,
+        "startSec": 0.56,
+        "name": "ShachiZ",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114250633109382": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84271637509046": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 84271637509046",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "120664443221590": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Swing4",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129441247864879": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100344407851618": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Anim 100344407851618",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71420999059607": {
+        "distanceAdj": 0,
+        "startSec": 0.51,
+        "name": "Critical",
+        "hold": 0.15,
+        "repeats": [
+            0.86
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124343869615532": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "9876543210": {
+        "distanceAdj": 0,
+        "startSec": 0.26999999999999998,
+        "name": "Anim 9876543210",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "85614011160854": {
+        "distanceAdj": 0,
+        "startSec": 1.6,
+        "name": "Anim 85614011160854",
+        "hold": 0.6000000000000001,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137536807753517": {
+        "distanceAdj": 0,
+        "startSec": 0.29,
+        "name": "blood fan",
+        "hold": 0.15,
+        "repeats": [
+            0.756666
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78297239425049": {
+        "distanceAdj": 0,
+        "startSec": 0.13,
+        "name": "Swing2",
+        "hold": 0.483333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125225118278296": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Aversion",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122058927995139": {
+        "distanceAdj": 0,
+        "startSec": 0.05000000000000002,
+        "name": "Anim 122058927995139",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86187711733321": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 86187711733321",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125001482194702": {
+        "distanceAdj": 0,
+        "startSec": 0.7333330000000001,
+        "name": "Steel Retreat",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135839768689737": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing2",
+        "hold": 0.366667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129003302707709": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 129003302707709",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134071135239015": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "Swing3",
+        "hold": 0.45,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123084791240164": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 123084791240164",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135207502419237": {
+        "distanceAdj": 0,
+        "startSec": 0.07666699999999999,
+        "name": "Critical",
+        "hold": 0.483333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122661360698160": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125049330153289": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Swing3",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "73070498967421": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "97948186676988": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "ApproachUser",
+        "hold": 0.15,
+        "repeats": [
+            0.143333,
+            0.36,
+            0.526667,
+            0.71
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106775306544683": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 106775306544683",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "73383098189453": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111432568957261": {
+        "distanceAdj": 0,
+        "startSec": 0.10000000000000004,
+        "name": "Skill1Execution",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134101600310736": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "RunningAttack",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82321974164036": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122576225066490": {
+        "distanceAdj": 0,
+        "startSec": 0.44,
+        "name": "Anim 122576225066490",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125756826659861": {
+        "distanceAdj": 0,
+        "startSec": 0.17,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "133929766213678": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 133929766213678",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "96854702208827": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing5",
+        "hold": 0.45,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102453919149515": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90524148205499": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "113175465376972": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Cyclone Bruiser",
+        "hold": 0.15,
+        "repeats": [
+            0.816667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91532107165998": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing4",
+        "hold": 0.55,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90442984429511": {
+        "distanceAdj": 0,
+        "startSec": 0.49,
+        "name": "Anim 90442984429511",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "126074016457313": {
+        "distanceAdj": 0,
+        "startSec": 0.08000000000000002,
+        "name": "Swing1",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77368757687748": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "ShieldSlamM2",
+        "hold": 0.15,
+        "repeats": [
+            0.35000000000000006,
+            0.666667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134646776465233": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 134646776465233",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129126721746103": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Tatara Ignite Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83232773804937": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Tatara Blaze Shoot",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "133226169224453": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "BarrageAction",
+        "hold": 0.15,
+        "repeats": [
+            0.009999999999999981,
+            0.10999999999999999,
+            0.19333299999999999,
+            0.26,
+            0.343333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72659935381687": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 72659935381687",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "109184942183064": {
+        "distanceAdj": 0,
+        "startSec": 0.55,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "92648977102139": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Anim 92648977102139",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "88509112744612": {
+        "distanceAdj": 0,
+        "startSec": 0.76,
+        "name": "Impaling",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125985327613003": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "139882895533511": {
+        "distanceAdj": 0,
+        "startSec": 0.226667,
+        "name": "KickSlam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119570344423009": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing1",
+        "hold": 0.202,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122454882730691": {
+        "distanceAdj": 0,
+        "startSec": 0.13,
+        "name": "Swing2",
+        "hold": 0.366667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103463736964630": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "HalfKillAttempt",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115299391673163": {
+        "distanceAdj": 0,
+        "startSec": 0.67,
+        "name": "Anim 115299391673163",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "117895576903926": {
+        "distanceAdj": 0,
+        "startSec": 0.17666699999999997,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77659049501128": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing3",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "115935194502458": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 115935194502458",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "76272752426300": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "89959759283148": {
+        "distanceAdj": 0,
+        "startSec": 0.04333299999999998,
+        "name": "Feast",
+        "hold": 0.15,
+        "repeats": [
+            0.39333299999999996
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "88408002982819": {
+        "distanceAdj": 0,
+        "startSec": 0.093333,
+        "name": "CriticalV2Confirm",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108665178801618": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Swing1",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137619265423164": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "ShachiC",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119083279207398": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Overheat C Cast",
+        "hold": 0.15,
+        "repeats": [
+            0.35
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "98312504474371": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 98312504474371",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84024525589689": {
+        "distanceAdj": 0,
+        "startSec": 0.88,
+        "name": "Anim 84024525589689",
+        "hold": 0.2599999999999999,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124960892283230": {
+        "distanceAdj": 0,
+        "startSec": 0.07,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110095853598336": {
+        "distanceAdj": 0,
+        "startSec": 0.45999999999999999,
+        "name": "Narukami Crit",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137511148168199": {
+        "distanceAdj": 0,
+        "startSec": 0.343333,
+        "name": "EyePatchAction",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "99807726895726": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 99807726895726",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "82989744322417": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 82989744322417",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "71464287181868": {
+        "distanceAdj": 0,
+        "startSec": 0.19333299999999999,
+        "name": "IXA Crit Feint",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "113219432678875": {
+        "distanceAdj": 0,
+        "startSec": 0.8,
+        "name": "Phantom Drop",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102158544938828": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "Narukami Z",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86064530980403": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "Burrow",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "73909511758220": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 73909511758220",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114394198383881": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123123044774364": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "85198011676849": {
+        "distanceAdj": 0,
+        "startSec": 0.10999999999999999,
+        "name": "LanceCritP2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128106238874291": {
+        "distanceAdj": 0,
+        "startSec": 0.18333299999999998,
+        "name": "MaraudInitial",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119912107937230": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "OwlRend",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121448140753859": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 121448140753859",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134047638406873": {
+        "distanceAdj": 0,
+        "startSec": 0.13,
+        "name": "Swing3",
+        "hold": 0.483333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130783290284678": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "DesireWindup",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "93208123390221": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Narukami Z Feint",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87492498431491": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "70467113681722": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 70467113681722",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "118696475800411": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "138484499722859": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Crackle",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "93457709307676": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101138797487568": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Swing2",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136400690344027": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Anim 136400690344027",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86716001800586": {
+        "distanceAdj": 0,
+        "startSec": 0.06,
+        "name": "SplittingDeathFollowup",
+        "hold": 0.15,
+        "repeats": [
+            0.226667,
+            0.326667,
+            0.39333299999999996,
+            0.47666699999999997,
+            0.5599999999999999,
+            0.61,
+            0.6433329999999999,
+            0.693333,
+            0.743333,
+            0.776667,
+            0.826667,
+            0.893333,
+            1.06,
+            1.1099999999999999,
+            1.193333,
+            1.443333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121249350564834": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "AerialAttack",
+        "hold": 0.5,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "112697833450520": {
+        "distanceAdj": 0,
+        "startSec": 0.41,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84438345872276": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134741686910618": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "86163858467809": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 86163858467809",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135530502434129": {
+        "distanceAdj": 0,
+        "startSec": 0.41,
+        "name": "Anim 135530502434129",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91668992403483": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "W Key Warriors Pri",
+        "hold": 0.15,
+        "repeats": [
+            0.766667,
+            2.366667
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110143853925768": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "100191558480841": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 100191558480841",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "136184907369757": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Wing Assault",
+        "hold": 0.9,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "107868355016077": {
+        "distanceAdj": 0,
+        "startSec": 1.583333,
+        "name": "WhirlAssault",
+        "hold": 0.15,
+        "repeats": [
+            1.75
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "116175888742894": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Suppression",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77317789467088": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "123392788492194": {
+        "distanceAdj": 0,
+        "startSec": 0.23,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "97870196303383": {
+        "distanceAdj": 0,
+        "startSec": 1.15,
+        "name": "Anim 97870196303383",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102546483231226": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Maraud2",
+        "hold": 0.15,
+        "repeats": [
+            0.4
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111588815160704": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Usurper",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137484309550445": {
+        "distanceAdj": 0,
+        "startSec": 1.06,
+        "name": "Anim 137484309550445",
+        "hold": 0.5,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "89307852214578": {
+        "distanceAdj": 0,
+        "startSec": 0.71,
+        "name": "NewSkill3",
+        "hold": 0.383333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "91139296283591": {
+        "distanceAdj": 0,
+        "startSec": 0.56,
+        "name": "Anim 91139296283591",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "113848079779223": {
+        "distanceAdj": 0,
+        "startSec": 0.2023121387283237,
+        "name": "Spinning Hook Kick",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "77200481731064": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing1",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "79229888407512": {
+        "distanceAdj": 0,
+        "startSec": 0.41000000000000005,
+        "name": "Overheat2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "95204787982562": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "MassacreFollowup",
+        "hold": 0.15,
+        "repeats": [
+            0.016667,
+            0.166667,
+            0.3
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "99963342174936": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128313390310908": {
+        "distanceAdj": 0,
+        "startSec": 0.876667,
+        "name": "DevourerTentacle",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "111633774847428": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Anim 111633774847428",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122675079330408": {
+        "distanceAdj": 0,
+        "startSec": 0.8,
+        "name": "Anim 122675079330408",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103956940674117": {
+        "distanceAdj": 0,
+        "startSec": 0.343333,
+        "name": "FeastAction",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103768229983074": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "DesireAction",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "114645482282576": {
+        "distanceAdj": 0,
+        "startSec": 0.143333,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "128170253639184": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "IndigestionConfirm",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "132460798392888": {
+        "distanceAdj": 0,
+        "startSec": 0.15999999999999998,
+        "name": "Scalpel Drive Throw",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90105278811432": {
+        "distanceAdj": 0,
+        "startSec": 0.21,
+        "name": "Anim 90105278811432",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "117434170736698": {
+        "distanceAdj": 0,
+        "startSec": 0.08000000000000002,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135835813606350": {
+        "distanceAdj": 0,
+        "startSec": 0.25,
+        "name": "Swing1",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81823547351174": {
+        "distanceAdj": 0,
+        "startSec": 0.08333300000000005,
+        "name": "Punctured Lunge Cast",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "130872155278190": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Sanrenzan",
+        "hold": 0.15,
+        "repeats": [
+            0.576667,
+            0.9766670000000001
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "119882630862689": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "NewCritical",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "103983986351361": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing1",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78579526667061": {
+        "distanceAdj": 0,
+        "startSec": 0.793333,
+        "name": "GnawBite",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "97615082234385": {
+        "distanceAdj": 0,
+        "startSec": 0.10999999999999999,
+        "name": "Asunder",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "126930390220804": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Uppercut Part 1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101093312856347": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 101093312856347",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "87887548675431": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Highrise",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83748907427260": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Shield Slam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121773250743693": {
+        "distanceAdj": 0,
+        "startSec": 0.24,
+        "name": "Anim 121773250743693",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135996369936805": {
+        "distanceAdj": 0,
+        "startSec": 0.826667,
+        "name": "BFChain2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "137968686155978": {
+        "distanceAdj": 0,
+        "startSec": 0.04333299999999998,
+        "name": "DoubleKick",
+        "hold": 0.15,
+        "repeats": [
+            0.41000000000000005
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "138168065858800": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Anim 138168065858800",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "116301245600177": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72662379371809": {
+        "distanceAdj": 0,
+        "startSec": 0.04333299999999998,
+        "name": "Maraud3",
+        "hold": 0.15,
+        "repeats": [
+            0.39333299999999996,
+            0.66,
+            0.91
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "116560311654983": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Swing2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "70506218732605": {
+        "distanceAdj": 0,
+        "startSec": 0.14,
+        "name": "UrieDashStab",
+        "hold": 0.583333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "110669648239165": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Anim 110669648239165",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "78994342814792": {
+        "distanceAdj": 0,
+        "startSec": 0.6,
+        "name": "Anim 78994342814792",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84032491629355": {
+        "distanceAdj": 0,
+        "startSec": 0.4,
+        "name": "Axe Kick - 24SP",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "83894242302290": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Anim 83894242302290",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "96240580568749": {
+        "distanceAdj": 0,
+        "startSec": 0.13,
+        "name": "Swing1",
+        "hold": 0.30000000000000007,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "121092258344696": {
+        "distanceAdj": 0,
+        "startSec": 0.35,
+        "name": "DebilitatingM2",
+        "hold": 0.15,
+        "repeats": [
+            0.5
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "81343624564970": {
+        "distanceAdj": 0,
+        "startSec": 0.12,
+        "name": "Swing1",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131051682278134": {
+        "distanceAdj": 0,
+        "startSec": 0.18,
+        "name": "Swing2",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101521677894258": {
+        "distanceAdj": 0,
+        "startSec": 0.5,
+        "name": "Critical",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "73188053010196": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "CriticalCast",
+        "hold": 0.15,
+        "repeats": [
+            0.593334
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "125009591132881": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Swing5",
+        "hold": 0.416667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129436447203162": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 129436447203162",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "126381011592027": {
+        "distanceAdj": 0,
+        "startSec": 0.31,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "131725694254635": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Swing2",
+        "hold": 0.35,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106306160427852": {
+        "distanceAdj": 0,
+        "startSec": 0.13,
+        "name": "Swing4",
+        "hold": 0.483333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "80394717803764": {
+        "distanceAdj": 0,
+        "startSec": 0.426667,
+        "name": "Phezaro Hit",
+        "hold": 0.15,
+        "repeats": [
+            1.0266669999999998
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102333760180664": {
+        "distanceAdj": 0,
+        "startSec": 0.202,
+        "name": "RunningAttack",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101523256677778": {
+        "distanceAdj": 0,
+        "startSec": 0.03,
+        "name": "Swing3",
+        "hold": 0.533333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "90378632792073": {
+        "distanceAdj": 0,
+        "startSec": 0.07666699999999999,
+        "name": "Sunder",
+        "hold": 0.15,
+        "repeats": [
+            0.543333
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "101968837242799": {
+        "distanceAdj": 0,
+        "startSec": 0.19333299999999999,
+        "name": "BeakThrust",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "122316986850697": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Downslam",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "72026342966670": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "Anim 72026342966670",
+        "hold": 0.29999999999999996,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "104346885061572": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing4",
+        "hold": 0.466667,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102534431526280": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Skill1Activation",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108307424389592": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "132546734612246": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "Flow action",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84922253817066": {
+        "distanceAdj": 0,
+        "startSec": 0.05,
+        "name": "Anim 84922253817066",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "89816763320681": {
+        "distanceAdj": 0,
+        "startSec": 0.11666700000000002,
+        "name": "Shoot",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "129165719671535": {
+        "distanceAdj": 0,
+        "startSec": 0.41,
+        "name": "Anim 129165719671535",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "140017849718031": {
+        "distanceAdj": 0,
+        "startSec": 0.36,
+        "name": "Tatara V2 Z2",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "88929119667129": {
+        "distanceAdj": 0,
+        "startSec": 0.3,
+        "name": "BeakSpin",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "134287260412530": {
+        "distanceAdj": 0,
+        "startSec": 0.04999999999999999,
+        "name": "Swing4",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "106461888875800": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing5",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "108458212372937": {
+        "distanceAdj": 0,
+        "startSec": 0.1,
+        "name": "Swing3",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "84043093107309": {
+        "distanceAdj": 0,
+        "startSec": 0.28,
+        "name": "Anim 84043093107309",
+        "hold": 0.29000000000000006,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "70412028803830": {
+        "distanceAdj": 0,
+        "startSec": 0,
+        "name": "Uppercut",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102288540818350": {
+        "distanceAdj": 0,
+        "startSec": 0.15,
+        "name": "OwlHunt",
+        "hold": 0.3,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "124099807109821": {
+        "distanceAdj": 0,
+        "startSec": 3,
+        "name": "Anim 124099807109821",
+        "hold": 0.35,
+        "repeats": [
+            3.2
+        ],
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "135442996725675": {
+        "distanceAdj": 0,
+        "startSec": 0.26,
+        "name": "Anim 135442996725675",
+        "hold": 0.15,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    },
+    "102445468244138": {
+        "distanceAdj": 0,
+        "startSec": 0.2,
+        "name": "Swing2",
+        "hold": 0.433333,
+        "priority": "parry",
+        "rollOnFail": true,
+        "enabled": true
+    }
+}
