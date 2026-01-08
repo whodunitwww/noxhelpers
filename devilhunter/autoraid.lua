@@ -93,6 +93,14 @@ return function(ctx)
         return type(name) == "string" and string.find(string.lower(name), "zombie", 1, true) ~= nil
     end
 
+    local function zombieTypeKey(name)
+        if type(name) ~= "string" then return nil end
+        local base = name:match("^(.*)_[^_]+$") or name
+        base = base:gsub("%s+$", ""):gsub("^%s+", "")
+        if base == "" then base = name end
+        return string.lower(base)
+    end
+
     local function isTankZombieName(name)
         if type(name) ~= "string" then return false end
         local lower = string.lower(name)
@@ -110,16 +118,20 @@ return function(ctx)
         return type(name) == "string" and string.find(string.lower(name), "leech", 1, true) ~= nil
     end
 
-    local function hasZombieEntity()
+    local function getZombieTypeCount()
         local world = Services.Workspace:FindFirstChild("World")
         local entities = world and world:FindFirstChild("Entities")
-        if not entities then return false end
-        for _, v in ipairs(entities:GetDescendants()) do
+        if not entities then return 0 end
+        local types = {}
+        for _, v in ipairs(entities:GetChildren()) do
             if isZombieName(v.Name) then
-                return true
+                local key = zombieTypeKey(v.Name)
+                if key then types[key] = true end
             end
         end
-        return false
+        local count = 0
+        for _ in pairs(types) do count = count + 1 end
+        return count
     end
 
     local function isKatanaRaid()
@@ -143,24 +155,14 @@ return function(ctx)
     end
 
     local function getRaidType()
-        local zombieNow = hasZombieEntity()
-        if zombieNow then
+        local zombieTypeCount = getZombieTypeCount()
+        if zombieTypeCount >= 10 then
             Autos.ZombieRaidActive = true
         end
 
         if isKatanaRaid() then
             Autos.RaidType = "Katana Raid"
             return Autos.RaidType
-        end
-
-        if Autos.ZombieRaidActive then
-            if not Autos.ZombieRaidLeftLobby and not isLobby() then
-                Autos.ZombieRaidLeftLobby = true
-            end
-            if Autos.ZombieRaidLeftLobby and isLobby() and not zombieNow then
-                Autos.ZombieRaidActive = false
-                Autos.ZombieRaidLeftLobby = false
-            end
         end
 
         if Autos.ZombieRaidActive then
@@ -266,6 +268,28 @@ return function(ctx)
         return nil
     end
 
+    local function clickGuiButton(btn)
+        if not btn or not btn.Visible then return false end
+
+        local pos = btn.AbsolutePosition
+        local size = btn.AbsoluteSize
+        local centerX = pos.X + (size.X / 2)
+        local centerY = pos.Y + (size.Y / 2)
+
+        Services.VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, game, 1)
+        task.wait(0.05)
+        Services.VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 1)
+
+        Services.GuiService.SelectedObject = btn
+        Services.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+        task.wait(0.05)
+        Services.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+
+        task.wait(0.1)
+        Services.GuiService.SelectedObject = nil
+        return true
+    end
+
     local function clickRaidButton()
         local gui = References.player:WaitForChild("PlayerGui", 5)
         local enterRaid = gui and gui:WaitForChild("EnterRaid", 5)
@@ -275,26 +299,7 @@ return function(ctx)
         local enterFrame = enterRaid:FindFirstChild("Frame")
         local btn = enterFrame and enterFrame:FindFirstChild("Enter")
 
-        if btn and btn.Visible then
-            local pos = btn.AbsolutePosition
-            local size = btn.AbsoluteSize
-            local centerX = pos.X + (size.X / 2)
-            local centerY = pos.Y + (size.Y / 2)
-
-            Services.VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, game, 1)
-            task.wait(0.05)
-            Services.VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 1)
-
-            Services.GuiService.SelectedObject = btn
-            Services.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-            task.wait(0.05)
-            Services.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-
-            task.wait(0.1)
-            Services.GuiService.SelectedObject = nil
-            return true
-        end
-        return false
+        return clickGuiButton(btn)
     end
 
     local function hasParty()
@@ -326,7 +331,7 @@ return function(ctx)
 
     local AutoRaidGroup = Tabs.Auto:AddLeftGroupbox("Auto Raid", "shield")
 
-    local InfoLabel = AutoRaidGroup:AddLabel("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill enabled. (set range to 20 for Zombie Raid)", true)
+    local InfoLabel = AutoRaidGroup:AddLabel("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill enabled.", true)
     AutoRaidGroup:AddDivider()
 
     local StatusLabel = AutoRaidGroup:AddLabel("Status: Checking...", true)
@@ -367,20 +372,22 @@ return function(ctx)
     AutoRaidGroup:AddToggle("AutoClearRaid", { Text = "Auto Clear Raid", Default = false })
     AutoRaidGroup:AddToggle("Devil_ForceLoaded", { Text = "Force Load", Default = false })
 
-    Options.MainAccountName:OnChanged(function() UpdateAccountConfig() end)
-    Options.AltAccountName:OnChanged(function() UpdateAccountConfig() end)
-    Options.RaidStartSelect:OnChanged(function()
-        Autos.SelectedRaidStart = Options.RaidStartSelect.Value
+    local function updateRaidInfoLabel()
         if Autos.SelectedRaidStart == "Zombie Raid" then
             InfoLabel:SetText("Info: Zombie Raid - Do NOT use InstaKill. Requires AutoEquip and AutoAttack (M1).")
         else
             InfoLabel:SetText("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill enabled.")
         end
+    end
+
+    Options.MainAccountName:OnChanged(function() UpdateAccountConfig() end)
+    Options.AltAccountName:OnChanged(function() UpdateAccountConfig() end)
+    Options.RaidStartSelect:OnChanged(function()
+        Autos.SelectedRaidStart = Options.RaidStartSelect.Value
+        updateRaidInfoLabel()
     end)
 
-    if Autos.SelectedRaidStart == "Zombie Raid" then
-        InfoLabel:SetText("Info: Zombie Raid - Do NOT use InstaKill. Requires AutoEquip and AutoAttack (M1).")
-    end
+    updateRaidInfoLabel()
 
     local function getSkipButton()
         local pg = References.player:FindFirstChild("PlayerGui")
@@ -797,7 +804,7 @@ return function(ctx)
                                             task.wait(0.5)
                                             local dropBtn = getCraneDropButton()
                                             if dropBtn and dropBtn.Visible then
-                                                clickSkipViaGuiNav(dropBtn)
+                                                clickGuiButton(dropBtn)
                                             end
                                         end
                                     end
