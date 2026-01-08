@@ -93,14 +93,6 @@ return function(ctx)
         return type(name) == "string" and string.find(string.lower(name), "zombie", 1, true) ~= nil
     end
 
-    local function zombieTypeKey(name)
-        if type(name) ~= "string" then return nil end
-        local base = name:match("^(.*)_[^_]+$") or name
-        base = base:gsub("%s+$", ""):gsub("^%s+", "")
-        if base == "" then base = name end
-        return string.lower(base)
-    end
-
     local function isTankZombieName(name)
         if type(name) ~= "string" then return false end
         local lower = string.lower(name)
@@ -118,19 +110,27 @@ return function(ctx)
         return type(name) == "string" and string.find(string.lower(name), "leech", 1, true) ~= nil
     end
 
-    local function getZombieTypeCount()
+    local function isDevilName(name)
+        return type(name) == "string" and string.find(string.lower(name), "devil", 1, true) ~= nil
+    end
+
+    local function isTeleportOnlyTarget(name, raidType)
+        if isLeechName(name) or isDevilName(name) then
+            return true
+        end
+        return raidType == "Zombie Raid" and isSeaZombieName(name)
+    end
+
+    local function getZombieCount()
         local world = Services.Workspace:FindFirstChild("World")
         local entities = world and world:FindFirstChild("Entities")
         if not entities then return 0 end
-        local types = {}
+        local count = 0
         for _, v in ipairs(entities:GetChildren()) do
             if isZombieName(v.Name) then
-                local key = zombieTypeKey(v.Name)
-                if key then types[key] = true end
+                count = count + 1
             end
         end
-        local count = 0
-        for _ in pairs(types) do count = count + 1 end
         return count
     end
 
@@ -155,8 +155,8 @@ return function(ctx)
     end
 
     local function getRaidType()
-        local zombieTypeCount = getZombieTypeCount()
-        if zombieTypeCount >= 10 then
+        local zombieCount = getZombieCount()
+        if zombieCount >= 10 then
             Autos.ZombieRaidActive = true
         end
 
@@ -698,8 +698,7 @@ return function(ctx)
                     if myRoot and Autos.RaidEntitiesPath then
                         for _, v in ipairs(Autos.RaidEntitiesPath:GetChildren()) do
                             if v ~= References.player.Character then
-                                local isTeleportOnly = isLeechName(v.Name)
-                                    or (raidType == "Zombie Raid" and isSeaZombieName(v.Name))
+                                local isTeleportOnly = isTeleportOnlyTarget(v.Name, raidType)
                                 local pos = nil
 
                                 if isTeleportOnly then
@@ -726,7 +725,7 @@ return function(ctx)
                     if target then
                         Autos.NoEnemyTimer = os.clock()
 
-                        if isLeechName(target.Name) or (raidType == "Zombie Raid" and isSeaZombieName(target.Name)) then
+                        if isTeleportOnlyTarget(target.Name, raidType) then
                             if Autos.IsAttaching then
                                 AttachPanel.Stop()
                                 Autos.IsAttaching = false
