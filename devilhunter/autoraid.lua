@@ -17,7 +17,6 @@ return function(ctx)
     -- Ensure Services
     Services.TeleportService = Services.TeleportService or game:GetService("TeleportService")
     Services.HttpService = Services.HttpService or game:GetService("HttpService")
-    -- Added specific services for the new click method
     Services.GuiService = Services.GuiService or game:GetService("GuiService")
     Services.VirtualInputManager = Services.VirtualInputManager or game:GetService("VirtualInputManager")
     Services.RunService = Services.RunService or game:GetService("RunService")
@@ -43,6 +42,7 @@ return function(ctx)
     Autos.LastJobIdCheck = 0
     Autos.IsHopping = false
     Autos.WaitThreshold = 5
+    Autos.HopWaitStart = nil -- Added for the 15s delay logic
     
     Autos.LastTeleportTime = Autos.LastTeleportTime or 0
     Autos.NoEnemyTimer = Autos.NoEnemyTimer or 0
@@ -270,76 +270,7 @@ return function(ctx)
         end
     end)
 
-    -- // NETWORKING & HOPPING LOOP (NEW FEATURE) //
-    task.spawn(function()
-        while true do
-            task.wait(2) -- Heartbeat for config sync
-            
-            -- Reload Config to get updates from other instances
-            local diskConfig = LoadConfig()
-            diskConfig.LastSelected = Autos.CurrentGroupIndex 
-            CachedConfig = diskConfig
-            RefreshLocalAutos()
-
-            local myName = normalizeName(References.player.Name)
-            local currentGroup = CachedConfig.Groups[Autos.CurrentGroupIndex]
-
-            if currentGroup and Toggles.AutoJoinRaid.Value then
-                
-                -- >> ALT LOGIC <<
-                if isAltAccount(myName) then
-                    local needsSave = false
-                    
-                    -- 1. Broadcast Job ID
-                    if currentGroup.JobId ~= game.JobId then
-                        currentGroup.JobId = game.JobId
-                        needsSave = true
-                    end
-                    
-                    if needsSave then
-                        SaveConfig(CachedConfig)
-                    end
-
-                    -- 2. Alt Hop Logic
-                    if Toggles.AltHop.Value and Autos.NextHopTime and not Autos.IsHopping then
-                        local timeLeft = Autos.NextHopTime - os.time()
-                        if timeLeft <= 0 then
-                            Autos.IsHopping = true
-                            notify("Alt Hop: Switching Servers...", 5)
-                            
-                            if queue_on_teleport then
-                                -- queue_on_teleport('loadstring(game:HttpGet("YOUR_SCRIPT_URL_HERE"))()') 
-                            end
-                            
-                            Services.TeleportService:Teleport(game.PlaceId, References.player)
-                            task.wait(10)
-                        elseif timeLeft < 60 and timeLeft % 15 == 0 then
-                            notify("Alt Hop: " .. timeLeft .. "s remaining", 3)
-                        end
-                    end
-                end
-
-                -- >> MAIN LOGIC <<
-                if isMainAccount(myName) then
-                    local targetJob = currentGroup.JobId
-                    
-                    if targetJob and targetJob ~= "" and targetJob ~= game.JobId then
-                        local map = Services.Workspace:FindFirstChild("Map")
-                        
-                        if map and not Autos.IsHopping then
-                            Autos.IsHopping = true
-                            notify("Main: Joining Alt's Server...", 5)
-                            Services.TeleportService:TeleportToPlaceInstance(game.PlaceId, targetJob, References.player)
-                            task.wait(10)
-                        end
-                    end
-                end
-            end
-        end
-    end)
-
-    -- // RAID HELPER FUNCTIONS //
-
+    -- // RAID HELPER FUNCTIONS (MOVED UP FOR SCOPE) //
     local function getRaidEntrancePos()
         if Autos.SelectedRaidStart == "Zombie Raid" then
             return ZOMBIE_RAID_ENTRANCE_POS
@@ -486,6 +417,93 @@ return function(ctx)
         return nil
     end
 
+    -- // NETWORKING & HOPPING LOOP (MODIFIED & MOVED) //
+    task.spawn(function()
+        while true do
+            task.wait(2) -- Heartbeat for config sync
+            
+            -- Reload Config to get updates from other instances
+            local diskConfig = LoadConfig()
+            diskConfig.LastSelected = Autos.CurrentGroupIndex 
+            CachedConfig = diskConfig
+            RefreshLocalAutos()
+
+            local myName = normalizeName(References.player.Name)
+            local currentGroup = CachedConfig.Groups[Autos.CurrentGroupIndex]
+
+            if currentGroup and Toggles.AutoJoinRaid.Value then
+                
+                -- >> ALT LOGIC <<
+                if isAltAccount(myName) then
+                    local needsSave = false
+                    
+                    -- 1. Broadcast Job ID
+                    if currentGroup.JobId ~= game.JobId then
+                        currentGroup.JobId = game.JobId
+                        needsSave = true
+                    end
+                    
+                    if needsSave then
+                        SaveConfig(CachedConfig)
+                    end
+
+                    -- 2. Alt Hop Logic
+                    if Toggles.AltHop.Value and Autos.NextHopTime and not Autos.IsHopping then
+                        local timeLeft = Autos.NextHopTime - os.time()
+                        if timeLeft <= 0 then
+                            Autos.IsHopping = true
+                            notify("Alt Hop: Switching Servers...", 5)
+                            
+                            if queue_on_teleport then
+                                -- queue_on_teleport('loadstring(game:HttpGet("YOUR_SCRIPT_URL_HERE"))()') 
+                            end
+                            
+                            Services.TeleportService:Teleport(game.PlaceId, References.player)
+                            task.wait(10)
+                        elseif timeLeft < 60 and timeLeft % 15 == 0 then
+                            notify("Alt Hop: " .. timeLeft .. "s remaining", 3)
+                        end
+                    end
+                end
+
+                -- >> MAIN LOGIC (UPDATED WITH 15S WAIT + NO RAID CHECK) <<
+                if isMainAccount(myName) then
+                    local targetJob = currentGroup.JobId
+                    
+                    -- Check if target exists, we are NOT in that server, and NOT hopping
+                    if targetJob and targetJob ~= "" and targetJob ~= game.JobId and not Autos.IsHopping then
+                        
+                        -- Requirement 1: Only if not in a raid
+                        if not isInRaid() then
+                            -- Requirement 2 & 3: Wait 15s before assessing
+                            if not Autos.HopWaitStart then
+                                Autos.HopWaitStart = os.time()
+                                notify("Main: Wrong server. Waiting 15s to hop...", 4)
+                            else
+                                local elapsed = os.time() - Autos.HopWaitStart
+                                if elapsed >= 15 then
+                                    Autos.IsHopping = true
+                                    notify("Main: Joining Alt's Server Now...", 5)
+                                    Services.TeleportService:TeleportToPlaceInstance(game.PlaceId, targetJob, References.player)
+                                    task.wait(10)
+                                elseif elapsed % 5 == 0 then
+                                    -- Optional countdown status
+                                    -- notify("Main: Hop in " .. (15 - elapsed) .. "s", 1)
+                                end
+                            end
+                        else
+                            -- We are in a raid, cancel any pending hop
+                            Autos.HopWaitStart = nil
+                        end
+                    else
+                        -- We are either in the right server, target is invalid, or already hopping
+                        Autos.HopWaitStart = nil
+                    end
+                end
+            end
+        end
+    end)
+
     -- // IMPROVED CLICKER (UPDATED WITH UI SELECTION) //
     local function clickGuiButton(btn)
         if not btn or not btn.Visible then return false end
@@ -501,7 +519,6 @@ return function(ctx)
         Services.RunService.RenderStepped:Wait()
         
         -- 4. Send the "Return" (Enter) key via VirtualInputManager
-        -- This works in the background because it injects the input event directly into the engine.
         Services.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
         task.wait(0.1)
         Services.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
