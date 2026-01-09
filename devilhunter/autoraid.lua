@@ -17,6 +17,10 @@ return function(ctx)
     -- Ensure Services
     Services.TeleportService = Services.TeleportService or game:GetService("TeleportService")
     Services.HttpService = Services.HttpService or game:GetService("HttpService")
+    -- Added specific services for the new click method
+    Services.GuiService = Services.GuiService or game:GetService("GuiService")
+    Services.VirtualInputManager = Services.VirtualInputManager or game:GetService("VirtualInputManager")
+    Services.RunService = Services.RunService or game:GetService("RunService")
 
     local Remotes = RemoteFunction or (NetworkPath and NetworkPath:WaitForChild("RemoteFunction"))
     if not Remotes then
@@ -33,14 +37,13 @@ return function(ctx)
 
     local GROUP_OPTIONS = { "Group 1", "Group 2", "Group 3", "Group 4", "Group 5" }
     
-    -- // STATE INITIALIZATION (Restored Missing Variables) //
+    -- // STATE INITIALIZATION //
     Autos.CurrentGroupIndex = "Group 1"
     Autos.NextHopTime = nil
     Autos.LastJobIdCheck = 0
     Autos.IsHopping = false
     Autos.WaitThreshold = 5
     
-    -- Restored combat/raid timers to prevent 'arithmetic on nil' errors
     Autos.LastTeleportTime = Autos.LastTeleportTime or 0
     Autos.NoEnemyTimer = Autos.NoEnemyTimer or 0
     Autos.LastPlayGameFire = Autos.LastPlayGameFire or 0
@@ -194,9 +197,9 @@ return function(ctx)
     
     -- Alt Hop
     AutoRaidGroup:AddToggle("AltHop", { 
-        Text = "Alt Hop (30m)", 
+        Text = "Alt Hop",
         Default = false, 
-        Tooltip = "Alt hops every 30 mins. Must have AutoLoad!" 
+        Tooltip = "Alt hops every 30 mins. Must have AutoLoad and ForceLoad!"
     })
 
     -- Raid Toggles
@@ -483,36 +486,32 @@ return function(ctx)
         return nil
     end
 
-    -- IMPROVED CLICKER
+    -- // IMPROVED CLICKER (UPDATED WITH UI SELECTION) //
     local function clickGuiButton(btn)
         if not btn or not btn.Visible then return false end
         
-        -- Method 1: VirtualInputManager (Reliable)
-        local pos = btn.AbsolutePosition
-        local size = btn.AbsoluteSize
-        local centerX = pos.X + (size.X / 2)
-        local centerY = pos.Y + (size.Y / 2)
-
-        Services.VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, game, 1)
-        task.wait(0.05)
-        Services.VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 1)
+        -- 1. Ensure the button is technically selectable so the engine accepts it
+        btn.Selectable = true
+        btn.Active = true
         
-        -- Method 2: GuiService / Keyboard Fallback
+        -- 2. Force Roblox to "Select" this object visually and logically
         Services.GuiService.SelectedObject = btn
+        
+        -- 3. Wait one frame to ensure the selection registers
+        Services.RunService.RenderStepped:Wait()
+        
+        -- 4. Send the "Return" (Enter) key via VirtualInputManager
+        -- This works in the background because it injects the input event directly into the engine.
         Services.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-        task.wait(0.05)
+        task.wait(0.1)
         Services.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-        Services.GuiService.SelectedObject = nil
-
-        -- Method 3: Direct Signal Firing (Aggressive fallback)
-        if getconnections then
-            for _, c in ipairs(getconnections(btn.MouseButton1Click)) do
-                pcall(function() c:Fire() end)
+        
+        -- 5. Cleanup: Clear selection to avoid stuck UI highlights
+        task.delay(0.1, function()
+            if Services.GuiService.SelectedObject == btn then
+                Services.GuiService.SelectedObject = nil
             end
-            for _, c in ipairs(getconnections(btn.Activated)) do
-                pcall(function() c:Fire() end)
-            end
-        end
+        end)
 
         return true
     end
