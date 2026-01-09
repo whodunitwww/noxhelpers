@@ -1,6 +1,7 @@
 return function(ctx)
     assert(type(ctx) == "table", "AutoRaid: context table required")
 
+    -- // SERVICES & UTILS //
     local Services = assert(ctx.Services, "AutoRaid: Services missing")
     local References = assert(ctx.References, "AutoRaid: References missing")
     local Library = assert(ctx.Library, "AutoRaid: Library missing")
@@ -13,6 +14,10 @@ return function(ctx)
     local NetworkPath = ctx.NetworkPath
     local RemoteFunction = ctx.RemoteFunction
 
+    -- Ensure TeleportService is defined
+    Services.TeleportService = Services.TeleportService or game:GetService("TeleportService")
+    Services.HttpService = Services.HttpService or game:GetService("HttpService")
+
     local Remotes = RemoteFunction or (NetworkPath and NetworkPath:WaitForChild("RemoteFunction"))
     if not Remotes then
         error("AutoRaid: RemoteFunction missing")
@@ -20,93 +25,89 @@ return function(ctx)
 
     local LoadedRemote = Services.ReplicatedStorage:WaitForChild("Files"):WaitForChild("Remotes"):WaitForChild("Loaded")
 
+    -- // CONFIGURATION CONSTANTS //
     local CONFIG_FOLDER_ROOT = "Cerberus"
     local CONFIG_FOLDER_PATH = References.gameDir or "Cerberus/Devil Hunter"
-    local CONFIG_FILE_NAME = "RaidAccounts.json"
+    local CONFIG_FILE_NAME = "RaidGroups_v2.json"
     local FULL_PATH = CONFIG_FOLDER_PATH .. "/" .. CONFIG_FILE_NAME
 
+    local GROUP_OPTIONS = { "Group 1", "Group 2", "Group 3", "Group 4", "Group 5" }
+    
+    -- // STATE INITIALIZATION //
+    Autos.CurrentGroupIndex = "Group 1"
+    Autos.NextHopTime = nil
+    Autos.LastJobIdCheck = 0
+    Autos.IsHopping = false
+
+    -- // HELPER FUNCTIONS //
     local function normalizeName(name)
         return (tostring(name or ""):gsub("^%s+", ""):gsub("%s+$", ""))
     end
 
-    local function addUnique(list, name)
-        local cleaned = normalizeName(name)
-        if cleaned == "" then return false end
-        for _, v in ipairs(list) do
-            if v == cleaned then return false end
+    local function ParseMains(str)
+        local list = {}
+        for s in string.gmatch(str, "([^,]+)") do
+            local clean = normalizeName(s)
+            if clean ~= "" then table.insert(list, clean) end
         end
-        table.insert(list, cleaned)
-        return true
+        return list
     end
 
-    local function LoadAccountConfig()
+    local function MainsToString(list)
+        return table.concat(list or {}, ", ")
+    end
+
+    -- // CONFIGURATION HANDLERS //
+    local function GetDefaultConfig()
+        local cfg = { LastSelected = "Group 1", Groups = {} }
+        for _, g in ipairs(GROUP_OPTIONS) do
+            cfg.Groups[g] = { Alt = "", Mains = {}, JobId = "" }
+        end
+        return cfg
+    end
+
+    local function LoadConfig()
         if isfile(FULL_PATH) then
             local success, result = pcall(function()
                 return Services.HttpService:JSONDecode(readfile(FULL_PATH))
             end)
-            if success and type(result) == "table" then
-                local mains = {}
-                if type(result.Mains) == "table" then
-                    for _, name in ipairs(result.Mains) do
-                        addUnique(mains, name)
+            if success and type(result) == "table" and result.Groups then
+                for _, g in ipairs(GROUP_OPTIONS) do
+                    if not result.Groups[g] then
+                        result.Groups[g] = { Alt = "", Mains = {}, JobId = "" }
                     end
                 end
-
-                local mainName = type(result.Main) == "string" and result.Main or ""
-                addUnique(mains, mainName)
-
-                return {
-                    Main = mainName,
-                    Alt = type(result.Alt) == "string" and result.Alt or "",
-                    Mains = mains
-                }
+                return result
             end
         end
-        return { Main = "", Alt = "", Mains = {} }
+        return GetDefaultConfig()
     end
 
-    local function UpdateAccountConfig()
+    local function SaveConfig(data)
         if not isfolder(CONFIG_FOLDER_ROOT) then makefolder(CONFIG_FOLDER_ROOT) end
         if not isfolder(CONFIG_FOLDER_PATH) then makefolder(CONFIG_FOLDER_PATH) end
-
-        Autos.MainAccountName = Options.MainAccountName.Value
-        Autos.AltAccountName = Options.AltAccountName.Value
-
-        local data = {
-            Main = Autos.MainAccountName,
-            Alt = Autos.AltAccountName,
-            Mains = Autos.MainAccountNames or {}
-        }
-
+        
         local success, err = pcall(function()
             writefile(FULL_PATH, Services.HttpService:JSONEncode(data))
         end)
-        if not success then warn("Failed to save config: " .. tostring(err)) end
+        if not success then warn("AutoRaid Save Error: " .. tostring(err)) end
     end
 
-    local savedData = LoadAccountConfig()
-    Autos.MainAccountName = savedData.Main or Autos.MainAccountName or ""
-    Autos.AltAccountName = savedData.Alt or Autos.AltAccountName or ""
-    Autos.MainAccountNames = savedData.Mains or {}
-    addUnique(Autos.MainAccountNames, Autos.MainAccountName)
-    Autos.ZombieRaidActive = Autos.ZombieRaidActive or false
-    Autos.ZombieRaidLeftLobby = Autos.ZombieRaidLeftLobby or false
-    Autos.LastRaidTypeNotified = Autos.LastRaidTypeNotified or ""
-    Autos.LastTeleportTime = Autos.LastTeleportTime or 0
-    Autos.SelectedRaidStart = Autos.SelectedRaidStart or "Katana Man Raid"
-    Autos.LastPlayGameFire = Autos.LastPlayGameFire or 0
-    Autos.ZombieResetting = Autos.ZombieResetting or false
-    Autos.ZombieResetCleanup = Autos.ZombieResetCleanup or nil
-    Autos.ZombieEmptySince = Autos.ZombieEmptySince or nil
-    Autos.ZombieEmptyLastAction = Autos.ZombieEmptyLastAction or 0
-    Autos.ActiveMainName = Autos.ActiveMainName or nil
-    Autos.SuppressAccountUpdate = Autos.SuppressAccountUpdate or false
+    -- Initial Load
+    local CachedConfig = LoadConfig()
+    Autos.CurrentGroupIndex = CachedConfig.LastSelected or "Group 1"
 
-    local RAID_START_OPTIONS = { "Katana Man Raid", "Zombie Raid" }
-    local ZOMBIE_RAID_ENTRANCE_POS = Vector3.new(37.856991, 6.760758, -1441.734375)
-    local ZOMBIE_VOID_POS = Vector3.new(0, -1000, 0)
-    local ZOMBIE_EMPTY_POS = Vector3.new(-448.255676, 60.691345, 512.108337)
+    local function RefreshLocalAutos()
+        local gData = CachedConfig.Groups[Autos.CurrentGroupIndex]
+        if gData then
+            Autos.AltAccountName = gData.Alt
+            Autos.MainAccountNames = gData.Mains
+            Autos.MainAccountName = gData.Mains[1] or ""
+        end
+    end
+    RefreshLocalAutos()
 
+    -- // NOTIFICATION //
     local function notify(msg, duration)
         if Autos.LastNotif ~= msg then
             Library:Notify(msg, duration or 3)
@@ -117,30 +118,220 @@ return function(ctx)
         end
     end
 
+    -- // RAID CONSTANTS //
+    local RAID_START_OPTIONS = { "Katana Man Raid", "Zombie Raid" }
+    local ZOMBIE_RAID_ENTRANCE_POS = Vector3.new(37.856991, 6.760758, -1441.734375)
+    local ZOMBIE_VOID_POS = Vector3.new(0, -1000, 0)
+    local ZOMBIE_EMPTY_POS = Vector3.new(-448.255676, 60.691345, 512.108337)
+
+    -- // IDENTITY CHECKS //
+    local function isMainAccount(name)
+        local norm = normalizeName(name)
+        for _, v in ipairs(Autos.MainAccountNames or {}) do
+            if normalizeName(v) == norm then return true end
+        end
+        return false
+    end
+
+    local function isAltAccount(name)
+        return normalizeName(Autos.AltAccountName) == normalizeName(name)
+    end
+
+    -- // GUI CONSTRUCTION //
+    local AutoRaidGroup = Tabs.Auto:AddLeftGroupbox("Auto Raid Manager", "shield")
+    local InfoLabel = AutoRaidGroup:AddLabel("Info: Configure Groups & Multi-Instance", true)
+    
+    AutoRaidGroup:AddDivider()
+
+    -- Group Select
+    AutoRaidGroup:AddDropdown("GroupSelect", {
+        Text = "Select Group",
+        Values = GROUP_OPTIONS,
+        Default = Autos.CurrentGroupIndex,
+        Multi = false,
+    })
+
+    -- Config Inputs
+    AutoRaidGroup:AddInput("AltAccountName", {
+        Default = Autos.AltAccountName,
+        Numeric = false, Finished = true,
+        Text = "Alt Name (Host)", Tooltip = "The account that broadcasts JobID", Placeholder = "Username...",
+    })
+
+    AutoRaidGroup:AddInput("MainAccountName", {
+        Default = MainsToString(Autos.MainAccountNames),
+        Numeric = false, Finished = true,
+        Text = "Main Name(s)", Tooltip = "Separate with commas", Placeholder = "User1, User2...",
+    })
+
+    -- Buttons
+    AutoRaidGroup:AddButton("Clear Current Group", function()
+        Autos.SuppressAccountUpdate = true
+        CachedConfig = LoadConfig()
+        CachedConfig.Groups[Autos.CurrentGroupIndex] = { Alt = "", Mains = {}, JobId = "" }
+        SaveConfig(CachedConfig)
+
+        if Options.AltAccountName then Options.AltAccountName:SetValue("") end
+        if Options.MainAccountName then Options.MainAccountName:SetValue("") end
+        
+        RefreshLocalAutos()
+        Autos.SuppressAccountUpdate = false
+        notify("Cleared config for " .. Autos.CurrentGroupIndex, 3)
+    end)
+
+    AutoRaidGroup:AddDivider()
+    
+    -- Alt Hop
+    AutoRaidGroup:AddToggle("AltHop", { 
+        Text = "Alt Hop", 
+        Default = false, 
+    })
+
+    -- Raid Toggles
+    AutoRaidGroup:AddLabel("Raid Logic")
+    AutoRaidGroup:AddToggle("AutoJoinRaid", { Text = "Auto Join Raid", Default = false })
+    AutoRaidGroup:AddToggle("InfiniteRaid", { Text = "Infinite Raid", Default = false, Tooltip = "Uses Group Logic" })
+    
+    AutoRaidGroup:AddDropdown("RaidStartSelect", {
+        Text = "Raid Start",
+        Values = RAID_START_OPTIONS,
+        Default = Autos.SelectedRaidStart or "Katana Man Raid",
+        Multi = false,
+    })
+    
+    AutoRaidGroup:AddToggle("AutoClearRaid", { Text = "Auto Clear Raid", Default = false })
+    AutoRaidGroup:AddToggle("Devil_ForceLoaded", { Text = "Force Load", Default = false })
+
+    local StatusLabel = AutoRaidGroup:AddLabel("Status: Initializing...", true)
+
+    -- // UI CALLBACKS //
+    local function UpdateUIFromConfig()
+        local gData = CachedConfig.Groups[Autos.CurrentGroupIndex]
+        if gData then
+            Autos.SuppressAccountUpdate = true
+            if Options.AltAccountName then Options.AltAccountName:SetValue(gData.Alt) end
+            if Options.MainAccountName then Options.MainAccountName:SetValue(MainsToString(gData.Mains)) end
+            Autos.SuppressAccountUpdate = false
+            RefreshLocalAutos()
+        end
+    end
+
+    Options.GroupSelect:OnChanged(function()
+        Autos.CurrentGroupIndex = Options.GroupSelect.Value
+        CachedConfig = LoadConfig() 
+        CachedConfig.LastSelected = Autos.CurrentGroupIndex
+        SaveConfig(CachedConfig)
+        UpdateUIFromConfig()
+    end)
+
+    local function SaveCurrentInputs()
+        if Autos.SuppressAccountUpdate then return end
+        local alt = normalizeName(Options.AltAccountName.Value)
+        local mains = ParseMains(Options.MainAccountName.Value)
+        
+        CachedConfig.Groups[Autos.CurrentGroupIndex].Alt = alt
+        CachedConfig.Groups[Autos.CurrentGroupIndex].Mains = mains
+        SaveConfig(CachedConfig)
+        RefreshLocalAutos()
+    end
+
+    Options.AltAccountName:OnChanged(SaveCurrentInputs)
+    Options.MainAccountName:OnChanged(SaveCurrentInputs)
+    
+    Options.RaidStartSelect:OnChanged(function()
+        Autos.SelectedRaidStart = Options.RaidStartSelect.Value
+        if Autos.SelectedRaidStart == "Zombie Raid" then
+            InfoLabel:SetText("Info: Zombie Raid - No InstaKill. Needs AutoEquip + M1")
+        else
+            InfoLabel:SetText("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill.")
+        end
+    end)
+
+    -- FIX: Changed Options.AltHop to Toggles.AltHop to prevent 'attempt to index nil' error
+    Toggles.AltHop:OnChanged(function()
+        if Toggles.AltHop.Value then
+            Autos.NextHopTime = os.time() + 1800 -- 30 mins from now
+        else
+            Autos.NextHopTime = nil
+        end
+    end)
+
+    -- // NETWORKING & HOPPING LOOP //
+    task.spawn(function()
+        while true do
+            task.wait(2) -- Heartbeat for config sync
+            
+            -- Reload Config to get updates from other instances
+            local diskConfig = LoadConfig()
+            diskConfig.LastSelected = Autos.CurrentGroupIndex 
+            CachedConfig = diskConfig
+            RefreshLocalAutos()
+
+            local myName = normalizeName(References.player.Name)
+            local currentGroup = CachedConfig.Groups[Autos.CurrentGroupIndex]
+
+            if currentGroup and Toggles.AutoJoinRaid.Value then
+                
+                -- >> ALT LOGIC <<
+                if isAltAccount(myName) then
+                    local needsSave = false
+                    
+                    -- 1. Broadcast Job ID
+                    if currentGroup.JobId ~= game.JobId then
+                        currentGroup.JobId = game.JobId
+                        needsSave = true
+                    end
+                    
+                    if needsSave then
+                        SaveConfig(CachedConfig)
+                    end
+
+                    -- 2. Alt Hop Logic
+                    if Toggles.AltHop.Value and Autos.NextHopTime and not Autos.IsHopping then
+                        local timeLeft = Autos.NextHopTime - os.time()
+                        if timeLeft <= 0 then
+                            Autos.IsHopping = true
+                            notify("Alt Hop: Switching Servers...", 5)
+                            
+                            if queue_on_teleport then
+                                -- Note: You must manually add your script URL if you want it to auto-execute
+                                -- queue_on_teleport('loadstring(game:HttpGet("YOUR_SCRIPT_URL_HERE"))()') 
+                            end
+                            
+                            Services.TeleportService:Teleport(game.PlaceId, References.player)
+                            task.wait(10)
+                        elseif timeLeft < 60 and timeLeft % 15 == 0 then
+                            notify("Alt Hop: " .. timeLeft .. "s remaining", 3)
+                        end
+                    end
+                end
+
+                -- >> MAIN LOGIC <<
+                if isMainAccount(myName) then
+                    local targetJob = currentGroup.JobId
+                    
+                    if targetJob and targetJob ~= "" and targetJob ~= game.JobId then
+                        local map = Services.Workspace:FindFirstChild("Map")
+                        
+                        if map and not Autos.IsHopping then
+                            Autos.IsHopping = true
+                            notify("Main: Joining Alt's Server...", 5)
+                            Services.TeleportService:TeleportToPlaceInstance(game.PlaceId, targetJob, References.player)
+                            task.wait(10)
+                        end
+                    end
+                end
+            end
+        end
+    end)
+
+    -- // RAID HELPER FUNCTIONS //
+
     local function getRaidEntrancePos()
         if Autos.SelectedRaidStart == "Zombie Raid" then
             return ZOMBIE_RAID_ENTRANCE_POS
         end
-        return Autos.RaidEntrancePos
-    end
-
-    local function addMainAccount(name)
-        Autos.MainAccountNames = Autos.MainAccountNames or {}
-        return addUnique(Autos.MainAccountNames, name)
-    end
-
-    local function getMainAccountListText()
-        local mains = Autos.MainAccountNames or {}
-        if #mains == 0 then return "None" end
-        return table.concat(mains, ", ")
-    end
-
-    local function isMainAccount(name)
-        if type(name) ~= "string" or name == "" then return false end
-        for _, v in ipairs(Autos.MainAccountNames or {}) do
-            if v == name then return true end
-        end
-        return false
+        return Autos.RaidEntrancePos or Vector3.new(0,0,0)
     end
 
     local function getActiveMainPlayer()
@@ -163,25 +354,22 @@ return function(ctx)
                 end
             end
         end
-
         return nil, nil
     end
 
     local function isZombieName(name)
         return type(name) == "string" and string.find(string.lower(name), "zombie", 1, true) ~= nil
     end
-
+    
     local function isTankZombieName(name)
         if type(name) ~= "string" then return false end
         local lower = string.lower(name)
-        return string.find(lower, "zombie", 1, true) ~= nil
-            and string.find(lower, "tank", 1, true) ~= nil
+        return string.find(lower, "zombie", 1, true) ~= nil and string.find(lower, "tank", 1, true) ~= nil
     end
 
     local function isSeaZombieName(name)
         if type(name) ~= "string" then return false end
-        local lower = string.lower(name)
-        return string.find(lower, "sea", 1, true) ~= nil
+        return string.find(string.lower(name), "sea", 1, true) ~= nil
     end
 
     local function isLeechName(name)
@@ -193,9 +381,7 @@ return function(ctx)
     end
 
     local function isTeleportOnlyTarget(name, raidType)
-        if isLeechName(name) or isDevilName(name) then
-            return true
-        end
+        if isLeechName(name) or isDevilName(name) then return true end
         return raidType == "Zombie Raid" and isSeaZombieName(name)
     end
 
@@ -203,50 +389,25 @@ return function(ctx)
         local world = Services.Workspace:FindFirstChild("World")
         local entities = world and world:FindFirstChild("Entities")
         if not entities then return 0 end
-        local types = {}
-        for _, v in ipairs(entities:GetDescendants()) do
-            if v:IsA("Model") and not Services.Players:GetPlayerFromCharacter(v) then
-                if isZombieName(v.Name) then
-                    local base = v.Name:match("^(.*)_[^_]+$") or v.Name
-                    base = base:gsub("^%s+", ""):gsub("%s+$", "")
-                    if base ~= "" then
-                        types[base] = true
-                    end
-                end
-            end
-        end
         local count = 0
-        for _ in pairs(types) do
-            count = count + 1
+        for _, v in ipairs(entities:GetDescendants()) do
+            if v:IsA("Model") and not Services.Players:GetPlayerFromCharacter(v) and isZombieName(v.Name) then
+                count = count + 1
+            end
         end
         return count
     end
 
     local function isKatanaRaid()
         local gui = References.player:FindFirstChild("PlayerGui")
-        if gui then
-            local hud = gui:FindFirstChild("HUD")
-            local objectives = hud and hud:FindFirstChild("Objectives")
-            if objectives and objectives:FindFirstChild("Yakuza Infiltration") then
-                return true
-            end
-        end
-        return false
-    end
-
-    local function isLobby()
-        local map = Services.Workspace:FindFirstChild("Map")
-        if map then return false end
-        local gui = References.player:FindFirstChild("PlayerGui")
-        if not gui then return true end
-        return gui:FindFirstChild("EnterRaid") ~= nil
+        local hud = gui and gui:FindFirstChild("HUD")
+        local objectives = hud and hud:FindFirstChild("Objectives")
+        return objectives and objectives:FindFirstChild("Yakuza Infiltration") ~= nil
     end
 
     local function getRaidType()
         local zombieCount = getZombieCount()
-        if zombieCount >= 10 then
-            Autos.ZombieRaidActive = true
-        end
+        if zombieCount >= 10 then Autos.ZombieRaidActive = true end
 
         if isKatanaRaid() then
             Autos.RaidType = "Katana Raid"
@@ -257,25 +418,17 @@ return function(ctx)
             Autos.RaidType = "Zombie Raid"
             return Autos.RaidType
         end
-
         Autos.RaidType = nil
         return nil
     end
 
-    local function isInRaid()
-        return getRaidType() ~= nil
-    end
+    local function isInRaid() return getRaidType() ~= nil end
 
     local function isPlayerLoaded()
         if not game:IsLoaded() then return false end
-
         local char = References.player.Character
-        if not char then return false end
-
-        if not char:FindFirstChild("Humanoid") then return false end
-        if not char:FindFirstChild("HumanoidRootPart") then return false end
+        if not char or not char:FindFirstChild("Humanoid") or not char:FindFirstChild("HumanoidRootPart") then return false end
         if not References.player:FindFirstChild("PlayerGui") then return false end
-
         return true
     end
 
@@ -289,76 +442,39 @@ return function(ctx)
     local function triggerZombieReset()
         if Autos.ZombieResetting then return end
         Autos.ZombieResetting = true
-
-        if Autos.IsAttaching then
-            AttachPanel.Stop()
-            Autos.IsAttaching = false
-        end
-
+        if Autos.IsAttaching then AttachPanel.Stop(); Autos.IsAttaching = false end
+        
         local startChar = References.player.Character
-
         task.spawn(function()
             while Autos.ZombieResetting do
                 local char = References.player.Character
-                local hum = char and char:FindFirstChild("Humanoid")
                 local root = char and char:FindFirstChild("HumanoidRootPart")
-
-                if not char or not char.Parent then
-                    break
-                end
-                if startChar and char ~= startChar then
-                    break
-                end
-                if hum and hum.Health <= 0 then
-                    break
-                end
-
-                if Autos.ZombieResetCleanup then
-                    pcall(Autos.ZombieResetCleanup)
-                    Autos.ZombieResetCleanup = nil
-                end
-
+                local hum = char and char:FindFirstChild("Humanoid")
+                
+                if not char or not char.Parent or (startChar and char ~= startChar) or (hum and hum.Health <= 0) then break end
+                
                 if root then
-                    if MoveToPos then
-                        Autos.ZombieResetCleanup = MoveToPos(ZOMBIE_VOID_POS, 5000)
-                    else
-                        root.CFrame = CFrame.new(ZOMBIE_VOID_POS)
-                        root.AssemblyLinearVelocity = Vector3.zero
-                        root.AssemblyAngularVelocity = Vector3.zero
-                    end
+                    if MoveToPos then Autos.ZombieResetCleanup = MoveToPos(ZOMBIE_VOID_POS, 5000)
+                    else root.CFrame = CFrame.new(ZOMBIE_VOID_POS); root.AssemblyLinearVelocity = Vector3.zero end
                 end
                 task.wait(1)
             end
-            if Autos.ZombieResetCleanup then
-                pcall(Autos.ZombieResetCleanup)
-                Autos.ZombieResetCleanup = nil
-            end
-
+            if Autos.ZombieResetCleanup then pcall(Autos.ZombieResetCleanup); Autos.ZombieResetCleanup = nil end
             local currentChar = References.player.Character
-            if not currentChar or currentChar == startChar then
-                currentChar = References.player.CharacterAdded:Wait()
-            end
-            if currentChar then
-                currentChar:WaitForChild("HumanoidRootPart", 10)
-                currentChar:WaitForChild("Humanoid", 10)
-            end
+            if not currentChar or currentChar == startChar then References.player.CharacterAdded:Wait() end
             Autos.ZombieResetting = false
         end)
     end
 
     local function getSafePosition(instance)
         if not instance then return nil end
-        if instance:IsA("BasePart") then
-            return instance.Position
-        elseif instance:IsA("Model") then
-            return instance:GetPivot().Position
-        end
+        if instance:IsA("BasePart") then return instance.Position
+        elseif instance:IsA("Model") then return instance:GetPivot().Position end
         return nil
     end
 
     local function clickGuiButton(btn)
         if not btn or not btn.Visible then return false end
-
         local pos = btn.AbsolutePosition
         local size = btn.AbsoluteSize
         local centerX = pos.X + (size.X / 2)
@@ -367,13 +483,11 @@ return function(ctx)
         Services.VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, game, 1)
         task.wait(0.05)
         Services.VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 1)
-
+        
         Services.GuiService.SelectedObject = btn
         Services.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
         task.wait(0.05)
         Services.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-
-        task.wait(0.1)
         Services.GuiService.SelectedObject = nil
         return true
     end
@@ -381,12 +495,8 @@ return function(ctx)
     local function clickRaidButton()
         local gui = References.player:WaitForChild("PlayerGui", 5)
         local enterRaid = gui and gui:WaitForChild("EnterRaid", 5)
-
         if not enterRaid then return false end
-
-        local enterFrame = enterRaid:FindFirstChild("Frame")
-        local btn = enterFrame and enterFrame:FindFirstChild("Enter")
-
+        local btn = enterRaid:FindFirstChild("Frame") and enterRaid.Frame:FindFirstChild("Enter")
         return clickGuiButton(btn)
     end
 
@@ -394,9 +504,7 @@ return function(ctx)
         local hud = References.player.PlayerGui:FindFirstChild("HUD")
         if hud then
             local list = hud.Party.Main.Menu.List
-            for _, v in ipairs(list:GetChildren()) do
-                if v:IsA("Frame") then return true end
-            end
+            for _, v in ipairs(list:GetChildren()) do if v:IsA("Frame") then return true end end
         end
         return false
     end
@@ -417,94 +525,7 @@ return function(ctx)
         return false
     end
 
-    local AutoRaidGroup = Tabs.Auto:AddLeftGroupbox("Auto Raid", "shield")
-
-    local InfoLabel = AutoRaidGroup:AddLabel("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill enabled.", true)
-    AutoRaidGroup:AddDivider()
-
-    local StatusLabel = AutoRaidGroup:AddLabel("Status: Checking...", true)
-    task.spawn(function()
-        while true do
-            local raidType = getRaidType()
-            if raidType then
-                StatusLabel:SetText("Status: Raid (Active - " .. raidType .. ")", true)
-            else
-                StatusLabel:SetText("Status: Lobby")
-            end
-            task.wait(1)
-        end
-    end)
-
-    AutoRaidGroup:AddToggle("AutoJoinRaid", { Text = "Auto Join Raid", Default = false })
-    AutoRaidGroup:AddToggle("InfiniteRaid", { Text = "Infinite Raid", Default = false, Tooltip = "Requires Main + Alt setup." })
-    AutoRaidGroup:AddDropdown("RaidStartSelect", {
-        Text = "Raid Start",
-        Values = RAID_START_OPTIONS,
-        Default = Autos.SelectedRaidStart,
-        Multi = false,
-    })
-
-    AutoRaidGroup:AddInput("MainAccountName", {
-        Default = Autos.MainAccountName,
-        Numeric = false, Finished = true,
-        Text = "Main Username", Tooltip = "Clearing Account", Placeholder = "Username...",
-    })
-
-    AutoRaidGroup:AddInput("AltAccountName", {
-        Default = Autos.AltAccountName,
-        Numeric = false, Finished = true,
-        Text = "Alt Username", Tooltip = "Raid Starter", Placeholder = "Username...",
-    })
-
-    AutoRaidGroup:AddButton("Clear Accounts", function()
-        Autos.SuppressAccountUpdate = true
-        Autos.MainAccountName = ""
-        Autos.AltAccountName = ""
-        Autos.MainAccountNames = {}
-        Autos.ActiveMainName = nil
-        if Options.MainAccountName and Options.MainAccountName.SetValue then
-            Options.MainAccountName:SetValue("")
-        end
-        if Options.AltAccountName and Options.AltAccountName.SetValue then
-            Options.AltAccountName:SetValue("")
-        end
-        Autos.SuppressAccountUpdate = false
-        UpdateAccountConfig()
-        notify("Cleared raid accounts.", 3)
-    end)
-
-    AutoRaidGroup:AddDivider()
-    AutoRaidGroup:AddToggle("AutoClearRaid", { Text = "Auto Clear Raid", Default = false })
-    AutoRaidGroup:AddToggle("Devil_ForceLoaded", { Text = "Force Load", Default = false })
-
-    local function updateRaidInfoLabel()
-        if Autos.SelectedRaidStart == "Zombie Raid" then
-            InfoLabel:SetText("Info: Zombie Raid - Do NOT use InstaKill. Requires AutoEquip and AutoAttack (M1)")
-        else
-            InfoLabel:SetText("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill enabled.")
-        end
-    end
-
-    Options.AltAccountName:OnChanged(function()
-        if Autos.SuppressAccountUpdate then return end
-        UpdateAccountConfig()
-    end)
-    Options.RaidStartSelect:OnChanged(function()
-        Autos.SelectedRaidStart = Options.RaidStartSelect.Value
-        updateRaidInfoLabel()
-    end)
-
-    Options.MainAccountName:OnChanged(function()
-        if Autos.SuppressAccountUpdate then return end
-        Autos.MainAccountName = Options.MainAccountName.Value
-        if addMainAccount(Autos.MainAccountName) then
-            notify("Added main: " .. Autos.MainAccountName .. "\nMains: " .. getMainAccountListText(), 4)
-        end
-        UpdateAccountConfig()
-    end)
-
-    updateRaidInfoLabel()
-
+    -- // UTILITY BUTTON CLICKERS //
     local function getSkipButton()
         local pg = References.player:FindFirstChild("PlayerGui")
         local ls = pg and pg:FindFirstChild("LoadScreen")
@@ -544,14 +565,14 @@ return function(ctx)
         end)
     end
 
+    -- // BACKGROUND LOOP: FORCE LOAD //
     task.spawn(function()
         while true do
             task.wait(0.5)
             if Toggles.Devil_ForceLoaded and Toggles.Devil_ForceLoaded.Value then
                 local skipBtn = getSkipButton()
-                if skipBtn and skipBtn.Visible then
-                    clickSkipViaGuiNav(skipBtn)
-                end
+                if skipBtn and skipBtn.Visible then clickSkipViaGuiNav(skipBtn) end
+                
                 local playBtn = getPlayGameButton()
                 if playBtn and playBtn.Visible then
                     local now = os.clock()
@@ -560,32 +581,42 @@ return function(ctx)
                         Autos.LastPlayGameFire = now
                     end
                 end
-                if not isPlayerLoaded() then
-                    LoadedRemote:FireServer()
-                end
+                
+                if not isPlayerLoaded() then LoadedRemote:FireServer() end
             end
         end
     end)
 
+    -- // BACKGROUND LOOP: STATUS //
+    task.spawn(function()
+        while true do
+            local raidType = getRaidType()
+            if raidType then StatusLabel:SetText("Status: Raid (Active - " .. raidType .. ")", true)
+            else StatusLabel:SetText("Status: Lobby") end
+            task.wait(1)
+        end
+    end)
+
+    -- // MAIN RAID LOOP //
     task.spawn(function()
         while true do
             task.wait(1)
-
             pcall(function()
                 if not isInRaid() and Toggles.AutoJoinRaid.Value then
-                    Autos.MainAccountName = Options.MainAccountName.Value
-                    Autos.AltAccountName = Options.AltAccountName.Value
-
-                    local myName = References.player.Name
+                    local myName = normalizeName(References.player.Name)
                     local char = References.player.Character
                     local root = char and char:FindFirstChild("HumanoidRootPart")
 
+                    RefreshLocalAutos()
+
                     if Toggles.InfiniteRaid.Value then
-                        if myName == Autos.AltAccountName then
+                        
+                        -- == ALT (HOST) LOGIC ==
+                        if isAltAccount(myName) then
                             local mainName, mainPlayer = getActiveMainPlayer()
 
                             if not mainPlayer then
-                                if os.clock() % 5 < 1 then notify("Waiting for Main...", 2) end
+                                if os.clock() % 5 < 1 then notify("Waiting for a Main...", 2) end
                             else
                                 if not hasParty() then
                                     notify("Creating Party...", 2)
@@ -594,8 +625,8 @@ return function(ctx)
                                 end
 
                                 if not isPlayerInParty(mainName) then
-                                    if (os.clock() - Autos.LastInviteTime) > 15 then
-                                        notify("Inviting Main...", 2)
+                                    if (os.clock() - (Autos.LastInviteTime or 0)) > 15 then
+                                        notify("Inviting " .. mainName .. "...", 2)
                                         Remotes:InvokeServer("InviteParty", mainPlayer)
                                         Autos.LastInviteTime = os.clock()
                                     end
@@ -608,14 +639,10 @@ return function(ctx)
                                             task.wait(0.5)
                                         end
 
-                                        local uiFound = false
-                                        for _ = 1, 10 do
-                                            local pg = References.player:FindFirstChild("PlayerGui")
-                                            if pg and pg:FindFirstChild("EnterRaid") and pg.EnterRaid:FindFirstChild("Frame") and pg.EnterRaid.Frame.Visible then
-                                                uiFound = true
-                                                break
-                                            end
-
+                                        local pg = References.player:FindFirstChild("PlayerGui")
+                                        local uiFound = (pg and pg:FindFirstChild("EnterRaid") and pg.EnterRaid:FindFirstChild("Frame") and pg.EnterRaid.Frame.Visible)
+                                        
+                                        if not uiFound then
                                             for _, v in ipairs(Services.Workspace:GetDescendants()) do
                                                 if v:IsA("ProximityPrompt") then
                                                     local pos = getSafePosition(v.Parent)
@@ -630,7 +657,7 @@ return function(ctx)
                                             task.wait(0.5)
                                         end
 
-                                        if uiFound then
+                                        if uiFound or (pg and pg:FindFirstChild("EnterRaid") and pg.EnterRaid:FindFirstChild("Frame") and pg.EnterRaid.Frame.Visible) then
                                             for _ = 1, 3 do
                                                 if not clickRaidButton() then break end
                                                 task.wait(0.5)
@@ -640,17 +667,18 @@ return function(ctx)
                                 end
                             end
 
+                        -- == MAIN (JOINER) LOGIC ==
                         elseif isMainAccount(myName) then
-                            local activeName = getActiveMainPlayer()
+                            local activeName, _ = getActiveMainPlayer()
+                            
                             if activeName and activeName ~= myName then
-                                if os.clock() % 5 < 1 then
-                                    notify("Waiting for active main: " .. activeName .. "...", 2)
-                                end
+                                if os.clock() % 5 < 1 then notify("Waiting for active main: " .. activeName, 2) end
                                 return
                             end
 
                             Autos.ActiveMainName = myName
                             local altPlayer = Services.Players:FindFirstChild(Autos.AltAccountName)
+                            
                             if altPlayer then
                                 if not isPlayerInParty(Autos.AltAccountName) then
                                     notify("Waiting for invite...", 2)
@@ -660,11 +688,12 @@ return function(ctx)
                                     notify("In Party! Waiting for start...", 2)
                                 end
                             else
-                                notify("Waiting for Alt...", 2)
+                                notify("Waiting for Alt to load...", 2)
                             end
                         end
 
                     else
+                        -- == STANDARD SOLO LOGIC ==
                         if root then
                             local raidPos = getRaidEntrancePos()
                             if (root.Position - raidPos).Magnitude > 5 then
@@ -683,8 +712,7 @@ return function(ctx)
                                     if v:IsA("ProximityPrompt") then
                                         local pos = getSafePosition(v.Parent)
                                         if pos and (pos - raidPos).Magnitude < 15 then
-                                            v.HoldDuration = 0
-                                            v.RequiresLineOfSight = false
+                                            v.HoldDuration = 0; v.RequiresLineOfSight = false
                                             fireproximityprompt(v)
                                             break
                                         end
@@ -705,6 +733,7 @@ return function(ctx)
         end
     end)
 
+    -- // AUTOCLEAR LOGIC //
     task.spawn(function()
         local function checkAndInteractDialog()
             local map = Services.Workspace:FindFirstChild("Map")
@@ -941,7 +970,7 @@ return function(ctx)
                             if checkAndInteractDialog() then
                                 Autos.NoEnemyTimer = os.clock()
                             else
-                                if (os.clock() - Autos.NoEnemyTimer) > Autos.WaitThreshold then
+                                if (os.clock() - (Autos.NoEnemyTimer or 0)) > (Autos.WaitThreshold or 10) then
                                     local zone, prompt = getElevatorTarget()
 
                                     if zone and prompt then
