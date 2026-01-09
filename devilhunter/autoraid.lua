@@ -25,14 +25,44 @@ return function(ctx)
     local CONFIG_FILE_NAME = "RaidAccounts.json"
     local FULL_PATH = CONFIG_FOLDER_PATH .. "/" .. CONFIG_FILE_NAME
 
+    local function normalizeName(name)
+        return (tostring(name or ""):gsub("^%s+", ""):gsub("%s+$", ""))
+    end
+
+    local function addUnique(list, name)
+        local cleaned = normalizeName(name)
+        if cleaned == "" then return false end
+        for _, v in ipairs(list) do
+            if v == cleaned then return false end
+        end
+        table.insert(list, cleaned)
+        return true
+    end
+
     local function LoadAccountConfig()
         if isfile(FULL_PATH) then
             local success, result = pcall(function()
                 return Services.HttpService:JSONDecode(readfile(FULL_PATH))
             end)
-            if success and result then return result end
+            if success and type(result) == "table" then
+                local mains = {}
+                if type(result.Mains) == "table" then
+                    for _, name in ipairs(result.Mains) do
+                        addUnique(mains, name)
+                    end
+                end
+
+                local mainName = type(result.Main) == "string" and result.Main or ""
+                addUnique(mains, mainName)
+
+                return {
+                    Main = mainName,
+                    Alt = type(result.Alt) == "string" and result.Alt or "",
+                    Mains = mains
+                }
+            end
         end
-        return { Main = "", Alt = "" }
+        return { Main = "", Alt = "", Mains = {} }
     end
 
     local function UpdateAccountConfig()
@@ -44,7 +74,8 @@ return function(ctx)
 
         local data = {
             Main = Autos.MainAccountName,
-            Alt = Autos.AltAccountName
+            Alt = Autos.AltAccountName,
+            Mains = Autos.MainAccountNames or {}
         }
 
         local success, err = pcall(function()
@@ -56,6 +87,8 @@ return function(ctx)
     local savedData = LoadAccountConfig()
     Autos.MainAccountName = savedData.Main or Autos.MainAccountName or ""
     Autos.AltAccountName = savedData.Alt or Autos.AltAccountName or ""
+    Autos.MainAccountNames = savedData.Mains or {}
+    addUnique(Autos.MainAccountNames, Autos.MainAccountName)
     Autos.ZombieRaidActive = Autos.ZombieRaidActive or false
     Autos.ZombieRaidLeftLobby = Autos.ZombieRaidLeftLobby or false
     Autos.LastRaidTypeNotified = Autos.LastRaidTypeNotified or ""
@@ -66,6 +99,8 @@ return function(ctx)
     Autos.ZombieResetCleanup = Autos.ZombieResetCleanup or nil
     Autos.ZombieEmptySince = Autos.ZombieEmptySince or nil
     Autos.ZombieEmptyLastAction = Autos.ZombieEmptyLastAction or 0
+    Autos.ActiveMainName = Autos.ActiveMainName or nil
+    Autos.SuppressAccountUpdate = Autos.SuppressAccountUpdate or false
 
     local RAID_START_OPTIONS = { "Katana Man Raid", "Zombie Raid" }
     local ZOMBIE_RAID_ENTRANCE_POS = Vector3.new(37.856991, 6.760758, -1441.734375)
@@ -87,6 +122,49 @@ return function(ctx)
             return ZOMBIE_RAID_ENTRANCE_POS
         end
         return Autos.RaidEntrancePos
+    end
+
+    local function addMainAccount(name)
+        Autos.MainAccountNames = Autos.MainAccountNames or {}
+        return addUnique(Autos.MainAccountNames, name)
+    end
+
+    local function getMainAccountListText()
+        local mains = Autos.MainAccountNames or {}
+        if #mains == 0 then return "None" end
+        return table.concat(mains, ", ")
+    end
+
+    local function isMainAccount(name)
+        if type(name) ~= "string" or name == "" then return false end
+        for _, v in ipairs(Autos.MainAccountNames or {}) do
+            if v == name then return true end
+        end
+        return false
+    end
+
+    local function getActiveMainPlayer()
+        local mains = Autos.MainAccountNames or {}
+        local activeName = Autos.ActiveMainName
+        if activeName and activeName ~= "" then
+            local activePlayer = Services.Players:FindFirstChild(activeName)
+            if activePlayer then
+                return activeName, activePlayer
+            end
+            Autos.ActiveMainName = nil
+        end
+
+        for _, name in ipairs(mains) do
+            if name ~= Autos.AltAccountName then
+                local player = Services.Players:FindFirstChild(name)
+                if player then
+                    Autos.ActiveMainName = name
+                    return name, player
+                end
+            end
+        end
+
+        return nil, nil
     end
 
     local function isZombieName(name)
@@ -125,11 +203,21 @@ return function(ctx)
         local world = Services.Workspace:FindFirstChild("World")
         local entities = world and world:FindFirstChild("Entities")
         if not entities then return 0 end
-        local count = 0
-        for _, v in ipairs(entities:GetChildren()) do
-            if isZombieName(v.Name) then
-                count = count + 1
+        local types = {}
+        for _, v in ipairs(entities:GetDescendants()) do
+            if v:IsA("Model") and not Services.Players:GetPlayerFromCharacter(v) then
+                if isZombieName(v.Name) then
+                    local base = v.Name:match("^(.*)_[^_]+$") or v.Name
+                    base = base:gsub("^%s+", ""):gsub("%s+$", "")
+                    if base ~= "" then
+                        types[base] = true
+                    end
+                end
             end
+        end
+        local count = 0
+        for _ in pairs(types) do
+            count = count + 1
         end
         return count
     end
@@ -368,6 +456,23 @@ return function(ctx)
         Text = "Alt Username", Tooltip = "Raid Starter", Placeholder = "Username...",
     })
 
+    AutoRaidGroup:AddButton("Clear Accounts", function()
+        Autos.SuppressAccountUpdate = true
+        Autos.MainAccountName = ""
+        Autos.AltAccountName = ""
+        Autos.MainAccountNames = {}
+        Autos.ActiveMainName = nil
+        if Options.MainAccountName and Options.MainAccountName.SetValue then
+            Options.MainAccountName:SetValue("")
+        end
+        if Options.AltAccountName and Options.AltAccountName.SetValue then
+            Options.AltAccountName:SetValue("")
+        end
+        Autos.SuppressAccountUpdate = false
+        UpdateAccountConfig()
+        notify("Cleared raid accounts.", 3)
+    end)
+
     AutoRaidGroup:AddDivider()
     AutoRaidGroup:AddToggle("AutoClearRaid", { Text = "Auto Clear Raid", Default = false })
     AutoRaidGroup:AddToggle("Devil_ForceLoaded", { Text = "Force Load", Default = false })
@@ -380,11 +485,22 @@ return function(ctx)
         end
     end
 
-    Options.MainAccountName:OnChanged(function() UpdateAccountConfig() end)
-    Options.AltAccountName:OnChanged(function() UpdateAccountConfig() end)
+    Options.AltAccountName:OnChanged(function()
+        if Autos.SuppressAccountUpdate then return end
+        UpdateAccountConfig()
+    end)
     Options.RaidStartSelect:OnChanged(function()
         Autos.SelectedRaidStart = Options.RaidStartSelect.Value
         updateRaidInfoLabel()
+    end)
+
+    Options.MainAccountName:OnChanged(function()
+        if Autos.SuppressAccountUpdate then return end
+        Autos.MainAccountName = Options.MainAccountName.Value
+        if addMainAccount(Autos.MainAccountName) then
+            notify("Added main: " .. Autos.MainAccountName .. "\nMains: " .. getMainAccountListText(), 4)
+        end
+        UpdateAccountConfig()
     end)
 
     updateRaidInfoLabel()
@@ -466,7 +582,7 @@ return function(ctx)
 
                     if Toggles.InfiniteRaid.Value then
                         if myName == Autos.AltAccountName then
-                            local mainPlayer = Services.Players:FindFirstChild(Autos.MainAccountName)
+                            local mainName, mainPlayer = getActiveMainPlayer()
 
                             if not mainPlayer then
                                 if os.clock() % 5 < 1 then notify("Waiting for Main...", 2) end
@@ -477,7 +593,7 @@ return function(ctx)
                                     task.wait(1)
                                 end
 
-                                if not isPlayerInParty(Autos.MainAccountName) then
+                                if not isPlayerInParty(mainName) then
                                     if (os.clock() - Autos.LastInviteTime) > 15 then
                                         notify("Inviting Main...", 2)
                                         Remotes:InvokeServer("InviteParty", mainPlayer)
@@ -524,7 +640,16 @@ return function(ctx)
                                 end
                             end
 
-                        elseif myName == Autos.MainAccountName then
+                        elseif isMainAccount(myName) then
+                            local activeName = getActiveMainPlayer()
+                            if activeName and activeName ~= myName then
+                                if os.clock() % 5 < 1 then
+                                    notify("Waiting for active main: " .. activeName .. "...", 2)
+                                end
+                                return
+                            end
+
+                            Autos.ActiveMainName = myName
                             local altPlayer = Services.Players:FindFirstChild(Autos.AltAccountName)
                             if altPlayer then
                                 if not isPlayerInParty(Autos.AltAccountName) then
