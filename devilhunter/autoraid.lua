@@ -374,7 +374,7 @@ return function(ctx)
 
     local function updateRaidInfoLabel()
         if Autos.SelectedRaidStart == "Zombie Raid" then
-            InfoLabel:SetText("Info: Zombie Raid - Do NOT use InstaKill. Requires AutoEquip AutoAttack (M1), and No React")
+            InfoLabel:SetText("Info: Zombie Raid - Do NOT use InstaKill. Requires AutoEquip and AutoAttack (M1)")
         else
             InfoLabel:SetText("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill enabled.")
         end
