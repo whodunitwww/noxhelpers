@@ -973,14 +973,15 @@ return function(ctx)
                             else
                                 if not Autos.ZombieEmptySince then
                                     Autos.ZombieEmptySince = os.clock()
-                                    notify("Zombie Raid: Entities empty, waiting 15s...", 3)
+                                    notify("Zombie Raid: Entities empty, waiting 10s...", 3)
                                 end
                                 if not Autos.ZombieResetting
-                                    and (os.clock() - Autos.ZombieEmptySince) >= 15
+                                    and (os.clock() - Autos.ZombieEmptySince) >= 10
                                     and (os.clock() - Autos.ZombieEmptyLastAction) >= 10 then
                                     local root = References.player.Character and References.player.Character:FindFirstChild("HumanoidRootPart")
                                     if root then
                                         root.CFrame = CFrame.new(ZOMBIE_EMPTY_POS + Vector3.new(0, 3, 0))
+                                        wait(0.5)
                                         local prompt = getNearestPrompt(root)
                                         if prompt then
                                             fireproximityprompt(prompt)
