@@ -1,1 +1,2183 @@
-{"89859217236874":{"enabled":true,"startSec":0.1,"name":"100Year1","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"78653732575949":{"enabled":true,"startSec":0.75,"name":"Greenshot Crit","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"91841671178746":{"enabled":true,"startSec":0.6,"name":"DevilCrusherCrit","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"131011430867989":{"enabled":true,"startSec":0.1,"name":"Brass Stamp Miss","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"81298915826190":{"enabled":true,"startSec":0.1,"name":"CrossPunisher4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"96589164555293":{"enabled":true,"startSec":0.1,"name":"Rising Kick","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":true},"105896770408030":{"enabled":true,"startSec":0,"name":"Light1","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"102790860802603":{"enabled":true,"startSec":0.5,"name":"NewDaggerCrit","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"88055010695849":{"enabled":true,"startSec":0.1,"name":"RazorHalbred2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"114892824466097":{"enabled":true,"startSec":0.1,"name":"Sword Dash Draw Hit","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"125571123165138":{"enabled":true,"startSec":0.1,"name":"K4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"93431132327822":{"enabled":true,"startSec":0.1,"name":"Pistol4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"100209652951882":{"enabled":true,"startSec":0.1,"name":"Whirlwind Slash","hold":0.35,"repeats":[0.1],"priority":"parry","rollOnFail":false},"116937962567393":{"enabled":true,"startSec":0.05,"name":"Pistol1","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"95828122624545":{"enabled":true,"startSec":0.379,"name":"Air: Blood Spill","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"126257103110325":{"enabled":true,"startSec":0.05,"name":"Axe3","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"122926266667725":{"enabled":true,"startSec":0.1,"name":"TongueWhip","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"90303043747701":{"enabled":true,"startSec":0.01,"name":"DualDagger1","repeats":[],"priority":"parry","hold":0.3,"rollOnFail":false},"134137542280552":{"enabled":true,"startSec":0.15,"name":"SwordCrit","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"113898112403888":{"enabled":true,"startSec":0.1,"name":"Flying Headbutt","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"93712797216935":{"enabled":true,"startSec":0.1,"name":"Sickles4","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"138301923963329":{"enabled":true,"startSec":0.02,"name":"Fleshbreaker2","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"84882180540900":{"enabled":true,"startSec":0.3,"name":"NewFistCrit","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"83170627744442":{"enabled":true,"startSec":0.1,"name":"F1","repeats":[0.2],"priority":"parry","rollOnFail":false,"hold":0.35},"121912122097580":{"enabled":true,"startSec":0.1,"name":"FB Crit Whiff","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"78555663054449":{"enabled":true,"startSec":0.9,"name":"100YearsAngelCrit","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"123135962827332":{"enabled":true,"startSec":0.1,"name":"100Year4","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"83707871739410":{"enabled":true,"startSec":0.1,"name":"RotandRuin2","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"118176169991277":{"enabled":true,"startSec":0.1,"name":"K2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"79256796557911":{"enabled":true,"startSec":0.3,"name":"MantisDevilheavy","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"9876543210":{"distanceAdj":0,"startSec":0.41,"hold":0.3,"rollOnFail":false,"name":"Lunge"},"75114926121591":{"enabled":true,"startSec":0.1,"name":"F4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"108407067157515":{"enabled":true,"startSec":2.6,"name":"Waterfell Waltz","hold":0.35,"repeats":[0.1],"priority":"parry","rollOnFail":false},"80951747681281":{"enabled":true,"startSec":0.75,"name":"UnsheatheCrit","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"95592305575287":{"enabled":true,"startSec":0.1,"name":"D1","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"73107547769988":{"enabled":true,"startSec":0.05,"name":"DoubleAttack","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"131376945188225":{"enabled":true,"startSec":0.1,"name":"RazorF4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"87673107583059":{"enabled":true,"startSec":0.1,"name":"Sickles2","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"71244457428229":{"enabled":true,"startSec":0.05,"name":"AxeRunAttack","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"116948609204236":{"enabled":true,"startSec":0.1,"name":"RazorHalbred1","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"107049572669140":{"enabled":true,"startSec":0.1,"name":"Shark_1","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"87415953393018":{"enabled":true,"startSec":0.05,"name":"Murasama_2","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"88515182783630":{"enabled":true,"startSec":0.1,"name":"RotandRuin3","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"83003081767769":{"enabled":true,"startSec":0.379,"name":"PunkHazardCrit","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"81620195797285":{"enabled":true,"startSec":0.1,"name":"FrogTongueSlams","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"84691763419445":{"enabled":true,"startSec":0.4,"name":"Katana-Draw Dash Start","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"93421682454714":{"enabled":true,"startSec":0.1,"name":"Ant Fiend Jump and bite","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"70671254080081":{"enabled":true,"startSec":0.1,"name":"Eviscerate","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"82402970804238":{"enabled":true,"startSec":0.25,"name":"Uppercut","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"137901650114553":{"enabled":true,"startSec":0.1,"name":"D3","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"78520899606944":{"enabled":true,"startSec":0,"name":"Uzi2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"96039746848507":{"enabled":true,"startSec":0.379,"name":"Brass Stamp Hit","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"97784008298359":{"enabled":true,"startSec":0.1,"name":"AntBiteCombo","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"79067222542039":{"enabled":true,"startSec":0.5,"name":"Viper's Hold_Miss","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"105542119244161":{"enabled":true,"startSec":0.1,"name":"10YearAngel4","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"76827947490912":{"enabled":true,"startSec":0.05,"name":"AngelSword2","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"87836197455524":{"enabled":true,"startSec":0.1,"name":"Dante_Shedder_Miss","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"74945003628808":{"enabled":true,"startSec":0.1,"name":"Crimson Coil","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"125351403307657":{"enabled":true,"startSec":0.1,"name":"Sickles1","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"129319150158146":{"enabled":true,"startSec":0.1,"name":"F3","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"139601534028982":{"enabled":true,"startSec":0.8,"name":"Whirlwind Cleave","hold":0.35,"repeats":[0.85],"priority":"parry","rollOnFail":false},"108494510731610":{"enabled":true,"startSec":0.3,"name":"Hammer_1","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"115842491968911":{"enabled":true,"startSec":0.1,"name":"Windbreaker Slash","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"99361142840295":{"enabled":true,"startSec":0,"name":"Uzi3","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"120104961283636":{"enabled":true,"startSec":0.379,"name":"Triple Stab","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"102882680538170":{"enabled":true,"startSec":0.1,"name":"Cracked Bones","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"119185807465289":{"enabled":true,"startSec":0.2,"name":"Assassin's Step Start","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"120259039527861":{"enabled":true,"startSec":0.1,"name":"Dance Macabre","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"91402134057760":{"enabled":true,"startSec":0.1,"name":"Ironclad Thrust Miss","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"125750843182333":{"enabled":true,"startSec":0.25,"name":"Landsplitter","hold":0.35,"repeats":[1,0.5],"priority":"parry","rollOnFail":false},"108117067910919":{"enabled":true,"startSec":0.25,"name":"Edge Rider Start","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"91342131793707":{"enabled":true,"startSec":0.5,"name":"RotandRuinCrit","hold":0.35,"repeats":[0.1,0.1,0.1],"priority":"parry","rollOnFail":false},"88529291334531":{"enabled":true,"startSec":0.1,"name":"RotandRuin4","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"77311081382802":{"enabled":true,"startSec":0.1,"name":"KatanaHybrid3","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"78940054179950":{"enabled":true,"startSec":0.1,"name":"RotandRuin1","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"134212846921544":{"enabled":true,"startSec":1.25,"name":"10YearAngelCrit","hold":0,"repeats":[0.2,0.2,0.3],"priority":"parry","rollOnFail":false},"102225002431566":{"enabled":true,"startSec":0.1,"name":"DevilCrusher4","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"112091281860543":{"enabled":true,"startSec":0.1,"name":"100Year3","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"94783189330933":{"enabled":true,"startSec":0.1,"name":"Reoccurring Strikes","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"114393492422894":{"enabled":true,"startSec":0.1,"name":"KaijuCrusher2","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"98375305489054":{"enabled":true,"startSec":0.3,"name":"PistolCrit","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.75},"111469597121344":{"enabled":true,"startSec":0.5,"name":"Deadly Impale Miss","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"128389082852013":{"enabled":true,"startSec":0.1,"name":"Blitzcut","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"81093093791947":{"enabled":true,"startSec":0.05,"name":"Ak_M1_1","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"121610200528946":{"enabled":true,"startSec":0.1,"name":"Rondo Fang","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"106191095787074":{"enabled":true,"startSec":0.25,"name":"Devil's Knuckle","repeats":[0.1],"priority":"parry","rollOnFail":false,"hold":0.35},"72716101431005":{"enabled":true,"startSec":0.1,"name":"DevilCrusher1","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"113834682033104":{"enabled":true,"startSec":0.5,"name":"Broad Axe Crit","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"116531395203011":{"enabled":true,"startSec":0.1,"name":"Murasama_1","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"124298892076543":{"enabled":true,"startSec":0.1,"name":"Shark_3","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"99785834052081":{"enabled":true,"startSec":0.1,"name":"F2","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"108574344758700":{"enabled":true,"startSec":0.05,"name":"Murasama_4","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"121073263747297":{"enabled":true,"startSec":0.05,"name":"Pistol3","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"113014104453621":{"enabled":true,"startSec":0.5,"name":"Crit","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"104268439363335":{"enabled":true,"startSec":0.05,"name":"AngelSword4","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"95226068961241":{"enabled":true,"startSec":0.1,"name":"Yeardrain whiff","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"99589308896321":{"enabled":true,"startSec":0.1,"name":"Sickles3","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"91074807969609":{"enabled":true,"startSec":0.2,"name":"GhostArmSummon","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"86796432371278":{"enabled":true,"startSec":1,"name":"Materialize: Spear","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"95541991402036":{"enabled":true,"startSec":0.2,"name":"Ground Slam","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"72795592997118":{"enabled":true,"startSec":0.01,"name":"FistRunAttack","repeats":[],"priority":"parry","rollOnFail":true,"hold":0.35},"103478794733427":{"enabled":true,"startSec":0.05,"name":"KatanaHybrid2","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"109606843731827":{"enabled":true,"startSec":0.05,"name":"SingleAttack","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"97177191680752":{"enabled":true,"startSec":0.1,"name":"RazorF2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"85964235716367":{"enabled":true,"startSec":0.02,"name":"Fleshbreaker1","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"117722804257040":{"enabled":true,"startSec":1,"name":"SnakeContractPlayerDevour","hold":0.35,"repeats":[],"priority":"roll","rollOnFail":false},"97144244689985":{"enabled":true,"startSec":0.02,"name":"Fleshbreaker4","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"84360547187663":{"enabled":true,"startSec":0.1,"name":"CrossPunisher1","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"131451900296099":{"enabled":true,"startSec":0.1,"name":"TongueThrust","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"73086768097069":{"enabled":true,"startSec":0.1,"name":"100Year2","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"127716005072935":{"enabled":true,"startSec":0.05,"name":"DualDagger Run Attack","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"116907204347021":{"enabled":true,"startSec":0.01,"name":"Uzi1","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"107911992683261":{"enabled":true,"startSec":0.1,"name":"Frog Grab Whiff","repeats":[],"priority":"roll","rollOnFail":false,"hold":0.35},"109081847036247":{"enabled":true,"startSec":0.379,"name":"FishBite","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"115276870777429":{"enabled":true,"startSec":0.1,"name":"Skullcrusher Miss","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"139102550443102":{"enabled":true,"startSec":0.2,"name":"Skybreaker","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"119071326400759":{"enabled":true,"startSec":0.05,"name":"Ak_M1_4","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"89307684071889":{"enabled":true,"startSec":0.04,"name":"DualDagger3","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"115670609737438":{"enabled":true,"startSec":0.03,"name":"DualDagger4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"94912992248206":{"enabled":true,"startSec":0.1,"name":"CrossPunisher2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"98067867897649":{"enabled":true,"startSec":0.6,"name":"Blightshot","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"71420013211462":{"enabled":true,"startSec":0.1,"name":"D4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"88464980239593":{"enabled":true,"startSec":0.1,"name":"10YearAngel3","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"89332566098222":{"enabled":true,"startSec":0.1,"name":"K3","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"89332259138333":{"enabled":true,"startSec":0.1,"name":"10YearAngel2","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"126621054776220":{"enabled":true,"startSec":0.05,"name":"10YearAngel1","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"84627135360921":{"enabled":true,"startSec":0.2,"name":"5YearSwordCrit","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"72371046889893":{"enabled":true,"startSec":0.3,"name":"Hammer_4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"99419457549732":{"enabled":true,"startSec":0.05,"name":"AngelSword1","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"118737931852734":{"enabled":true,"startSec":0.1,"name":"Skyward Slash","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"127265672754416":{"enabled":true,"startSec":0.05,"name":"0.10","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"84310303507836":{"enabled":true,"startSec":0.1,"name":"Thousand Stab","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"133853808650941":{"enabled":true,"startSec":0.1,"name":"Pistol2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"116140324922122":{"enabled":true,"startSec":0.3,"name":"Fist 1","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"88281715895375":{"enabled":true,"startSec":0.1,"name":"Right Hook ","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"110406562971902":{"enabled":true,"startSec":0.3,"name":"Hammer_2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"73033593102525":{"enabled":true,"startSec":0.01,"name":"DualDagger2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.03},"81268534444911":{"enabled":true,"startSec":0.3,"name":"Flash Draw","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"91695353081923":{"enabled":true,"startSec":0.1,"name":"FistAerial ","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"123925906794646":{"enabled":true,"startSec":0.1,"name":"Beast's Stride","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"108613463864057":{"enabled":true,"startSec":0,"name":"Light5","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"139765911542742":{"enabled":true,"startSec":0.1,"name":"Bullrush Blitz Miss","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"118374669758371":{"enabled":true,"startSec":0.05,"name":"KatanaHybrid Run Attack","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"116781362921741":{"enabled":true,"startSec":0.1,"name":"Shark_2","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"116057799213168":{"enabled":true,"startSec":0.1,"name":"Murasama_3","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"99065009178414":{"enabled":true,"startSec":0.6,"name":"KatanaHybrid Bisection","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"139764969742388":{"enabled":true,"startSec":0.15,"name":"Viper's Dash","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"80639118737924":{"enabled":true,"startSec":0.3,"name":"Hammer_3","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"70550631174539":{"enabled":true,"startSec":0.05,"name":"Axe4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"84137884690432":{"enabled":true,"startSec":0.1,"name":"Overhead stance Charged","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"111024136790516":{"enabled":true,"startSec":0.1,"name":"Suplex Miss","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"105216815586895":{"enabled":true,"startSec":0.1,"name":"Dryleaf Whirlwind","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"106719097885109":{"enabled":true,"startSec":0.5,"name":"Critspeed1","hold":0.35,"repeats":[0],"priority":"parry","rollOnFail":false},"139174098471434":{"enabled":true,"startSec":0.1,"name":"K1","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"136126733820313":{"enabled":true,"startSec":0.15,"name":"Honey Comb Fire","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"87069745086938":{"enabled":true,"startSec":0.05,"name":"Fleshbreaker3","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"106187325444182":{"enabled":true,"startSec":1,"name":"ZombieSicklesCrit","repeats":[0.3],"priority":"parry","hold":0.25,"rollOnFail":false},"93357544618400":{"enabled":true,"startSec":0,"name":"Uzi4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"125936250279691":{"enabled":true,"rollOnFail":false,"hold":0.35,"name":"SpeedSwordRunning_Attack","repeats":[],"priority":"parry","startSec":0.1,"distanceAdj":15},"86067313793063":{"enabled":true,"startSec":0.1,"name":"Leaping Kicks","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"126406892829032":{"enabled":true,"startSec":0.1,"name":"Shark_4","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"98961744431023":{"enabled":true,"startSec":0.1,"name":"DevilCrusher3","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"92810019684011":{"enabled":true,"startSec":0.25,"name":"Spinning_Kick _Animation","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"137815370488524":{"enabled":true,"startSec":0.379,"name":"0.10","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"133512548611881":{"enabled":true,"startSec":0.05,"name":"AngelSword3","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"128262123797035":{"enabled":true,"startSec":0.2,"name":"Kick Shot ","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"97224257692999":{"enabled":true,"startSec":0.15,"name":"FiendBiteAttacker","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"115797906268659":{"enabled":true,"startSec":0.1,"name":"RazorF1","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"118375375261508":{"enabled":true,"startSec":0.1,"name":"CrossPunishera3","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"97504155433185":{"enabled":true,"startSec":0.1,"name":"D2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"108797839748822":{"enabled":true,"startSec":0.3,"name":"KatanaHybridCrit","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"116227634728279":{"enabled":true,"startSec":0.1,"name":"Triple Kick","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"80832841283430":{"enabled":true,"startSec":0,"name":"Aerial","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"95187086967174":{"enabled":true,"startSec":0.05,"name":"Ak_M1_3","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"119794946808722":{"enabled":true,"startSec":0.1,"name":"KatanaHybrid4","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"96430744634231":{"enabled":true,"startSec":0.05,"name":"Axe1","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"81424669180469":{"enabled":true,"startSec":0.6,"name":"YukimuraCrit","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"112280382670167":{"enabled":true,"startSec":0.05,"name":"Axe2","repeats":[],"priority":"parry","rollOnFail":false,"hold":0.35},"134638052110359":{"enabled":true,"startSec":0.2,"name":"Player Ghost Grab Miss","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"120048428697484":{"enabled":true,"startSec":0.379,"name":"UziCrit","repeats":[],"priority":"parry","hold":0.45,"rollOnFail":false},"100351193638035":{"enabled":true,"startSec":0.1,"name":"Shoulder Charge","hold":0.35,"repeats":[],"priority":"parry","rollOnFail":false},"134472537908248":{"enabled":true,"startSec":0.04,"name":"Overhead Stance","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false},"92347535171309":{"enabled":true,"startSec":0.1,"name":"KatanaHybrid1","repeats":[],"priority":"parry","hold":0.35,"rollOnFail":false}}
+{
+    "89859217236874": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "100Year1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "78653732575949": {
+        "enabled": true,
+        "startSec": 0.75,
+        "name": "Greenshot Crit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "87830698719703": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Iron Heel",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "91841671178746": {
+        "enabled": true,
+        "startSec": 0.6,
+        "name": "DevilCrusherCrit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "119537814529732": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "GreatSword3",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "71070657950153": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "DropKickFX",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "81298915826190": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "CrossPunisher4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "117416560814575": {
+        "enabled": true,
+        "startSec": 1,
+        "name": "Crit",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "113429385792170": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "Yamada1",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "95099034924342": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "2",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "96589164555293": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Rising Kick",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": true,
+        "hold": 0.35
+    },
+    "91695353081923": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "FistAerial ",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "102790860802603": {
+        "enabled": true,
+        "startSec": 0.5,
+        "name": "NewDaggerCrit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "88055010695849": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "RazorHalbred2",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "114892824466097": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Sword Dash Draw Hit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "71420013211462": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "D4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "93431132327822": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Pistol4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "93298677235070": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "Pummel and Fire",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "99528925126794": {
+        "enabled": true,
+        "startSec": 0.4,
+        "name": "Crit",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "86241520002115": {
+        "enabled": true,
+        "startSec": 0.35,
+        "name": "KonArmSummon",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "111469597121344": {
+        "enabled": true,
+        "startSec": 0.5,
+        "name": "Deadly Impale Miss",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "70550631174539": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Axe4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "106013309621307": {
+        "enabled": true,
+        "startSec": 0.6,
+        "name": "ZombieSwordCrit",
+        "hold": 0.35,
+        "repeats": [
+            0.9
+        ],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "110406562971902": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "Hammer_2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "108494510731610": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "Hammer_1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "122926266667725": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "TongueWhip",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "108574344758700": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Murasama_4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "134137542280552": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "SwordCrit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "139513647256700": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "Yamada4",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "79256796557911": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "MantisDevilheavy",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "78842969890728": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "Yamada Crit",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "113898112403888": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Flying Headbutt",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "109871824431204": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "Yamada2",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "93712797216935": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Sickles4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "126257103110325": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Axe3",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "138301923963329": {
+        "enabled": true,
+        "startSec": 0.02,
+        "name": "Fleshbreaker2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "86067313793063": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Leaping Kicks",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "114370481620131": {
+        "enabled": true,
+        "startSec": 0.35,
+        "name": "Fiend Bite Miss",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "129855748333858": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Rotblade1",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "78940054179950": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "RotandRuin1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "132697132032347": {
+        "enabled": true,
+        "startSec": 0.65,
+        "name": "Strike! FX",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "72371046889893": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "Hammer_4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "112091281860543": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "100Year3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "131011430867989": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Brass Stamp Miss",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.4
+    },
+    "121912122097580": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "FB Crit Whiff",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "78555663054449": {
+        "enabled": true,
+        "startSec": 0.9,
+        "name": "100YearsAngelCrit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "119366440833103": {
+        "enabled": true,
+        "startSec": 0.37,
+        "name": "NailFiendCrit",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "117196948797125": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "H_1",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "88809233843821": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "4",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "101912154341522": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "Curse Devil Skill",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "128641773780380": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "H_4",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "105896770408030": {
+        "enabled": true,
+        "startSec": 0,
+        "name": "Light1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "79294213380648": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "H_3",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "127656671537189": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "3",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "112665344245966": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "SharkUppercut2",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "125571123165138": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "K4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "102225002431566": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "DevilCrusher4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "123135962827332": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "100Year4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "129665648910588": {
+        "enabled": true,
+        "startSec": 0.01,
+        "name": "Grab Hit",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "100209652951882": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Whirlwind Slash",
+        "repeats": [
+            0.1
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "83707871739410": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "RotandRuin2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "91402134057760": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Ironclad Thrust Miss",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "80832841283430": {
+        "enabled": true,
+        "startSec": 0,
+        "name": "Aerial",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "113014104453621": {
+        "enabled": true,
+        "startSec": 0.5,
+        "name": "Crit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "88529291334531": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "RotandRuin4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "121310069262921": {
+        "enabled": true,
+        "startSec": 0.5,
+        "name": "Jaws",
+        "hold": 0.35,
+        "repeats": [
+            0.5,
+            0.25
+        ],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "108407067157515": {
+        "enabled": true,
+        "startSec": 2.6,
+        "name": "Waterfell Waltz",
+        "repeats": [
+            0.1
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "80951747681281": {
+        "enabled": true,
+        "startSec": 0.75,
+        "name": "UnsheatheCrit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "99065009178414": {
+        "enabled": true,
+        "startSec": 0.6,
+        "name": "KatanaHybrid Bisection",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "96430107593955": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "H_2",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "116937962567393": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Pistol1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "73107547769988": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "DoubleAttack",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "84118640051654": {
+        "enabled": true,
+        "startSec": 0.35,
+        "name": "Iron Drift Miss ",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "95828122624545": {
+        "enabled": true,
+        "startSec": 0.379,
+        "name": "Air: Blood Spill",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "131376945188225": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "RazorF4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "71278955398870": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "BloodMultiScythe",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "90303043747701": {
+        "enabled": true,
+        "startSec": 0.01,
+        "name": "DualDagger1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.3
+    },
+    "87673107583059": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Sickles2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "132423234621948": {
+        "enabled": true,
+        "startSec": 0.6,
+        "name": "GreatswordCrit",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "107767339677031": {
+        "enabled": true,
+        "startSec": 0.01,
+        "name": "Bullet Storm Ground",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "93891386436024": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "Combo_3",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "116948609204236": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "RazorHalbred1",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "107049572669140": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Shark_1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "111703924384409": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "Rose Burst",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "81268534444911": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "Flash Draw",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "84882180540900": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "NewFistCrit",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "118258669929146": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "Combo_2",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "83170627744442": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "F1",
+        "repeats": [
+            0.2
+        ],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "83003081767769": {
+        "enabled": true,
+        "startSec": 0.379,
+        "name": "PunkHazardCrit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "84360547187663": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "CrossPunisher1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "84691763419445": {
+        "enabled": true,
+        "startSec": 0.4,
+        "name": "Katana-Draw Dash Start",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "85339796481382": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "Pistol Whip",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "85964235716367": {
+        "enabled": true,
+        "startSec": 0.02,
+        "name": "Fleshbreaker1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "100763501434406": {
+        "enabled": true,
+        "startSec": 0.35,
+        "name": "PotSkill1",
+        "hold": 1,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "101953583082493": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "1",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "129449706917246": {
+        "enabled": true,
+        "startSec": 0.8,
+        "name": "Out of Nowhere",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "70671254080081": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Eviscerate",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "82402970804238": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Uppercut",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "115276870777429": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Skullcrusher Miss",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "108797839748822": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "KatanaHybridCrit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "97504155433185": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "D2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "96039746848507": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Brass Stamp Hit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "97784008298359": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "AntBiteCombo",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "79067222542039": {
+        "enabled": true,
+        "startSec": 0.5,
+        "name": "Viper's Hold_Miss",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "84310303507836": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Thousand Stab",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "120259039527861": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Dance Macabre",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "76827947490912": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "AngelSword2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "87836197455524": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Dante_Shedder_Miss",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "88464980239593": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "10YearAngel3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "102597139088834": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Rotblade3",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "134181836683161": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Rotblade2",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "74945003628808": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Crimson Coil",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "125351403307657": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Sickles1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "129319150158146": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "F3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "118176169991277": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "K2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "84627135360921": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "5YearSwordCrit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "126621054776220": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "10YearAngel1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "114630509263415": {
+        "enabled": true,
+        "startSec": 0.15,
+        "name": "Yamada3",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "99361142840295": {
+        "enabled": true,
+        "startSec": 0,
+        "name": "Uzi3",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "116140324922122": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "Fist 1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "102882680538170": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Cracked Bones",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "119185807465289": {
+        "enabled": true,
+        "startSec": 0.4,
+        "name": "Assassin's Step Start",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "9876543210": {
+        "distanceAdj": 0,
+        "startSec": 0.41,
+        "hold": 0.3,
+        "name": "Lunge",
+        "rollOnFail": false
+    },
+    "75114926121591": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "F4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "125750843182333": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "Landsplitter",
+        "repeats": [
+            1,
+            0.5
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "109081847036247": {
+        "enabled": true,
+        "startSec": 0.379,
+        "name": "FishBite",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "95592305575287": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "D1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "118339406620980": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Greatsword2",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "77311081382802": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "KatanaHybrid3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "84790818560573": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "RazorHalbred4",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "134212846921544": {
+        "enabled": true,
+        "startSec": 1.25,
+        "name": "10YearAngelCrit",
+        "repeats": [
+            0.2,
+            0.2,
+            0.3
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0
+    },
+    "117416838233330": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "RazorHalbred3",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "117722804257040": {
+        "enabled": true,
+        "startSec": 1,
+        "name": "SnakeContractPlayerDevour",
+        "repeats": [],
+        "priority": "roll",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "71244457428229": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "AxeRunAttack",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "87415953393018": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Murasama_2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "118374669758371": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "KatanaHybrid Run Attack",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "88515182783630": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "RotandRuin3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "116057799213168": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Murasama_3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "81620195797285": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "FrogTongueSlams",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "101268939874208": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "GreatSword4",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "106191095787074": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "Devil's Knuckle",
+        "repeats": [
+            0.25
+        ],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "72716101431005": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "DevilCrusher1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "93421682454714": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Ant Fiend Jump and bite",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "135802138221890": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Greatsword1",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "116531395203011": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Murasama_1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "124298892076543": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Shark_3",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "99785834052081": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "F2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "115096781003171": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "Combo_4",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "121073263747297": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Pistol3",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "137901650114553": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "D3",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "104268439363335": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "AngelSword4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "95226068961241": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Yeardrain whiff",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "99589308896321": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Sickles3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "78520899606944": {
+        "enabled": true,
+        "startSec": 0,
+        "name": "Uzi2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "86796432371278": {
+        "enabled": true,
+        "startSec": 1,
+        "name": "Materialize: Spear",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "95541991402036": {
+        "enabled": true,
+        "startSec": 0.75,
+        "name": "Ground Slam",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "105542119244161": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "10YearAngel4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "103478794733427": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "KatanaHybrid2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "127716005072935": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "DualDagger Run Attack",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "97177191680752": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "RazorF2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "71212949527139": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "Viper’s Fury",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "115842491968911": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Windbreaker Slash",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "97144244689985": {
+        "enabled": true,
+        "startSec": 0.02,
+        "name": "Fleshbreaker4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "94783189330933": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Reoccurring Strikes",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "131451900296099": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "TongueThrust",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "73086768097069": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "100Year2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "86309934203371": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "potskill_hit",
+        "hold": 0.35,
+        "repeats": [
+            0.1,
+            0.1
+        ],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "116907204347021": {
+        "enabled": true,
+        "startSec": 0.01,
+        "name": "Uzi1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "89332259138333": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "10YearAngel2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "120104961283636": {
+        "enabled": true,
+        "startSec": 0.379,
+        "name": "Triple Stab",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "92347535171309": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "KatanaHybrid1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "139102550443102": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "Skybreaker",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "119071326400759": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Ak_M1_4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "89307684071889": {
+        "enabled": true,
+        "startSec": 0.04,
+        "name": "DualDagger3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "80639118737924": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "Hammer_3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "118737931852734": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Skyward Slash",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "123925906794646": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Beast's Stride",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "100288926167133": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Rotblade4",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "134472537908248": {
+        "enabled": true,
+        "startSec": 0.04,
+        "name": "Overhead Stance",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "99419457549732": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "AngelSword1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "108117067910919": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "Edge Rider Start",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "112280382670167": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Axe2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "81424669180469": {
+        "enabled": true,
+        "startSec": 0.6,
+        "name": "YukimuraCrit",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "139601534028982": {
+        "enabled": true,
+        "startSec": 0.8,
+        "name": "Whirlwind Cleave",
+        "repeats": [
+            0.85
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "71726735162615": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "NailBounce",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "135415772810991": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "Headlock Volley Miss",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "119794946808722": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "KatanaHybrid4",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "98375305489054": {
+        "enabled": true,
+        "startSec": 0.3,
+        "name": "PistolCrit",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.75,
+        "rollOnFail": false
+    },
+    "133853808650941": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Pistol2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "95187086967174": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Ak_M1_3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "88281715895375": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Right Hook ",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "128389082852013": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Blitzcut",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "73033593102525": {
+        "enabled": true,
+        "startSec": 0.01,
+        "name": "DualDagger2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.03,
+        "rollOnFail": false
+    },
+    "116227634728279": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Triple Kick",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "81093093791947": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Ak_M1_1",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "118375375261508": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "CrossPunishera3",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "108613463864057": {
+        "enabled": true,
+        "startSec": 0,
+        "name": "Light5",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "139765911542742": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Bullrush Blitz Miss",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "109606843731827": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "SingleAttack",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "107911992683261": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Frog Grab Whiff",
+        "repeats": [],
+        "priority": "roll",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "92810019684011": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "Spinning_Kick _Animation",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "113834682033104": {
+        "enabled": true,
+        "startSec": 0.5,
+        "name": "Broad Axe Crit",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "139764969742388": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "Viper's Dash",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "94912992248206": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "CrossPunisher2",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "109023267285840": {
+        "enabled": true,
+        "startSec": 0.45,
+        "name": "Blood Spill",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "91074807969609": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "GhostArmSummon",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "111024136790516": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Suplex Miss",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "105216815586895": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Dryleaf Whirlwind",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "106719097885109": {
+        "enabled": true,
+        "startSec": 0.6,
+        "name": "Critspeed1",
+        "hold": 1,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "139174098471434": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "K1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "136126733820313": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Honey Comb Fire",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "87069745086938": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Fleshbreaker3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "106187325444182": {
+        "enabled": true,
+        "startSec": 1,
+        "name": "ZombieSicklesCrit",
+        "repeats": [
+            0.3
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.25
+    },
+    "115670609737438": {
+        "enabled": true,
+        "startSec": 0.03,
+        "name": "DualDagger4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "125936250279691": {
+        "enabled": true,
+        "rollOnFail": false,
+        "hold": 0.35,
+        "distanceAdj": 15,
+        "repeats": [],
+        "priority": "parry",
+        "startSec": 0.1,
+        "name": "SpeedSwordRunning_Attack"
+    },
+    "121610200528946": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Rondo Fang",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "126406892829032": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Shark_4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "98961744431023": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "DevilCrusher3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "84893282137796": {
+        "enabled": true,
+        "startSec": 0.4,
+        "name": "Nail Crit Miss",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "137815370488524": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "RazorF3",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "133512548611881": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "AngelSword3",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "128262123797035": {
+        "enabled": true,
+        "startSec": 0.35,
+        "name": "Kick Shot ",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "97224257692999": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "FiendBiteAttacker",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "115797906268659": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "RazorF1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "98067867897649": {
+        "enabled": true,
+        "startSec": 0.6,
+        "name": "Blightshot",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "93357544618400": {
+        "enabled": true,
+        "startSec": 0,
+        "name": "Uzi4",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "89332566098222": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "K3",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "114393492422894": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "KaijuCrusher2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "84137884690432": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Overhead stance Charged",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "127265672754416": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "0.10",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "89475662129258": {
+        "enabled": true,
+        "startSec": 0.2,
+        "name": "Combo_1",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "96430744634231": {
+        "enabled": true,
+        "startSec": 0.05,
+        "name": "Axe1",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": false
+    },
+    "126666479594850": {
+        "enabled": true,
+        "startSec": 0.25,
+        "name": "Maul Miss",
+        "hold": 0.35,
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false
+    },
+    "116781362921741": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Shark_2",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "134638052110359": {
+        "enabled": true,
+        "startSec": 0.75,
+        "name": "Player Ghost Grab Miss",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "120048428697484": {
+        "enabled": true,
+        "startSec": 0.379,
+        "name": "UziCrit",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.45
+    },
+    "100351193638035": {
+        "enabled": true,
+        "startSec": 0.1,
+        "name": "Shoulder Charge",
+        "repeats": [],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "91342131793707": {
+        "enabled": true,
+        "startSec": 0.5,
+        "name": "RotandRuinCrit",
+        "repeats": [
+            0.1,
+            0.1,
+            0.1
+        ],
+        "priority": "parry",
+        "rollOnFail": false,
+        "hold": 0.35
+    },
+    "72795592997118": {
+        "enabled": true,
+        "startSec": 0.01,
+        "name": "FistRunAttack",
+        "repeats": [],
+        "priority": "parry",
+        "hold": 0.35,
+        "rollOnFail": true
+    }
+}
