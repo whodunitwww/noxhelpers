@@ -14,7 +14,7 @@ return function(ctx)
     local NetworkPath = ctx.NetworkPath
     local RemoteFunction = ctx.RemoteFunction
 
-    -- Ensure TeleportService is defined
+    -- Ensure Services
     Services.TeleportService = Services.TeleportService or game:GetService("TeleportService")
     Services.HttpService = Services.HttpService or game:GetService("HttpService")
 
@@ -33,11 +33,22 @@ return function(ctx)
 
     local GROUP_OPTIONS = { "Group 1", "Group 2", "Group 3", "Group 4", "Group 5" }
     
-    -- // STATE INITIALIZATION //
+    -- // STATE INITIALIZATION (Restored Missing Variables) //
     Autos.CurrentGroupIndex = "Group 1"
     Autos.NextHopTime = nil
     Autos.LastJobIdCheck = 0
     Autos.IsHopping = false
+    Autos.WaitThreshold = 5
+    
+    -- Restored combat/raid timers to prevent 'arithmetic on nil' errors
+    Autos.LastTeleportTime = Autos.LastTeleportTime or 0
+    Autos.NoEnemyTimer = Autos.NoEnemyTimer or 0
+    Autos.LastPlayGameFire = Autos.LastPlayGameFire or 0
+    Autos.LastInviteTime = Autos.LastInviteTime or 0
+    Autos.ZombieResetting = Autos.ZombieResetting or false
+    Autos.ZombieResetCleanup = Autos.ZombieResetCleanup or nil
+    Autos.ZombieEmptySince = Autos.ZombieEmptySince or nil
+    Autos.ZombieEmptyLastAction = Autos.ZombieEmptyLastAction or 0
 
     -- // HELPER FUNCTIONS //
     local function normalizeName(name)
@@ -183,8 +194,9 @@ return function(ctx)
     
     -- Alt Hop
     AutoRaidGroup:AddToggle("AltHop", { 
-        Text = "Alt Hop", 
+        Text = "Alt Hop (30m)", 
         Default = false, 
+        Tooltip = "Alt hops every 30 mins. Must have AutoLoad!" 
     })
 
     -- Raid Toggles
@@ -247,7 +259,6 @@ return function(ctx)
         end
     end)
 
-    -- FIX: Changed Options.AltHop to Toggles.AltHop to prevent 'attempt to index nil' error
     Toggles.AltHop:OnChanged(function()
         if Toggles.AltHop.Value then
             Autos.NextHopTime = os.time() + 1800 -- 30 mins from now
@@ -256,7 +267,7 @@ return function(ctx)
         end
     end)
 
-    -- // NETWORKING & HOPPING LOOP //
+    -- // NETWORKING & HOPPING LOOP (NEW FEATURE) //
     task.spawn(function()
         while true do
             task.wait(2) -- Heartbeat for config sync
@@ -294,7 +305,6 @@ return function(ctx)
                             notify("Alt Hop: Switching Servers...", 5)
                             
                             if queue_on_teleport then
-                                -- Note: You must manually add your script URL if you want it to auto-execute
                                 -- queue_on_teleport('loadstring(game:HttpGet("YOUR_SCRIPT_URL_HERE"))()') 
                             end
                             
@@ -473,8 +483,11 @@ return function(ctx)
         return nil
     end
 
+    -- IMPROVED CLICKER
     local function clickGuiButton(btn)
         if not btn or not btn.Visible then return false end
+        
+        -- Method 1: VirtualInputManager (Reliable)
         local pos = btn.AbsolutePosition
         local size = btn.AbsoluteSize
         local centerX = pos.X + (size.X / 2)
@@ -484,11 +497,23 @@ return function(ctx)
         task.wait(0.05)
         Services.VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 1)
         
+        -- Method 2: GuiService / Keyboard Fallback
         Services.GuiService.SelectedObject = btn
         Services.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
         task.wait(0.05)
         Services.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
         Services.GuiService.SelectedObject = nil
+
+        -- Method 3: Direct Signal Firing (Aggressive fallback)
+        if getconnections then
+            for _, c in ipairs(getconnections(btn.MouseButton1Click)) do
+                pcall(function() c:Fire() end)
+            end
+            for _, c in ipairs(getconnections(btn.Activated)) do
+                pcall(function() c:Fire() end)
+            end
+        end
+
         return true
     end
 
@@ -496,8 +521,21 @@ return function(ctx)
         local gui = References.player:WaitForChild("PlayerGui", 5)
         local enterRaid = gui and gui:WaitForChild("EnterRaid", 5)
         if not enterRaid then return false end
-        local btn = enterRaid:FindFirstChild("Frame") and enterRaid.Frame:FindFirstChild("Enter")
-        return clickGuiButton(btn)
+        
+        local frame = enterRaid:FindFirstChild("Frame")
+        if not frame or not frame.Visible then return false end
+
+        -- Try typical button names
+        local btn = frame:FindFirstChild("Enter") or frame:FindFirstChild("Button")
+        if btn and btn:IsA("GuiButton") then return clickGuiButton(btn) end
+        
+        -- Recursive search
+        for _, v in ipairs(frame:GetDescendants()) do
+            if v:IsA("GuiButton") and (v.Name == "Enter" or v.Name == "Button" or v.Name == "Yes") then
+                 return clickGuiButton(v)
+            end
+        end
+        return false
     end
 
     local function hasParty()
@@ -552,17 +590,7 @@ return function(ctx)
 
     local function clickSkipViaGuiNav(btn)
         if not btn or not btn.Visible then return end
-        pcall(function()
-            Services.GuiService.GuiNavigationEnabled = true
-            task.wait(0.05)
-            Services.GuiService.SelectedObject = btn
-            task.wait(0.05)
-            if getconnections then
-                for _, c in ipairs(getconnections(btn.Activated)) do pcall(function() c:Fire() end) end
-                for _, c in ipairs(getconnections(btn.MouseButton1Click)) do pcall(function() c:Fire() end) end
-            end
-            pcall(function() btn:Activate() end)
-        end)
+        clickGuiButton(btn)
     end
 
     -- // BACKGROUND LOOP: FORCE LOAD //
@@ -597,7 +625,7 @@ return function(ctx)
         end
     end)
 
-    -- // MAIN RAID LOOP //
+    -- // MAIN JOIN LOOP //
     task.spawn(function()
         while true do
             task.wait(1)
@@ -639,10 +667,13 @@ return function(ctx)
                                             task.wait(0.5)
                                         end
 
+                                        -- UI Detection and Clicking
                                         local pg = References.player:FindFirstChild("PlayerGui")
-                                        local uiFound = (pg and pg:FindFirstChild("EnterRaid") and pg.EnterRaid:FindFirstChild("Frame") and pg.EnterRaid.Frame.Visible)
+                                        local enterRaid = pg and pg:FindFirstChild("EnterRaid")
+                                        local frame = enterRaid and enterRaid:FindFirstChild("Frame")
+                                        local uiVisible = (frame and frame.Visible)
                                         
-                                        if not uiFound then
+                                        if not uiVisible then
                                             for _, v in ipairs(Services.Workspace:GetDescendants()) do
                                                 if v:IsA("ProximityPrompt") then
                                                     local pos = getSafePosition(v.Parent)
@@ -657,10 +688,10 @@ return function(ctx)
                                             task.wait(0.5)
                                         end
 
-                                        if uiFound or (pg and pg:FindFirstChild("EnterRaid") and pg.EnterRaid:FindFirstChild("Frame") and pg.EnterRaid.Frame.Visible) then
-                                            for _ = 1, 3 do
-                                                if not clickRaidButton() then break end
-                                                task.wait(0.5)
+                                        if uiVisible or (pg and pg:FindFirstChild("EnterRaid") and pg.EnterRaid:FindFirstChild("Frame") and pg.EnterRaid.Frame.Visible) then
+                                            for _ = 1, 5 do
+                                                if clickRaidButton() then break end
+                                                task.wait(0.3)
                                             end
                                         end
                                     end
@@ -721,9 +752,9 @@ return function(ctx)
                                 task.wait(0.5)
                             end
                             if uiFound then
-                                for _ = 1, 3 do
-                                    if not clickRaidButton() then break end
-                                    task.wait(0.5)
+                                for _ = 1, 5 do
+                                    if clickRaidButton() then break end
+                                    task.wait(0.3)
                                 end
                             end
                         end
@@ -966,11 +997,12 @@ return function(ctx)
                             end
                         end
 
+                        -- // RESTORED KATANA RAID ELEVATOR LOGIC //
                         if raidType == "Katana Raid" then
                             if checkAndInteractDialog() then
                                 Autos.NoEnemyTimer = os.clock()
                             else
-                                if (os.clock() - (Autos.NoEnemyTimer or 0)) > (Autos.WaitThreshold or 10) then
+                                if (os.clock() - (Autos.NoEnemyTimer or 0)) > Autos.WaitThreshold then
                                     local zone, prompt = getElevatorTarget()
 
                                     if zone and prompt then
@@ -989,6 +1021,7 @@ return function(ctx)
                                 end
                             end
                         end
+                        -- // END RESTORED LOGIC //
                     end
 
                     if not Autos.IsAttaching and Autos.RaidEntitiesPath and myRoot then
