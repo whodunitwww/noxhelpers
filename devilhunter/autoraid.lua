@@ -763,26 +763,21 @@ return function(ctx)
 
                         -- == MAIN (JOINER) LOGIC ==
                         elseif isMainAccount(myName) then
-                            local activeName, _ = getActiveMainPlayer()
-                            
-                            if activeName and activeName ~= myName then
-                                if os.clock() % 5 < 1 then notify("Waiting for active main: " .. activeName, 2) end
-                                return
+                            Autos.ActiveMainName = myName
+                            local now = os.clock()
+                            if (now - (Autos.LastAcceptInvite or 0)) >= 2 then
+                                Autos.LastAcceptInvite = now
+                                for _, plr in ipairs(Services.Players:GetPlayers()) do
+                                    if plr ~= References.player then
+                                        Remotes:InvokeServer("AcceptInvite", plr)
+                                    end
+                                end
                             end
 
-                            Autos.ActiveMainName = myName
-                            local altPlayer = Services.Players:FindFirstChild(Autos.AltAccountName)
-                            
-                            if altPlayer then
-                                if not isPlayerInParty(Autos.AltAccountName) then
-                                    notify("Waiting for invite...", 2)
-                                    Remotes:InvokeServer("AcceptInvite", altPlayer)
-                                    task.wait(2)
-                                else
-                                    notify("In Party! Waiting for start...", 2)
-                                end
+                            if hasParty() then
+                                notify("In Party! Waiting for start...", 2)
                             else
-                                notify("Waiting for Alt to load...", 2)
+                                notify("Waiting for invite...", 2)
                             end
                         end
 
