@@ -203,7 +203,7 @@ return function(ctx)
     })
 
     -- Raid Toggles
-    AutoRaidGroup:AddLabel("Raid Logic")
+    AutoRaidGroup:AddDivider()
     AutoRaidGroup:AddToggle("AutoJoinRaid", { Text = "Auto Join Raid", Default = false })
     AutoRaidGroup:AddToggle("InfiniteRaid", { Text = "Infinite Raid", Default = false, Tooltip = "Uses Group Logic" })
     
@@ -764,20 +764,20 @@ return function(ctx)
                         -- == MAIN (JOINER) LOGIC ==
                         elseif isMainAccount(myName) then
                             Autos.ActiveMainName = myName
-                            local now = os.clock()
-                            if (now - (Autos.LastAcceptInvite or 0)) >= 2 then
-                                Autos.LastAcceptInvite = now
-                                for _, plr in ipairs(Services.Players:GetPlayers()) do
-                                    if plr ~= References.player then
-                                        Remotes:InvokeServer("AcceptInvite", plr)
+
+                            if not hasParty() then
+                                local now = os.clock()
+                                if (now - (Autos.LastAcceptInvite or 0)) >= 2 then
+                                    Autos.LastAcceptInvite = now
+                                    for _, plr in ipairs(Services.Players:GetPlayers()) do
+                                        if plr ~= References.player then
+                                            Remotes:InvokeServer("AcceptInvite", plr)
+                                        end
                                     end
                                 end
-                            end
-
-                            if hasParty() then
-                                notify("In Party! Waiting for start...", 2)
-                            else
                                 notify("Waiting for invite...", 2)
+                            else
+                                notify("In Party! Waiting for start...", 2)
                             end
                         end
 
