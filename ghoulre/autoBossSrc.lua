@@ -232,7 +232,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     -- UI
     ------------------------------------------------------
     local BossDropdown = AutoBossGroupbox:AddDropdown("BossSelect", {
-        Values  = { "Noro", "Eto", "Tatara", "Kuzen" },
+        Values  = { "Noro", "Eto", "Tatara", "Kuzen", "Yukinori" },
         Default = 1,
         Multi   = false,
         Text    = "Select Boss",
