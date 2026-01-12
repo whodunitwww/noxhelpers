@@ -324,6 +324,30 @@ return function(ctx)
         return type(name) == "string" and string.find(string.lower(name), "devil", 1, true) ~= nil
     end
 
+    local function buildPlayerNameSet()
+        local set = {}
+        for _, pl in ipairs(Services.Players:GetPlayers()) do
+            if pl and pl.Name then
+                set[pl.Name] = true
+            end
+        end
+        return set
+    end
+
+    local function isPlayerName(name, nameSet)
+        return type(name) == "string" and nameSet and nameSet[name] == true
+    end
+
+    local function hasNonPlayerEntities(entities, playerNames)
+        if not entities then return false end
+        for _, v in ipairs(entities:GetChildren()) do
+            if v ~= References.player.Character and not isPlayerName(v.Name, playerNames) then
+                return true
+            end
+        end
+        return false
+    end
+
     local function isTeleportOnlyTarget(name, raidType)
         if isLeechName(name) or isDevilName(name) then return true end
         return raidType == "Zombie Raid" and isSeaZombieName(name)
@@ -334,8 +358,12 @@ return function(ctx)
         local entities = world and world:FindFirstChild("Entities")
         if not entities then return 0 end
         local count = 0
+        local playerNames = buildPlayerNameSet()
         for _, v in ipairs(entities:GetDescendants()) do
-            if v:IsA("Model") and not Services.Players:GetPlayerFromCharacter(v) and isZombieName(v.Name) then
+            if v:IsA("Model")
+                and not isPlayerName(v.Name, playerNames)
+                and not Services.Players:GetPlayerFromCharacter(v)
+                and isZombieName(v.Name) then
                 count = count + 1
             end
         end
@@ -415,6 +443,25 @@ return function(ctx)
         if instance:IsA("BasePart") then return instance.Position
         elseif instance:IsA("Model") then return instance:GetPivot().Position end
         return nil
+    end
+
+    local function hopToAltOrRandom()
+        if Autos.IsHopping then return end
+        Autos.IsHopping = true
+        notify("AutoClear: No enemies for 2m. Hopping servers...", 5)
+        local group = CachedConfig and CachedConfig.Groups and CachedConfig.Groups[Autos.CurrentGroupIndex]
+        local targetJob = group and group.JobId
+        if type(targetJob) == "string" and targetJob ~= "" and targetJob ~= game.JobId then
+            local ok = pcall(function()
+                Services.TeleportService:TeleportToPlaceInstance(game.PlaceId, targetJob, References.player)
+            end)
+            if not ok then
+                Services.TeleportService:Teleport(game.PlaceId, References.player)
+            end
+        else
+            Services.TeleportService:Teleport(game.PlaceId, References.player)
+        end
+        task.wait(10)
     end
 
     -- // NETWORKING & HOPPING LOOP (MODIFIED & MOVED) //
@@ -829,11 +876,11 @@ return function(ctx)
             return nil, nil
         end
 
-        local function getClosestEntityNoHealth(entities, myRoot)
+        local function getClosestEntityNoHealth(entities, myRoot, playerNames)
             local closest = nil
             local shortestDist = math.huge
             for _, v in ipairs(entities:GetChildren()) do
-                if v ~= References.player.Character and v.Name ~= References.player.Name then
+                if v ~= References.player.Character and not isPlayerName(v.Name, playerNames) then
                     local pos = getSafePosition(v)
                     if pos then
                         local dist = (pos - myRoot.Position).Magnitude
@@ -892,13 +939,14 @@ return function(ctx)
                 local target = nil
                 local shortestDist = math.huge
                 local myRoot = References.player.Character and References.player.Character:FindFirstChild("HumanoidRootPart")
+                local playerNames = buildPlayerNameSet()
 
                 if Autos.ZombieResetting then
                     Autos.LastTeleportTime = os.clock()
                 else
                     if myRoot and Autos.RaidEntitiesPath then
                         for _, v in ipairs(Autos.RaidEntitiesPath:GetChildren()) do
-                            if v ~= References.player.Character then
+                            if v ~= References.player.Character and not isPlayerName(v.Name, playerNames) then
                                 local isTeleportOnly = isTeleportOnlyTarget(v.Name, raidType)
                                 local pos = nil
 
@@ -925,6 +973,7 @@ return function(ctx)
 
                     if target then
                         Autos.NoEnemyTimer = os.clock()
+                        Autos.EntitiesEmptySince = nil
 
                         if isTeleportOnlyTarget(target.Name, raidType) then
                             if Autos.IsAttaching then
@@ -973,18 +1022,20 @@ return function(ctx)
                             end
                         end
 
-                        if raidType == "Zombie Raid" then
-                            local nonPlayerFound = false
-                            if Autos.RaidEntitiesPath then
-                                for _, v in ipairs(Autos.RaidEntitiesPath:GetChildren()) do
-                                    if v ~= References.player.Character and v.Name ~= References.player.Name then
-                                        nonPlayerFound = true
-                                        break
-                                    end
-                                end
+                        local hasNonPlayers = hasNonPlayerEntities(Autos.RaidEntitiesPath, playerNames)
+                        if hasNonPlayers then
+                            Autos.EntitiesEmptySince = nil
+                        else
+                            if not Autos.EntitiesEmptySince then
+                                Autos.EntitiesEmptySince = os.clock()
+                            elseif (os.clock() - Autos.EntitiesEmptySince) >= 120 then
+                                Autos.EntitiesEmptySince = nil
+                                hopToAltOrRandom()
                             end
+                        end
 
-                            if nonPlayerFound then
+                        if raidType == "Zombie Raid" then
+                            if hasNonPlayers then
                                 Autos.ZombieEmptySince = nil
                                 Autos.ZombieEmptyLastAction = 0
                             else
@@ -1044,7 +1095,7 @@ return function(ctx)
                     if not Autos.IsAttaching and Autos.RaidEntitiesPath and myRoot then
                         local now = os.clock()
                         if (now - Autos.LastTeleportTime) >= 2 then
-                            local closest = getClosestEntityNoHealth(Autos.RaidEntitiesPath, myRoot)
+                            local closest = getClosestEntityNoHealth(Autos.RaidEntitiesPath, myRoot, playerNames)
                             local pos = closest and getSafePosition(closest)
                             if pos then
                                 myRoot.CFrame = CFrame.new(pos + Vector3.new(0, 3, 0))
@@ -1058,6 +1109,7 @@ return function(ctx)
                     AttachPanel.Stop()
                     Autos.IsAttaching = false
                 end
+                Autos.EntitiesEmptySince = nil
                 Autos.LastRaidTypeNotified = ""
             end
         end
