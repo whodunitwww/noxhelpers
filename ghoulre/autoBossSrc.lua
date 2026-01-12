@@ -10,6 +10,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     local ReplicatedStorage = Services.ReplicatedStorage or game:GetService("ReplicatedStorage")
     local VIM               = Services.VirtualInputManager or game:GetService("VirtualInputManager")
     local CoreGui           = Services.CoreGui           or game:GetService("CoreGui")
+    local GuiService        = Services.GuiService        or game:GetService("GuiService")
 
     -- OPT: cache some frequently-used references
     local LocalPlayer       = Players.LocalPlayer
@@ -444,39 +445,30 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         end
     end)
 
-    local function VisualizeClick(x, y)
-        local gui = Instance.new("ScreenGui")
-        gui.Name = "AutoBossDebugVisual"
-        gui.Parent = CoreGui
-
-        local dot = Instance.new("Frame")
-        dot.Size = UDim2.new(0, 10, 0, 10)
-        dot.Position = UDim2.new(0, x - 5, 0, y - 5)
-        dot.BackgroundColor3 = Color3.new(1, 0, 0)
-        dot.BorderSizePixel = 0
-        dot.Parent = gui
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(1, 0)
-        corner.Parent = dot
-
-        task.delay(0.5, function()
-            gui:Destroy()
-        end)
-    end
-
     local function PerformReplayClick()
-        local cam = Workspace.CurrentCamera or CurrentCamera
-        if not cam then return end
+        local player = Players.LocalPlayer or LocalPlayer
+        if not player then return end
 
-        local screenSize = cam.ViewportSize
-        local absX = screenSize.X * BossState.ReplayConfig.ScaleX
-        local absY = screenSize.Y * BossState.ReplayConfig.ScaleY
+        local playerGui = player:FindFirstChild("PlayerGui")
+        if not playerGui then return end
 
-        VisualizeClick(absX, absY)
-        VIM:SendMouseButtonEvent(absX, absY, 0, true, game, 1)
-        task.wait(0.05)
-        VIM:SendMouseButtonEvent(absX, absY, 0, false, game, 1)
+        local replayButton =
+            playerGui:FindFirstChild("Vote")
+            and playerGui.Vote:FindFirstChild("Frame")
+            and playerGui.Vote.Frame:FindFirstChild("CosmeticInterface")
+            and playerGui.Vote.Frame.CosmeticInterface:FindFirstChild("Replay")
+
+        if not replayButton then return end
+
+        if getconnections then
+            for _, connection in pairs(getconnections(replayButton.MouseButton1Click)) do
+                connection:Fire()
+            end
+        end
+
+        GuiService.GuiNavigationEnabled = true
+        task.wait(0.1)
+        GuiService.SelectedObject = replayButton
     end
 
     ------------------------------------------------------
