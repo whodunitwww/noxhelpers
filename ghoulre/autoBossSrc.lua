@@ -231,12 +231,100 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
     ------------------------------------------------------
     -- UI
     ------------------------------------------------------
+    local BossDropdownValues = { "Noro", "Eto", "Tatara", "Kuzen", "Yukinori" }
+    local HiddenBossTargetFilters = {
+        ["the monster"] = "humanoid",
+    }
+
+    local function IsBossTargetAllowed(name)
+        if type(name) ~= "string" or name == "" then
+            return false
+        end
+
+        local lower = string.lower(name)
+        if HiddenBossTargetFilters[lower] then
+            return true
+        end
+
+        if string.find(lower, "humanoid", 1, true) then
+            return true
+        end
+
+        for _, value in ipairs(BossDropdownValues) do
+            if lower == string.lower(value) then
+                return true
+            end
+        end
+
+        return false
+    end
+
     local BossDropdown = AutoBossGroupbox:AddDropdown("BossSelect", {
-        Values  = { "Noro", "Eto", "Tatara", "Kuzen", "Yukinori" },
+        Values  = BossDropdownValues,
         Default = 1,
         Multi   = false,
         Text    = "Select Boss",
     })
+
+    local function GetSelectedBossName()
+        local override = (Shared and Shared.AutoBossTarget) or getgenv().AutoBossTarget
+        if IsBossTargetAllowed(override) then
+            return override
+        end
+
+        local value = BossDropdown and BossDropdown.Value or nil
+        if IsBossTargetAllowed(value) then
+            return value
+        end
+        return BossDropdownValues[1]
+    end
+
+    local function GetBossFilterName()
+        local selected = GetSelectedBossName()
+        local lower = string.lower(selected or "")
+        if lower == "" then
+            return ""
+        end
+
+        local mapped = HiddenBossTargetFilters[lower]
+        if mapped then
+            return mapped
+        end
+
+        if string.find(lower, "humanoid", 1, true) then
+            return "humanoid"
+        end
+
+        return lower
+    end
+
+    local function ApplyHorizontalOffset(val)
+        if not AttachPanel then
+            return
+        end
+
+        if type(AttachPanel) == "table" then
+            AttachPanel.HorizDist = val
+            AttachPanel.HorizOffset = val
+            AttachPanel.HorizontalOffset = val
+        end
+
+        if type(AttachPanel.SetHorizDist) == "function" then
+            AttachPanel.SetHorizDist(val)
+        end
+
+        if type(AttachPanel.SetHorizOffset) == "function" then
+            AttachPanel.SetHorizOffset(val)
+        end
+
+        if BossState.ActiveTarget and type(AttachPanel.SetTarget) == "function" then
+            AttachPanel.SetTarget(BossState.ActiveTarget)
+        end
+
+        if BossState.ActiveTarget and type(AttachPanel.TeleportToTarget) == "function" then
+            AttachPanel.TeleportToTarget(BossState.ActiveTarget)
+        end
+    end
 
     AutoBossGroupbox:AddSlider("BossYOffset", {
         Text    = "Vertical Offset",
@@ -262,9 +350,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         Suffix  = " studs",
         Callback = function(val)
             BossState.CurrentHorizOffset = val
-            if AttachPanel then
-                AttachPanel.SetHorizDist(val)
-            end
+            ApplyHorizontalOffset(val)
         end
     })
 
@@ -692,7 +778,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
 
             task.wait(0.6)
 
-            local selectedBoss = BossDropdown.Value
+            local selectedBoss = GetSelectedBossName()
             local args = {
                 [1] = {
                     [1] = {
@@ -739,7 +825,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
         if AttachPanel then
             AttachPanel.SetMode("Aligned")
             AttachPanel.SetYOffset(BossState.CurrentYOffset)
-            AttachPanel.SetHorizDist(BossState.CurrentHorizOffset)
+            ApplyHorizontalOffset(BossState.CurrentHorizOffset)
         end
 
         if Toggles.AutoBoss_SkipCutscene and Toggles.AutoBoss_SkipCutscene.Value then
@@ -823,7 +909,7 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                 targetToUse = nil
 
                 local entityFolder = Workspace:FindFirstChild("Entities") or Workspace
-                local filterName   = tostring(BossDropdown.Value):lower()
+                local filterName   = GetBossFilterName()
                 local closestTarget
                 local closestDistSq = math.huge
                 local rootPos = root.Position
@@ -835,12 +921,20 @@ return function(Services, Tabs, References, Toggles, Options, Library, Shared)
                         -- UPDATED: we NO LONGER require a Humanoid or Health > 0.
                         -- We just care that the model has a HumanoidRootPart and a matching name.
                         local hrp = v:FindFirstChild("HumanoidRootPart")
-                        if hrp and string.find(string.lower(v.Name), filterName, 1, true) then
+                        if hrp then
+                            local lowerName = string.lower(v.Name)
+                            local matchesSelected = filterName ~= ""
+                                and string.find(lowerName, filterName, 1, true)
+                            local matchesSpecial = string.find(lowerName, "humanoid", 1, true)
+                                or string.find(lowerName, "the monster", 1, true)
+
+                            if matchesSelected or matchesSpecial then
                             local offset = hrp.Position - rootPos
                             local distSq = offset.X * offset.X + offset.Y * offset.Y + offset.Z * offset.Z
                             if distSq < closestDistSq then
                                 closestDistSq = distSq
                                 closestTarget = v
+                            end
                             end
                         end
                     end
