@@ -13,6 +13,10 @@ return function(ctx)
     local MoveToPos = ctx.MoveToPos
     local NetworkPath = ctx.NetworkPath
     local RemoteFunction = ctx.RemoteFunction
+    local Webhook = ctx.Webhook
+    local Framework = ctx.Framework
+    local ItemLibrary = ctx.ItemLibrary
+    local WeaponLibrary = ctx.WeaponLibrary
 
     -- Ensure Services
     Services.TeleportService = Services.TeleportService or game:GetService("TeleportService")
@@ -52,6 +56,24 @@ return function(ctx)
     Autos.ZombieResetCleanup = Autos.ZombieResetCleanup or nil
     Autos.ZombieEmptySince = Autos.ZombieEmptySince or nil
     Autos.ZombieEmptyLastAction = Autos.ZombieEmptyLastAction or 0
+    Autos.RaidWebhook = Autos.RaidWebhook or {
+        active = false,
+        raidType = nil,
+        startInv = nil,
+        invValid = false,
+        startLoot = nil,
+        lootValid = false,
+        startYen = nil,
+        yenValid = false,
+        elevatorVisits = 0,
+        katanaClearSince = nil,
+        zombieCraneSeen = false,
+        zombieCraneGoneAt = nil,
+        lastElevatorAt = 0,
+        endLogged = false,
+        startClock = 0,
+        awaitRaidExit = false,
+    }
 
     -- // HELPER FUNCTIONS //
     local function normalizeName(name)
@@ -69,6 +91,171 @@ return function(ctx)
 
     local function MainsToString(list)
         return table.concat(list or {}, ", ")
+    end
+
+    -- // RAID WEBHOOK HELPERS //
+    local RAID_WEBHOOK_EVENT = "Raid"
+
+    local function webhookEnabled(eventType)
+        if Webhook and Webhook.IsEnabled then
+            return Webhook.IsEnabled(eventType)
+        end
+        return Webhook and Webhook.Report ~= nil
+    end
+
+    local function reportWebhook(eventType, title, description)
+        if Webhook and Webhook.Report then
+            Webhook.Report(eventType, title, description)
+        end
+    end
+
+    local function formatNumber(n)
+        if type(n) ~= "number" then return "?" end
+        local s = tostring(math.floor(n + 0.5))
+        local rev = s:reverse():gsub("(%d%d%d)", "%1,"):reverse()
+        if rev:sub(1, 1) == "," then rev = rev:sub(2) end
+        return rev
+    end
+
+    local itemNameCache = {}
+    local function getItemName(rawID)
+        local cleanID = tostring(rawID):match("ItemID:(%d+)") or tostring(rawID)
+        if itemNameCache[cleanID] then return itemNameCache[cleanID] end
+
+        local foundName = "Unknown (" .. cleanID .. ")"
+        if ItemLibrary and ItemLibrary.PresetIds then
+            for name, id in pairs(ItemLibrary.PresetIds) do
+                if tostring(id):match("ItemID:(%d+)") == cleanID then
+                    foundName = name
+                    break
+                end
+            end
+        end
+        if foundName:find("Unknown") and WeaponLibrary and WeaponLibrary.WeaponData then
+            local weapon = WeaponLibrary.WeaponData[cleanID] or WeaponLibrary.WeaponData[tonumber(cleanID)]
+            if weapon and weapon.Name then
+                foundName = weapon.Name
+            end
+        end
+        itemNameCache[cleanID] = foundName
+        return foundName
+    end
+
+    local function safeGetItems()
+        if not (Framework and Framework.GetData) then return nil end
+        local ok, res = pcall(function()
+            return Framework:GetData(References.player, { "Player", "Items" })
+        end)
+        return (ok and type(res) == "table") and res or nil
+    end
+
+    local function snapshotInventory()
+        local state = {}
+        local items = safeGetItems()
+        if not items then
+            return state, false
+        end
+        for rawId, instances in pairs(items) do
+            if type(instances) == "table" then
+                local count = 0
+                for _ in pairs(instances) do
+                    count = count + 1
+                end
+                if count > 0 then
+                    local name = getItemName(rawId)
+                    state[name] = (state[name] or 0) + count
+                end
+            end
+        end
+        return state, true
+    end
+
+    local function getLootboxScroller()
+        local playerGui = References.player:FindFirstChild("PlayerGui")
+        local hud = playerGui and playerGui:FindFirstChild("HUD")
+        local phone = hud and hud:FindFirstChild("Phone")
+        local lootboxes = phone and phone:FindFirstChild("Lootboxes")
+        return lootboxes and lootboxes:FindFirstChild("ScrollingFrame")
+    end
+
+    local function getLootboxTypeFromFrame(lootboxFrame)
+        if not lootboxFrame then return nil end
+        local typeLabel = lootboxFrame:FindFirstChild("LootboxType")
+        if not (typeLabel and typeLabel:IsA("TextLabel")) then
+            typeLabel = lootboxFrame:FindFirstChild("LootboxType", true)
+        end
+        if typeLabel and typeLabel:IsA("TextLabel") then
+            local text = typeLabel.Text or ""
+            if text ~= "" then
+                local extracted = text:match("Lootbox Type%s*:%s*(.+)")
+                if extracted and extracted ~= "" then
+                    return extracted
+                end
+                return text
+            end
+        end
+        return nil
+    end
+
+    local function snapshotLootboxes()
+        local state = {}
+        local scroller = getLootboxScroller()
+        if not scroller then
+            return state, false
+        end
+        for _, frame in ipairs(scroller:GetChildren()) do
+            if frame:IsA("Frame") then
+                local lootboxType = getLootboxTypeFromFrame(frame) or frame.Name
+                state[lootboxType] = (state[lootboxType] or 0) + 1
+            end
+        end
+        return state, true
+    end
+
+    local function getYenAmount()
+        local pg = References.player:FindFirstChild("PlayerGui")
+        local hud = pg and pg:FindFirstChild("HUD")
+        local yen = hud and hud:FindFirstChild("Yen")
+        local label = yen and yen:FindFirstChild("TextLabel")
+        local text = label and label.Text
+        if type(text) ~= "string" then return nil end
+        local digits = text:gsub("[^%d]", "")
+        if digits == "" then return nil end
+        return tonumber(digits)
+    end
+
+    local function diffCounts(oldState, newState)
+        local changes = {}
+        for name, newCount in pairs(newState) do
+            local oldCount = oldState[name] or 0
+            if newCount > oldCount then
+                table.insert(changes, string.format("+ %dx %s", newCount - oldCount, name))
+            end
+        end
+        for name, oldCount in pairs(oldState) do
+            local newCount = newState[name] or 0
+            if newCount < oldCount then
+                table.insert(changes, string.format("- %dx %s", oldCount - newCount, name))
+            end
+        end
+        table.sort(changes)
+        return changes
+    end
+
+    local function formatDiffSection(title, lines, maxLines)
+        local out = { title, "```diff" }
+        if #lines == 0 then
+            table.insert(out, "No changes")
+        else
+            for i = 1, math.min(#lines, maxLines) do
+                table.insert(out, lines[i])
+            end
+            if #lines > maxLines then
+                table.insert(out, string.format("# ... %d more change(s)", #lines - maxLines))
+            end
+        end
+        table.insert(out, "```")
+        return table.concat(out, "\n")
     end
 
     -- // CONFIGURATION HANDLERS //
@@ -688,6 +875,168 @@ return function(ctx)
         end
     end)
 
+    local function resetRaidWebhookState()
+        local state = Autos.RaidWebhook
+        state.active = false
+        state.raidType = nil
+        state.startInv = nil
+        state.invValid = false
+        state.startLoot = nil
+        state.lootValid = false
+        state.startYen = nil
+        state.yenValid = false
+        state.elevatorVisits = 0
+        state.katanaClearSince = nil
+        state.zombieCraneSeen = false
+        state.zombieCraneGoneAt = nil
+        state.lastElevatorAt = 0
+        state.endLogged = false
+        state.startClock = 0
+        state.awaitRaidExit = false
+    end
+
+    local function startRaidWebhook(raidType)
+        local state = Autos.RaidWebhook
+        state.active = true
+        state.raidType = raidType
+        state.startClock = os.clock()
+        state.endLogged = false
+        state.awaitRaidExit = false
+        state.elevatorVisits = 0
+        state.katanaClearSince = nil
+        state.zombieCraneSeen = false
+        state.zombieCraneGoneAt = nil
+        state.lastElevatorAt = 0
+
+        state.startInv, state.invValid = snapshotInventory()
+        state.startLoot, state.lootValid = snapshotLootboxes()
+        state.startYen = getYenAmount()
+        state.yenValid = type(state.startYen) == "number"
+
+        local desc = string.format("Joined raid: **%s**", raidType or "Unknown")
+        reportWebhook(RAID_WEBHOOK_EVENT, "Raid Joined", desc)
+    end
+
+    local function completeRaidWebhook(reason)
+        local state = Autos.RaidWebhook
+        if not state.active or state.endLogged then return end
+        state.endLogged = true
+
+        local endInv, endInvValid = snapshotInventory()
+        local endLoot, endLootValid = snapshotLootboxes()
+        local endYen = getYenAmount()
+
+        local parts = {}
+        table.insert(parts, string.format("Raid completed: **%s**", state.raidType or "Unknown"))
+
+        if state.yenValid and type(endYen) == "number" then
+            local delta = endYen - (state.startYen or endYen)
+            local sign = delta >= 0 and "+" or "-"
+            table.insert(
+                parts,
+                string.format(
+                    "Yen: %s -> %s (%s%s)",
+                    formatNumber(state.startYen),
+                    formatNumber(endYen),
+                    sign,
+                    formatNumber(math.abs(delta))
+                )
+            )
+        else
+            table.insert(parts, "Yen: unavailable")
+        end
+
+        if state.invValid and endInvValid then
+            local lines = diffCounts(state.startInv or {}, endInv)
+            table.insert(parts, formatDiffSection("Inventory Changes", lines, 25))
+        else
+            table.insert(parts, "Inventory Changes: unavailable")
+        end
+
+        if state.lootValid and endLootValid then
+            local lines = diffCounts(state.startLoot or {}, endLoot)
+            table.insert(parts, formatDiffSection("Lootbox Changes", lines, 25))
+        else
+            table.insert(parts, "Lootbox Changes: unavailable (open phone lootboxes)")
+        end
+
+        if type(reason) == "string" and reason ~= "" then
+            table.insert(parts, "End trigger: " .. reason)
+        end
+
+        reportWebhook(RAID_WEBHOOK_EVENT, "Raid Completed", table.concat(parts, "\n"))
+        state.active = false
+        state.awaitRaidExit = true
+    end
+
+    local function updateRaidWebhook(raidType)
+        local state = Autos.RaidWebhook
+        if not webhookEnabled(RAID_WEBHOOK_EVENT) then
+            if state.active or state.awaitRaidExit then
+                resetRaidWebhookState()
+            end
+            return
+        end
+
+        if state.awaitRaidExit then
+            if not raidType then
+                resetRaidWebhookState()
+            end
+            return
+        end
+
+        if not raidType then
+            if state.active then resetRaidWebhookState() end
+            return
+        end
+
+        if not state.active then
+            startRaidWebhook(raidType)
+            return
+        end
+
+        state.raidType = raidType or state.raidType
+
+        if raidType == "Zombie Raid" then
+            local btn = getCraneDropButton()
+            local visible = btn and btn.Visible
+            if visible then
+                state.zombieCraneSeen = true
+                state.zombieCraneGoneAt = nil
+            elseif state.zombieCraneSeen then
+                if not state.zombieCraneGoneAt then
+                    state.zombieCraneGoneAt = os.clock()
+                elseif (os.clock() - state.zombieCraneGoneAt) >= 2 then
+                    completeRaidWebhook("Crane drop complete")
+                end
+            end
+        elseif raidType == "Katana Raid" then
+            if state.elevatorVisits >= 5 then
+                local world = Services.Workspace:FindFirstChild("World")
+                local entities = world and world:FindFirstChild("Entities")
+                local playerNames = buildPlayerNameSet()
+                local hasNonPlayers = hasNonPlayerEntities(entities, playerNames)
+                if not hasNonPlayers then
+                    if not state.katanaClearSince then
+                        state.katanaClearSince = os.clock()
+                    elseif (os.clock() - state.katanaClearSince) >= 2 then
+                        completeRaidWebhook("Entities cleared after 5 elevator trips")
+                    end
+                else
+                    state.katanaClearSince = nil
+                end
+            end
+        end
+    end
+
+    task.spawn(function()
+        while true do
+            task.wait(1)
+            local raidType = getRaidType()
+            updateRaidWebhook(raidType)
+        end
+    end)
+
     -- // MAIN JOIN LOOP //
     task.spawn(function()
         while true do
@@ -1076,6 +1425,14 @@ return function(ctx)
                                             root.CFrame = zone.CFrame + Vector3.new(0, 3, 0)
                                             task.wait(0.3)
                                             fireproximityprompt(prompt)
+                                            local raidState = Autos.RaidWebhook
+                                            if raidState and raidState.active and raidState.raidType == "Katana Raid" then
+                                                local now = os.clock()
+                                                if raidState.lastElevatorAt == 0 or (now - raidState.lastElevatorAt) > 5 then
+                                                    raidState.elevatorVisits = (raidState.elevatorVisits or 0) + 1
+                                                    raidState.lastElevatorAt = now
+                                                end
+                                            end
                                             notify("Loading Next Level...", 10)
                                             task.wait(12)
                                             Autos.NoEnemyTimer = os.clock()
