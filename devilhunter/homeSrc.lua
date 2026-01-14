@@ -278,16 +278,20 @@ return function(ctx)
     end
 
     -- event keys
-    local WEBHOOK_EVENT_LAUNCH  = "Launch"
-    local WEBHOOK_EVENT_INV     = "InventoryChange" -- now: Backpack changes
-    local WEBHOOK_EVENT_CHAT    = "Chat"
-    local WEBHOOK_EVENT_PLAYERS = "PlayerJoinLeave"
+    local WEBHOOK_EVENT_LAUNCH       = "Launch"
+    local WEBHOOK_EVENT_INV          = "InventoryChange" -- now: Backpack changes
+    local WEBHOOK_EVENT_CHAT         = "Chat"
+    local WEBHOOK_EVENT_PLAYERS      = "PlayerJoinLeave"
+    local WEBHOOK_EVENT_RAID         = "Raid"
+    local WEBHOOK_EVENT_MISSION_RAID = "MissionRaid"
 
     local webhookEvents = {
         WEBHOOK_EVENT_LAUNCH,
         WEBHOOK_EVENT_INV,
         WEBHOOK_EVENT_CHAT,
         WEBHOOK_EVENT_PLAYERS,
+        WEBHOOK_EVENT_RAID,
+        WEBHOOK_EVENT_MISSION_RAID,
     }
 
     -- UI
@@ -521,62 +525,88 @@ return function(ctx)
         end))
 
         ----------------------------------------------------------------
-        -- 🚀 INVENTORY LOGGING (OPTIMISED, EVENT-DRIVEN)
+        -- INVENTORY LOGGING VIA BACKPACK (BATCHED)
         ----------------------------------------------------------------
-        invBuffer    = {}
-        lastInvFlush = os.clock()
-
+        invBuffer      = {}
+        lastInvFlush   = os.clock()
         local INV_FLUSH_INTERVAL  = 15
         local INV_MAX_LINES_TOTAL = 40
         local INV_MAX_LEN         = 1900
 
-        local invCounts = {}
-
-        local function isTrackedItem(item)
-            return item:IsA("Tool")
-                or item:IsA("HopperBin")
-                or item:IsA("Accoutrement")
-                or item:IsA("Folder")
-                or item:IsA("Model")
-        end
-
         local function getBackpack()
             if not LocalPlayer then return nil end
+            -- standard Roblox backpack
+            local bp = LocalPlayer:FindFirstChild("Backpack")
+            if bp and bp:IsA("Backpack") then
+                return bp
+            end
+            -- fallback if executor / game exposes it differently
             return LocalPlayer:FindFirstChildOfClass("Backpack")
         end
 
-        -- INITIAL SNAPSHOT (ONE TIME ONLY)
-        do
+        local function snapshotInventory()
+            local state = {}
             local bp = getBackpack()
-            if bp then
-                for _, item in ipairs(bp:GetChildren()) do
-                    if isTrackedItem(item) then
-                        invCounts[item.Name] = (invCounts[item.Name] or 0) + 1
-                    end
+            if not bp then
+                return state
+            end
+
+            for _, item in ipairs(bp:GetChildren()) do
+                -- Be generous: any child counts as an "item", grouped by name
+                if item:IsA("Tool") or item:IsA("HopperBin") or item:IsA("Accoutrement") or item:IsA("Folder") or item:IsA("Model") then
+                    local name = item.Name
+                    state[name] = (state[name] or 0) + 1
+                end
+            end
+
+            return state
+        end
+
+        local invState          = snapshotInventory()
+        local lastInvCheck      = os.clock()
+        local INV_CHECK_INTERVAL = 2 -- how often we resnapshot backpack
+
+        local function diffInventory(old, new, out)
+            for name, newCount in pairs(new) do
+                local oldCount = old[name] or 0
+                if newCount > oldCount then
+                    table.insert(out, string.format("+ %dx %s (Backpack)", newCount - oldCount, name))
+                end
+            end
+            for name, oldCount in pairs(old) do
+                local newCount = new[name] or 0
+                if newCount < oldCount then
+                    table.insert(out, string.format("- %dx %s (Backpack)", oldCount - newCount, name))
                 end
             end
         end
 
-        local function onItemAdded(item)
-            if not webhookIsEventEnabled(WEBHOOK_EVENT_INV) then return end
-            if not isTrackedItem(item) then return end
+        local function pollInventoryForChanges()
+            if not webhookIsEventEnabled(WEBHOOK_EVENT_INV) then
+                -- keep snapshot up-to-date but don't record changes
+                invState = snapshotInventory()
+                return
+            end
 
-            invCounts[item.Name] = (invCounts[item.Name] or 0) + 1
-            table.insert(invBuffer, string.format("+ 1x %s (Backpack)", item.Name))
-        end
+            local oldState = invState
+            local newState = snapshotInventory()
 
-        local function onItemRemoved(item)
-            if not webhookIsEventEnabled(WEBHOOK_EVENT_INV) then return end
-            if not isTrackedItem(item) then return end
+            local changes = {}
+            diffInventory(oldState, newState, changes)
 
-            invCounts[item.Name] = math.max((invCounts[item.Name] or 1) - 1, 0)
-            table.insert(invBuffer, string.format("- 1x %s (Backpack)", item.Name))
-        end
+            invState = newState
 
-        local bp = getBackpack()
-        if bp then
-            track(bp.ChildAdded:Connect(onItemAdded))
-            track(bp.ChildRemoved:Connect(onItemRemoved))
+            if #changes == 0 then
+                return
+            end
+
+            for i, line in ipairs(changes) do
+                if i > INV_MAX_LINES_TOTAL then
+                    table.insert(invBuffer, string.format("... %d more change(s)", #changes - INV_MAX_LINES_TOTAL))
+                    break
+                end
+                table.insert(invBuffer, line)
+            end
         end
 
         local function flushInventoryBuffer()
@@ -587,8 +617,8 @@ return function(ctx)
             if #invBuffer == 0 then return end
 
             local header = string.format("**%s** inventory changes:", safeName(LocalPlayer))
-            local diffBody = { "```diff" }
 
+            local diffBody = { "```diff" }
             for i, change in ipairs(invBuffer) do
                 if i > INV_MAX_LINES_TOTAL then
                     table.insert(diffBody, string.format("# ... %d more change(s)", #invBuffer - INV_MAX_LINES_TOTAL))
@@ -596,10 +626,9 @@ return function(ctx)
                 end
                 table.insert(diffBody, change)
             end
-
             table.insert(diffBody, "```")
-            local desc = header .. "\n" .. table.concat(diffBody, "\n")
 
+            local desc = header .. "\n" .. table.concat(diffBody, "\n")
             if #desc > INV_MAX_LEN then
                 desc = desc:sub(1, INV_MAX_LEN - 3) .. "..."
             end
@@ -609,14 +638,21 @@ return function(ctx)
         end
 
         ----------------------------------------------------------------
-        -- HEARTBEAT (NOW LIGHTWEIGHT)
+        -- PERIODIC FLUSH / POLL LOOP (BATCHES WEBHOOK SENDS)
         ----------------------------------------------------------------
         track(RunService.Heartbeat:Connect(function()
             local now = os.clock()
 
+            -- chat: batch messages into a single webhook every few seconds
             if now - lastChatFlush >= CHAT_FLUSH_INTERVAL then
                 lastChatFlush = now
                 flushChatBuffer()
+            end
+
+            -- inventory (backpack) changes: diff backpack and report batched
+            if now - lastInvCheck >= INV_CHECK_INTERVAL then
+                lastInvCheck = now
+                pollInventoryForChanges()
             end
 
             if now - lastInvFlush >= INV_FLUSH_INTERVAL then
@@ -625,7 +661,7 @@ return function(ctx)
             end
         end))
     end
-  
+
     ----------------------------------------------------------------
     -- ================== UPDATES / FEEDBACK / CREDITS =========== --
     ----------------------------------------------------------------
@@ -718,6 +754,14 @@ return function(ctx)
     )
 
     local H = {}
+    H.Webhook = {
+        Report = webhookReport,
+        IsEnabled = webhookIsEventEnabled,
+        Events = {
+            Raid = WEBHOOK_EVENT_RAID,
+            MissionRaid = WEBHOOK_EVENT_MISSION_RAID,
+        },
+    }
 
     function H.Unload()
         for i, conn in ipairs(connections) do
