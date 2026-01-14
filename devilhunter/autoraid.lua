@@ -39,6 +39,7 @@ return function(ctx)
     local FULL_PATH = CONFIG_FOLDER_PATH .. "/" .. CONFIG_FILE_NAME
 
     local GROUP_OPTIONS = { "Group 1", "Group 2", "Group 3", "Group 4", "Group 5" }
+    local DEFAULT_RAID_START = "Katana Man Raid"
     
     -- // STATE INITIALIZATION //
     Autos.CurrentGroupIndex = "Group 1"
@@ -56,6 +57,9 @@ return function(ctx)
     Autos.ZombieResetCleanup = Autos.ZombieResetCleanup or nil
     Autos.ZombieEmptySince = Autos.ZombieEmptySince or nil
     Autos.ZombieEmptyLastAction = Autos.ZombieEmptyLastAction or 0
+    Autos.SuppressRaidStartUpdate = Autos.SuppressRaidStartUpdate or false
+    Autos.PartyGatherStart = Autos.PartyGatherStart or nil
+    Autos.MissingAltSince = Autos.MissingAltSince or nil
     Autos.RaidWebhook = Autos.RaidWebhook or {
         active = false,
         raidType = nil,
@@ -213,7 +217,7 @@ return function(ctx)
     end
 
     local function getYenAmount()
-        local pg = References.player:FindFirstChild("PlayerGui")
+        local pg = References.player and References.player:FindFirstChild("PlayerGui")
         local hud = pg and pg:FindFirstChild("HUD")
         local yen = hud and hud:FindFirstChild("Yen")
         local label = yen and yen:FindFirstChild("TextLabel")
@@ -262,7 +266,7 @@ return function(ctx)
     local function GetDefaultConfig()
         local cfg = { LastSelected = "Group 1", Groups = {} }
         for _, g in ipairs(GROUP_OPTIONS) do
-            cfg.Groups[g] = { Alt = "", Mains = {}, JobId = "" }
+            cfg.Groups[g] = { Alt = "", Mains = {}, JobId = "", RaidStart = DEFAULT_RAID_START }
         end
         return cfg
     end
@@ -275,7 +279,9 @@ return function(ctx)
             if success and type(result) == "table" and result.Groups then
                 for _, g in ipairs(GROUP_OPTIONS) do
                     if not result.Groups[g] then
-                        result.Groups[g] = { Alt = "", Mains = {}, JobId = "" }
+                        result.Groups[g] = { Alt = "", Mains = {}, JobId = "", RaidStart = DEFAULT_RAID_START }
+                    elseif not result.Groups[g].RaidStart then
+                        result.Groups[g].RaidStart = DEFAULT_RAID_START
                     end
                 end
                 return result
@@ -304,6 +310,7 @@ return function(ctx)
             Autos.AltAccountName = gData.Alt
             Autos.MainAccountNames = gData.Mains
             Autos.MainAccountName = gData.Mains[1] or ""
+            Autos.SelectedRaidStart = gData.RaidStart or DEFAULT_RAID_START
         end
     end
     RefreshLocalAutos()
@@ -393,6 +400,13 @@ return function(ctx)
     AutoRaidGroup:AddDivider()
     AutoRaidGroup:AddToggle("AutoJoinRaid", { Text = "Auto Join Raid", Default = false })
     AutoRaidGroup:AddToggle("InfiniteRaid", { Text = "Infinite Raid", Default = false, Tooltip = "Uses Group Logic" })
+    AutoRaidGroup:AddSlider("RequiredPartyMembers", {
+        Text = "Required Party Members",
+        Default = 2,
+        Min = 2,
+        Max = 6,
+        Rounding = 0,
+    })
     
     AutoRaidGroup:AddDropdown("RaidStartSelect", {
         Text = "Raid Start",
@@ -407,14 +421,28 @@ return function(ctx)
     local StatusLabel = AutoRaidGroup:AddLabel("Status: Initializing...", true)
 
     -- // UI CALLBACKS //
+    local function updateRaidStartInfo(selected)
+        if selected == "Zombie Raid" then
+            InfoLabel:SetText("Info: Zombie Raid - No InstaKill. Needs AutoEquip + M1")
+        else
+            InfoLabel:SetText("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill.")
+        end
+    end
+
     local function UpdateUIFromConfig()
         local gData = CachedConfig.Groups[Autos.CurrentGroupIndex]
         if gData then
             Autos.SuppressAccountUpdate = true
             if Options.AltAccountName then Options.AltAccountName:SetValue(gData.Alt) end
             if Options.MainAccountName then Options.MainAccountName:SetValue(MainsToString(gData.Mains)) end
+            Autos.SuppressRaidStartUpdate = true
+            if Options.RaidStartSelect then
+                Options.RaidStartSelect:SetValue(gData.RaidStart or DEFAULT_RAID_START)
+            end
+            Autos.SuppressRaidStartUpdate = false
             Autos.SuppressAccountUpdate = false
             RefreshLocalAutos()
+            updateRaidStartInfo(Autos.SelectedRaidStart)
         end
     end
 
@@ -441,12 +469,14 @@ return function(ctx)
     Options.MainAccountName:OnChanged(SaveCurrentInputs)
     
     Options.RaidStartSelect:OnChanged(function()
+        if Autos.SuppressRaidStartUpdate then return end
         Autos.SelectedRaidStart = Options.RaidStartSelect.Value
-        if Autos.SelectedRaidStart == "Zombie Raid" then
-            InfoLabel:SetText("Info: Zombie Raid - No InstaKill. Needs AutoEquip + M1")
-        else
-            InfoLabel:SetText("Info: Requires AutoEquip, AutoAttack (M1), and InstaKill.")
+        local gData = CachedConfig.Groups[Autos.CurrentGroupIndex]
+        if gData then
+            gData.RaidStart = Autos.SelectedRaidStart
+            SaveConfig(CachedConfig)
         end
+        updateRaidStartInfo(Autos.SelectedRaidStart)
     end)
 
     Toggles.AltHop:OnChanged(function()
@@ -788,29 +818,71 @@ return function(ctx)
         return false
     end
 
+    local function getPartyList()
+        local pg = References.player and References.player:FindFirstChild("PlayerGui")
+        local hud = pg and pg:FindFirstChild("HUD")
+        local party = hud and hud:FindFirstChild("Party")
+        local main = party and party:FindFirstChild("Main")
+        local menu = main and main:FindFirstChild("Menu")
+        return menu and menu:FindFirstChild("List")
+    end
+
+    local function getPartyMemberNames()
+        local names = {}
+        local list = getPartyList()
+        if not list then return names end
+
+        for _, v in ipairs(list:GetChildren()) do
+            if v:IsA("Frame") then
+                local frameName = normalizeName(v.Name)
+                if frameName ~= "" then names[frameName] = true end
+                for _, lbl in ipairs(v:GetDescendants()) do
+                    if lbl:IsA("TextLabel") then
+                        local text = normalizeName(lbl.Text)
+                        if text ~= "" then names[text] = true end
+                    end
+                end
+            end
+        end
+
+        return names
+    end
+
     local function hasParty()
-        local hud = References.player.PlayerGui:FindFirstChild("HUD")
-        if hud then
-            local list = hud.Party.Main.Menu.List
-            for _, v in ipairs(list:GetChildren()) do if v:IsA("Frame") then return true end end
+        local list = getPartyList()
+        if not list then return false end
+        for _, v in ipairs(list:GetChildren()) do
+            if v:IsA("Frame") then return true end
         end
         return false
     end
 
     local function isPlayerInParty(targetName)
-        local hud = References.player.PlayerGui:FindFirstChild("HUD")
-        if hud then
-            local list = hud.Party.Main.Menu.List
-            if list:FindFirstChild(targetName) then return true end
-            for _, v in ipairs(list:GetChildren()) do
-                if v:IsA("Frame") then
-                    for _, lbl in ipairs(v:GetDescendants()) do
-                        if lbl:IsA("TextLabel") and lbl.Text == targetName then return true end
-                    end
-                end
-            end
+        if not targetName or targetName == "" then return false end
+        local names = getPartyMemberNames()
+        return names[normalizeName(targetName)] == true
+    end
+
+    local function getPartyMemberCount()
+        local names = getPartyMemberNames()
+        local selfName = References.player and References.player.Name
+        if hasParty() and selfName then
+            names[normalizeName(selfName)] = true
         end
-        return false
+        local count = 0
+        for _ in pairs(names) do count = count + 1 end
+        return count
+    end
+
+    local function getRequiredPartyMembers()
+        local value = Options.RequiredPartyMembers and Options.RequiredPartyMembers.Value or 2
+        value = math.floor(tonumber(value) or 2)
+        value = math.clamp(value, 2, 6)
+        return math.min(value, 5)
+    end
+
+    local function leaveParty()
+        Remotes:InvokeServer("LeaveParty")
     end
 
     -- // UTILITY BUTTON CLICKERS //
@@ -960,10 +1032,6 @@ return function(ctx)
             table.insert(parts, "Lootbox Changes: unavailable (open phone lootboxes)")
         end
 
-        if type(reason) == "string" and reason ~= "" then
-            table.insert(parts, "End trigger: " .. reason)
-        end
-
         reportWebhook(RAID_WEBHOOK_EVENT, "Raid Completed", table.concat(parts, "\n"))
         state.active = false
         state.awaitRaidExit = true
@@ -1037,6 +1105,44 @@ return function(ctx)
         end
     end)
 
+    local function tryStartRaid(root)
+        notify("Starting Raid...", 2)
+        Autos.PartyGatherStart = nil
+        if not root then return end
+        local raidPos = getRaidEntrancePos()
+        if (root.Position - raidPos).Magnitude > 5 then
+            root.CFrame = CFrame.new(raidPos)
+            task.wait(0.5)
+        end
+
+        local pg = References.player:FindFirstChild("PlayerGui")
+        local enterRaid = pg and pg:FindFirstChild("EnterRaid")
+        local frame = enterRaid and enterRaid:FindFirstChild("Frame")
+        local uiVisible = (frame and frame.Visible)
+
+        if not uiVisible then
+            for _, v in ipairs(Services.Workspace:GetDescendants()) do
+                if v:IsA("ProximityPrompt") then
+                    local pos = getSafePosition(v.Parent)
+                    if pos and (pos - raidPos).Magnitude < 15 then
+                        v.HoldDuration = 0
+                        v.RequiresLineOfSight = false
+                        fireproximityprompt(v)
+                        break
+                    end
+                end
+            end
+            task.wait(0.5)
+        end
+
+        if uiVisible or (pg and pg:FindFirstChild("EnterRaid") and pg.EnterRaid:FindFirstChild("Frame") and pg.EnterRaid.Frame.Visible) then
+            for _ = 1, 5 do
+                if clickRaidButton() then break end
+                task.wait(0.3)
+            end
+        end
+    end
+
     -- // MAIN JOIN LOOP //
     task.spawn(function()
         while true do
@@ -1053,60 +1159,70 @@ return function(ctx)
                         
                         -- == ALT (HOST) LOGIC ==
                         if isAltAccount(myName) then
-                            local mainName, mainPlayer = getActiveMainPlayer()
+                            local requiredMembers = getRequiredPartyMembers()
+                            local partyExists = hasParty()
 
-                            if not mainPlayer then
-                                if os.clock() % 5 < 1 then notify("Waiting for a Main...", 2) end
+                            if not partyExists then
+                                notify("Creating Party...", 2)
+                                Remotes:InvokeServer("RequestCreateParty")
+                                task.wait(1)
+                                partyExists = hasParty()
+                                if partyExists then
+                                    Autos.PartyGatherStart = os.clock()
+                                else
+                                    Autos.PartyGatherStart = nil
+                                end
+                            end
+
+                            if partyExists and not Autos.PartyGatherStart then
+                                Autos.PartyGatherStart = os.clock()
+                            end
+
+                            if requiredMembers <= 2 then
+                                local mainName, mainPlayer = getActiveMainPlayer()
+
+                                if not mainPlayer then
+                                    if os.clock() % 5 < 1 then notify("Waiting for a Main...", 2) end
+                                else
+                                    if not isPlayerInParty(mainName) then
+                                        if (os.clock() - (Autos.LastInviteTime or 0)) > 15 then
+                                            notify("Inviting " .. mainName .. "...", 2)
+                                            Remotes:InvokeServer("InviteParty", mainPlayer)
+                                            Autos.LastInviteTime = os.clock()
+                                        end
+                                    else
+                                        tryStartRaid(root)
+                                    end
+                                end
                             else
-                                if not hasParty() then
-                                    notify("Creating Party...", 2)
-                                    Remotes:InvokeServer("RequestCreateParty")
-                                    task.wait(1)
+                                if (os.clock() - (Autos.LastInviteTime or 0)) > 15 then
+                                    for _, name in ipairs(Autos.MainAccountNames or {}) do
+                                        if normalizeName(name) ~= normalizeName(Autos.AltAccountName) then
+                                            local plr = Services.Players:FindFirstChild(name)
+                                            if plr and not isPlayerInParty(name) then
+                                                Remotes:InvokeServer("InviteParty", plr)
+                                                task.wait(0.1)
+                                            end
+                                        end
+                                    end
+                                    Autos.LastInviteTime = os.clock()
                                 end
 
-                                if not isPlayerInParty(mainName) then
-                                    if (os.clock() - (Autos.LastInviteTime or 0)) > 15 then
-                                        notify("Inviting " .. mainName .. "...", 2)
-                                        Remotes:InvokeServer("InviteParty", mainPlayer)
-                                        Autos.LastInviteTime = os.clock()
+                                local partyCount = getPartyMemberCount()
+                                local canStart = partyCount >= requiredMembers
+                                if not canStart and Autos.PartyGatherStart and partyCount >= 2 then
+                                    if (os.clock() - Autos.PartyGatherStart) >= 120 then
+                                        canStart = true
                                     end
-                                else
-                                    notify("Starting Raid...", 2)
-                                    if root then
-                                        local raidPos = getRaidEntrancePos()
-                                        if (root.Position - raidPos).Magnitude > 5 then
-                                            root.CFrame = CFrame.new(raidPos)
-                                            task.wait(0.5)
-                                        end
+                                end
 
-                                        -- UI Detection and Clicking
-                                        local pg = References.player:FindFirstChild("PlayerGui")
-                                        local enterRaid = pg and pg:FindFirstChild("EnterRaid")
-                                        local frame = enterRaid and enterRaid:FindFirstChild("Frame")
-                                        local uiVisible = (frame and frame.Visible)
-                                        
-                                        if not uiVisible then
-                                            for _, v in ipairs(Services.Workspace:GetDescendants()) do
-                                                if v:IsA("ProximityPrompt") then
-                                                    local pos = getSafePosition(v.Parent)
-                                                    if pos and (pos - raidPos).Magnitude < 15 then
-                                                        v.HoldDuration = 0
-                                                        v.RequiresLineOfSight = false
-                                                        fireproximityprompt(v)
-                                                        break
-                                                    end
-                                                end
-                                            end
-                                            task.wait(0.5)
-                                        end
-
-                                        if uiVisible or (pg and pg:FindFirstChild("EnterRaid") and pg.EnterRaid:FindFirstChild("Frame") and pg.EnterRaid.Frame.Visible) then
-                                            for _ = 1, 5 do
-                                                if clickRaidButton() then break end
-                                                task.wait(0.3)
-                                            end
-                                        end
-                                    end
+                                if canStart then
+                                    tryStartRaid(root)
+                                elseif os.clock() % 5 < 1 then
+                                    notify(
+                                        string.format("Waiting for party (%d/%d)...", partyCount, requiredMembers),
+                                        2
+                                    )
                                 end
                             end
 
@@ -1115,6 +1231,7 @@ return function(ctx)
                             Autos.ActiveMainName = myName
 
                             if not hasParty() then
+                                Autos.MissingAltSince = nil
                                 local now = os.clock()
                                 if (now - (Autos.LastAcceptInvite or 0)) >= 2 then
                                     Autos.LastAcceptInvite = now
@@ -1126,6 +1243,18 @@ return function(ctx)
                                 end
                                 notify("Waiting for invite...", 2)
                             else
+                                local altName = Autos.AltAccountName
+                                if altName and altName ~= "" and not isPlayerInParty(altName) then
+                                    if not Autos.MissingAltSince then
+                                        Autos.MissingAltSince = os.clock()
+                                    elseif (os.clock() - Autos.MissingAltSince) >= 2 then
+                                        leaveParty()
+                                        Autos.MissingAltSince = nil
+                                        return
+                                    end
+                                else
+                                    Autos.MissingAltSince = nil
+                                end
                                 notify("In Party! Waiting for start...", 2)
                             end
                         end
