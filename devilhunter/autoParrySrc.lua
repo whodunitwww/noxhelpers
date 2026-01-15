@@ -18,41 +18,42 @@ return function(ctx)
 
     local clock = os.clock
     local insert, remove = table.insert, table.remove
-    
+
     -- Hard Stop
     if Config.Enabled ~= true then return end
 
     -- // State Management // --
     local State = {
         -- Global Cleanups
-        MainConnections = {}, 
-        
+        MainConnections = {},
+
         -- Per-Enemy Cleanup
-        EnemyTracks = {}, 
-        
+        EnemyTracks = {},
+
         -- Cache: Weak Keys ensure AnimationTracks are GC'd automatically
         AnimSeen = setmetatable({}, { __mode = "k" }),
-        
+
         -- Scheduler Queue
-        PendingParries = {}, 
-        
+        PendingParries = {},
+
         -- Math Caches
         RangeSq = 14 * 14,
         FovThreshold = -1, -- -1 = 180 degrees
-        
+
         -- Logic Flags
         ParryAvailTime = 0,
     }
 
     local AutoParry = {
-        ConfigPresets = { 
-            { Name = "Custom Config (Local)", Url = nil },
+        ConfigPresets = {
             {
                 Name = "Cash/Alexx Config",
-                Url = "https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/devilhunter/devil_ap.json"
-            }
+                Url =
+                "https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/devilhunter/devil_ap.json"
+            },
+            { Name = "Custom Config (Local)", Url = nil }
         },
-        
+
         -- Settings
         enabled = false,
         debug = false,
@@ -65,14 +66,14 @@ return function(ctx)
         parryFailTime = 0.25,
         rollOnFailGlob = true,
         productionMode = true,
-        
+
         keyCode = Enum.KeyCode.F,
         rollKey = Enum.KeyCode.Q,
 
         currentPresetIndex = 1,
         apFile = References.gameDir .. "/AP_Config.json",
         apExtraFile = References.gameDir .. "/AP_Config_Extra.json",
-        
+
         AP_Config_Default = {
             ["17030773401"] = {
                 name = "Zombie Attack",
@@ -97,7 +98,7 @@ return function(ctx)
     local function checkFov(myRoot, targetRoot)
         if not AutoParry.useFov then return true end
         if not myRoot or not targetRoot then return false end
-        
+
         local dir = (targetRoot.Position - myRoot.Position).Unit
         local look = myRoot.CFrame.LookVector
         return look:Dot(dir) >= State.FovThreshold
@@ -118,7 +119,7 @@ return function(ctx)
         if not References.humanoidRootPart then return end
 
         local now = clock()
-        
+
         for i = #State.PendingParries, 1, -1 do
             local taskData = State.PendingParries[i]
             if now >= taskData.triggerTime then
@@ -149,7 +150,7 @@ return function(ctx)
 
     function AutoParry:executeParry(cfg, animId, sourceModel, isRepeat, chainId)
         if not self.enabled then return end
-        
+
         local myRoot = References.humanoidRootPart
         if not myRoot then return end
 
@@ -160,7 +161,7 @@ return function(ctx)
             if self.rollOnFailGlob and cfg.rollOnFail then
                 performInput(self.rollKey, 0.05)
                 State.ParryAvailTime = now + self.parryFailTime
-                
+
                 -- HOOK: Parry Fail Roll
                 if getgenv().AutoParry_OnParryFailRoll then
                     pcall(getgenv().AutoParry_OnParryFailRoll, animId, cfg, srcName, chainId)
@@ -185,7 +186,7 @@ return function(ctx)
         -- 3. Execute
         local isRoll = (cfg.priority == "roll")
         local keyToUse = isRoll and self.rollKey or self.keyCode
-        
+
         performInput(keyToUse, cfg.hold)
         State.ParryAvailTime = now + self.parryFailTime
 
@@ -204,7 +205,7 @@ return function(ctx)
         local rtt = References.player:GetNetworkPing()
         local oneWay = (self.pingOn and (rtt * 0.5 * (self.pingScale / 100))) or 0
         oneWay = math.max(0, oneWay + (self.extraBiasMs / 1000))
-        
+
         local tPos = trackObj.TimePosition or 0
         local timings = { { t = cfg.startSec, isRepeat = false } }
 
@@ -223,14 +224,14 @@ return function(ctx)
                 distOffset = cfg.distanceAdj * (dist / 100)
             end
         end
-        
+
         local chainId = tostring(animId) .. "-" .. tostring(math.floor(now * 1000))
         local srcName = sourceModel and sourceModel.Name or "Unknown"
 
         for _, timing in ipairs(timings) do
             local hitTime = (timing.t or cfg.startSec) + distOffset
             local delayNeeded = hitTime - tPos - oneWay
-            
+
             -- HOOK: Scheduled
             if getgenv().AutoParry_OnParryScheduled then
                 pcall(
@@ -272,10 +273,10 @@ return function(ctx)
 
     function AutoParry:isValidTarget(model)
         if not model or model == References.character then return false end
-        
+
         local eRoot = model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
         local myRoot = References.humanoidRootPart
-        
+
         if not (eRoot and myRoot) then return false end
         if getDistSq(eRoot.Position, myRoot.Position) > State.RangeSq then return false end
 
@@ -292,8 +293,8 @@ return function(ctx)
 
         local animConn = hum.AnimationPlayed:Connect(function(animTrack)
             if not self.enabled then return end
-            if State.AnimSeen[animTrack] then return end 
-            
+            if State.AnimSeen[animTrack] then return end
+
             local model = hum.Parent
             if not self:isValidTarget(model) then return end
 
@@ -304,14 +305,14 @@ return function(ctx)
             local cfg = self.AP_Config[animId]
             if not cfg or cfg.enabled == false then return end
 
-            State.AnimSeen[animTrack] = true 
+            State.AnimSeen[animTrack] = true
             self:schedule(animId, animTrack, model, cfg)
         end)
         insert(connections, animConn)
 
         local ancestryConn = hum.AncestryChanged:Connect(function(_, parent)
             if not parent then
-                self:unhookHumanoid(hum) 
+                self:unhookHumanoid(hum)
             end
         end)
         insert(connections, ancestryConn)
@@ -322,7 +323,7 @@ return function(ctx)
     function AutoParry:Start()
         if self.enabled then return end
         self.enabled = true
-        
+
         for _, v in ipairs(Workspace:GetDescendants()) do
             if v:IsA("Animator") then self:processAnim(v) end
         end
@@ -332,7 +333,7 @@ return function(ctx)
                 if v:IsA("Animator") then self:processAnim(v) end
             end))
         end
-        
+
         debugNote("Auto Parry", "Enabled", 2)
     end
 
@@ -343,7 +344,7 @@ return function(ctx)
     end
 
     -- // Config Management // --
-    
+
     local function tryRead(path)
         if not (isfile and isfile(path)) then return nil end
         local ok, data = pcall(readfile, path)
@@ -384,7 +385,7 @@ return function(ctx)
             local s, r = pcall(game.HttpGet, game, selected.Url)
             if s then
                 local s2, d = pcall(HttpService.JSONDecode, HttpService, r)
-                if s2 then 
+                if s2 then
                     loadedConfig = parseConfig(d)
                     mainFrom = "Web: " .. selected.Name
                 end
@@ -393,7 +394,7 @@ return function(ctx)
             local content = tryRead(AutoParry.apFile)
             if content then
                 local s2, d = pcall(HttpService.JSONDecode, HttpService, content)
-                if s2 then 
+                if s2 then
                     loadedConfig = parseConfig(d)
                     mainFrom = "File: Custom"
                 end
@@ -403,14 +404,14 @@ return function(ctx)
 
         -- Extra Config
         if isfile(AutoParry.apExtraFile) then
-             local content = tryRead(AutoParry.apExtraFile)
-             if content then
+            local content = tryRead(AutoParry.apExtraFile)
+            if content then
                 local s2, d = pcall(HttpService.JSONDecode, HttpService, content)
                 if s2 then loadedExtra = d end
-             end
+            end
         end
         AutoParry.AP_ConfigExtra = loadedExtra
-        
+
         local pKey = AutoParry.AP_ConfigExtra.parryKey or "F"
         local rKey = AutoParry.AP_ConfigExtra.rollKey or "Q"
         AutoParry.keyCode = Enum.KeyCode[pKey:upper()] or Enum.KeyCode.F
@@ -484,7 +485,7 @@ return function(ctx)
     Group:AddToggle("AP_RollOnFail", { Text = "Roll on Fail", Default = true })
     Group:AddSlider("AP_FailWindow", { Text = "Fail Window", Default = 0.25, Min = 0, Max = 1, Suffix = " s" })
     Group:AddToggle("AP_Debug", { Text = "Debug Info", Default = false })
-    
+
     Group:AddToggle("AP_AutoRefresh", { Text = "Auto-Refresh (Local File)", Default = false })
 
     Group:AddButton({
@@ -503,15 +504,20 @@ return function(ctx)
     Group:AddButton({
         Text = "Launch Anim Player",
         Func = function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/animPlayer.lua"))()
+            loadstring(game:HttpGet(
+            "https://raw.githubusercontent.com/whodunitwww/noxhelpers/refs/heads/main/animPlayer.lua"))()
         end,
     })
 
     -- // Events // --
     Toggles.AP_Enable:OnChanged(function(v) if v then AutoParry:Start() else AutoParry:Stop() end end)
-    Options.AP_Range:OnChanged(function(v) AutoParry.range = v; State.RangeSq = v*v end)
+    Options.AP_Range:OnChanged(function(v)
+        AutoParry.range = v; State.RangeSq = v * v
+    end)
     Toggles.AP_UseFov:OnChanged(function(v) AutoParry.useFov = v end)
-    Options.AP_FovLimit:OnChanged(function(v) AutoParry.fovLimit = v; State.FovThreshold = math.cos(math.rad(v/2)) end)
+    Options.AP_FovLimit:OnChanged(function(v)
+        AutoParry.fovLimit = v; State.FovThreshold = math.cos(math.rad(v / 2))
+    end)
     Toggles.AP_Debug:OnChanged(function(v) AutoParry.debug = v end)
     Toggles.AP_Ping:OnChanged(function(v) AutoParry.pingOn = v end)
     Options.AP_PingScale:OnChanged(function(v) AutoParry.pingScale = v end)
@@ -525,7 +531,7 @@ return function(ctx)
             APAR.lastExtraSig = getFileSig(AutoParry.apExtraFile)
         end
     end)
-    
+
     Options.AP_ConfigProfile:OnChanged(function(val)
         for i, v in ipairs(AutoParry.ConfigPresets) do
             if v.Name == val then
