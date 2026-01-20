@@ -34,6 +34,7 @@ return function(ctx)
         DamageDitchEnabled           = false,
         DamageDitchThreshold         = 100,
         TargetFullHealth             = false,
+        AutoCritical                 = false,
         PlayerAvoidRadius            = 40,
         AttackNearbyMobs             = false,
         NearbyMobRange               = 40,
@@ -270,10 +271,115 @@ return function(ctx)
         return tonumber(AF_Config.MobExtraYOffset) or 0
     end
 
+    local AUTO_CRITICAL_DISTANCE    = 5
+    local AUTO_CRITICAL_MIN_Y       = 1
+
+    local function getRockCriticalPart(target)
+        if not target or not target.Parent then
+            return nil
+        end
+
+        local crit = target:FindFirstChild("RockCritical", true)
+        if not crit then
+            return nil
+        end
+
+        if crit:IsA("BasePart") then
+            return crit
+        end
+
+        if crit:IsA("Attachment") then
+            local parent = crit.Parent
+            if parent and parent:IsA("BasePart") then
+                return parent
+            end
+        end
+
+        if crit:IsA("Model") then
+            local part = crit.PrimaryPart or crit:FindFirstChildWhichIsA("BasePart")
+            if part then
+                return part
+            end
+        end
+
+        return nil
+    end
+
+    local function getAutoCriticalAttach(target, def)
+        if not (AF_Config.AutoCritical and FarmState.attached) then
+            return nil
+        end
+        if FarmState.currentTarget ~= target then
+            return nil
+        end
+        if not (def and def.name == "Ores") then
+            return nil
+        end
+
+        local root = (def.getRoot and def.getRoot(target)) or getMobRoot(target)
+        if not root then
+            return nil
+        end
+
+        local critical = getRockCriticalPart(target)
+        if not critical then
+            return nil
+        end
+
+        local criticalPos = critical.Position
+        local dir = criticalPos - root.Position
+        if dir.Magnitude < 1e-3 then
+            local hrp = getLocalHRP()
+            dir = hrp and (criticalPos - hrp.Position) or root.CFrame.LookVector
+        end
+        if dir.Magnitude < 1e-3 then
+            dir = Vector3.new(0, 0, -1)
+        else
+            dir = dir.Unit
+        end
+
+        local targetPos = criticalPos + dir * AUTO_CRITICAL_DISTANCE
+        local minY = criticalPos.Y + AUTO_CRITICAL_MIN_Y
+        if targetPos.Y < minY then
+            targetPos = Vector3.new(targetPos.X, minY, targetPos.Z)
+        end
+
+        return {
+            targetPos   = targetPos,
+            criticalPos = criticalPos,
+            root        = root,
+        }
+    end
+
+    local function applyAutoCriticalAttach(target, def)
+        local data = getAutoCriticalAttach(target, def)
+        if not data then
+            return false
+        end
+
+        local state = AttachPanel and AttachPanel.State
+        local attachA1 = state and state._attachA1
+        local alignOri = state and state._alignOri
+        local hrp = getLocalHRP()
+        if not (attachA1 and alignOri and hrp and data.root) then
+            return false
+        end
+
+        local offsetWorld = data.targetPos - data.root.Position
+        attachA1.Position = data.root.CFrame:VectorToObjectSpace(offsetWorld)
+        alignOri.CFrame = CFrame.lookAt(hrp.Position, data.criticalPos, Vector3.yAxis)
+        return true
+    end
+
     local function getAttachPosition(target, def, offsetType)
         if not (target and def) then
             return nil, nil
         end
+        local autoData = getAutoCriticalAttach(target, def)
+        if autoData then
+            return autoData.targetPos, autoData.root
+        end
+
         local root = (def.getRoot and def.getRoot(target)) or getMobRoot(target)
         if not root then
             return nil, nil
@@ -1524,7 +1630,9 @@ return function(ctx)
                 if FarmState.activeOffsetType ~= activeOffsetType then
                     FarmState.activeOffsetType = activeOffsetType
                     if FarmState.attached and activeTarget then
-                        realignAttach(activeTarget, activeDef, activeOffsetType)
+                        if not applyAutoCriticalAttach(activeTarget, activeDef) then
+                            realignAttach(activeTarget, activeDef, activeOffsetType)
+                        end
                     end
                 end
 
@@ -1711,12 +1819,15 @@ return function(ctx)
                                 task.wait(0.05)
                                 return
                             end
+                            applyAutoCriticalAttach(activeTarget, activeDef)
                             FarmState.lastTargetRef    = activeTarget
                             FarmState.stuckStartTime   = os.clock()
                             FarmState.lastTargetHealth = activeDef.getHealth(activeTarget) or 0
                             FarmState.lastHit          = 0
                         else
-                            realignAttach(activeTarget, activeDef, activeOffsetType)
+                            if not applyAutoCriticalAttach(activeTarget, activeDef) then
+                                realignAttach(activeTarget, activeDef, activeOffsetType)
+                            end
 
                             if not isDistracted and FarmState.lastTargetRef == activeTarget then
                                 local currHealth = activeDef.getHealth(activeTarget) or 0
@@ -2161,6 +2272,26 @@ return function(ctx)
                 and FarmState.mode == FARM_MODE_ORES
                 and not isBossModel(FarmState.currentTarget) then
                 Movement.realignAttach(FarmState.currentTarget, ModeDefs[FARM_MODE_ORES], "Ores")
+            end
+        end,
+    })
+
+    FarmGroup:AddToggle("AF_AutoCritical", {
+        Text     = "Auto Critical",
+        Default  = false,
+        Tooltip  = "Blatent - don't use it public servers.",
+        Callback = function(state)
+            AF_Config.AutoCritical = state and true or false
+            if FarmState.enabled
+                and FarmState.attached
+                and FarmState.currentTarget
+                and FarmState.mode == FARM_MODE_ORES
+            then
+                if state then
+                    applyAutoCriticalAttach(FarmState.currentTarget, ModeDefs[FARM_MODE_ORES])
+                else
+                    realignAttach(FarmState.currentTarget, ModeDefs[FARM_MODE_ORES], "Ores")
+                end
             end
         end,
     })
