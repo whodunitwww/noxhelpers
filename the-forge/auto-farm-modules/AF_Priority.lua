@@ -1,40 +1,75 @@
 -- AF_Priority.lua
--- Handles default priorities and config file loading for ores and enemies
+-- Handles default priorities and config file loading for ores, enemies, and runes
 return function(env)
     local HttpService             = env.HttpService
     local notify                  = env.notify
 
-    local PRIORITY_CONFIG_VERSION = 4.0
+    local PRIORITY_CONFIG_VERSION = 5.0
 
-local DefaultOrePriority = {
-    ["Basalt"] = 5,
-    ["Basalt Core"] = 4,
-    ["Basalt Rock"] = 5,
-    ["Basalt Vein"] = 3,
-    ["Boulder"] = 6,
-    ["Crimson Crystal"] = 1,
-    ["Cyan Crystal"] = 1,
-    ["Earth Crystal"] = 1,
-    ["Floating Crystal"] = 1,
-    ["Heart Of The Island"] = 6,
-    ["Iceberg"] = 6,
-    ["Icy Boulder"] = 6,
-    ["Icy Pebble"] = 6,
-    ["Icy Rock"] = 6,
-    ["Large Ice Crystal"] = 1,
-    ["Large Red Crystal"] = 1,
-    ["Lava Rock"] = 2,
-    ["Light Crystal"] = 1,
-    ["Lucky Block"] = 6,
-    ["Medium Ice Crystal"] = 1,
-    ["Medium Red Crystal"] = 1,
-    ["Pebble"] = 6,
-    ["Rock"] = 6,
-    ["Small Ice Crystal"] = 1,
-    ["Small Red Crystal"] = 1,
-    ["Violet Crystal"] = 1,
-    ["Volcanic Rock"] = 2,
-}
+    local DefaultOrePriority = {
+        ["Basalt"] = 5,
+        ["Basalt Core"] = 4,
+        ["Basalt Rock"] = 5,
+        ["Basalt Vein"] = 3,
+        ["Boulder"] = 6,
+        ["Iceberg"] = 6,
+        ["Icy Boulder"] = 6,
+        ["Icy Pebble"] = 6,
+        ["Icy Rock"] = 6,
+        ["Lava Rock"] = 2,
+        ["Lucky Block"] = 6,
+        ["Pebble"] = 6,
+        ["Rock"] = 6,
+        ["Volcanic Rock"] = 2,
+        ["Bamboo Pebble"] = 6,
+        ["Bamboo Rock"] = 6,
+        ["Bamboo Boulder"] = 6,
+        ["Hana Pebble"] = 6,
+        ["Glowy Rock"] = 6,
+        ["Blossom Boulder"] = 6,
+        ["Crimson Crystal"] = 1,
+        ["Cyan Crystal"] = 1,
+        ["Earth Crystal"] = 1,
+        ["Floating Crystal"] = 1,
+        ["Heart Of The Island"] = 6,
+        ["Large Ice Crystal"] = 1,
+        ["Large Red Crystal"] = 1,
+        ["Light Crystal"] = 1,
+        ["Medium Ice Crystal"] = 1,
+        ["Medium Red Crystal"] = 1,
+        ["Small Ice Crystal"] = 1,
+        ["Small Red Crystal"] = 1,
+        ["Violet Crystal"] = 1,
+        ["Golem Heart"] = 1,
+        ["Yeti Heart"] = 1,
+        ["Prismatic Heart"] = 1,
+        ["Onite"] = 1,
+        ["Kyubite"] = 1,
+        ["Root Spire"] = 1,
+        ["Water Stone"] = 1,
+        ["Earthite"] = 1,
+        ["Melonite"] = 1,
+        ["Rock Seed"] = 1,
+        ["Wraith"] = 1,
+        ["Tiger's Eye"] = 1,
+        ["Cyanite Jade"] = 1,
+        ["Magit"] = 1,
+        ["Duquack"] = 1,
+        ["Onyx"] = 1,
+        ["Aurelia-no-Ki"] = 1,
+        ["Sakuranite"] = 1,
+        ["Heat Steel"] = 1,
+        ["Fruite"] = 1,
+        ["Sealed Curse"] = 1,
+        ["Blue Gem Quill"] = 1,
+        ["Zenstone"] = 1,
+        ["Sun Stone"] = 1,
+        ["Azuryxite"] = 1,
+        ["Roosite"] = 1,
+        ["Meteorite"] = 1,
+        ["Heavenly Orb"] = 1,
+        ["Lucky Cat"] = 1,
+    }
     
     local PermOreList             = {
         "Crimson Crystal",
@@ -43,9 +78,9 @@ local DefaultOrePriority = {
         "Earth Crystal",
         "Light Crystal",
         "Floating Crystal",
-        "Large Red Crystal", -- Added
-        "Medium Red Crystal", -- Added
-        "Small Red Crystal", -- Added
+        "Large Red Crystal",
+        "Medium Red Crystal",
+        "Small Red Crystal",
         "Crimson Ice",
         "Heart Of The Island",
         "Large Ice Crystal",
@@ -55,42 +90,58 @@ local DefaultOrePriority = {
         "Lava Rock",
         "Basalt Vein",
         "Basalt Core",
+        "Golem Heart", "Yeti Heart", "Prismatic Heart", "Onite", "Kyubite", 
+        "Root Spire", "Water Stone", "Earthite", "Melonite", "Rock Seed", 
+        "Wraith", "Tiger's Eye", "Cyanite Jade", "Magit", "Duquack", 
+        "Onyx", "Aurelia-no-Ki", "Sakuranite", "Heat Steel", "Fruite", 
+        "Sealed Curse", "Blue Gem Quill", "Zenstone", "Sun Stone", 
+        "Azuryxite", "Roosite", "Meteorite", "Heavenly Orb", "Lucky Cat"
     }
 
-local DefaultEnemyPriority = {
-    ["Axe Skeleton"] = 6,
-    ["Blazing Slime"] = 1,
-    ["Blight Pyromancer"] = 2,
-    ["Bomber"] = 8,
-    ["Brute Zombie"] = 9,
-    ["Chuthlu"] = 10,
-    ["Common Orc"] = 5,
-    ["Crystal Golem"] = 2,
-    ["Crystal Spider"] = 3,
-    ["Deathaxe Skeleton"] = 5,
-    ["Delver Zombie"] = 9,
-    ["Demonic Queen Spider"] = 1,
-    ["Demonic Spider"] = 2,
-    ["Diamond Spider"] = 3,
-    ["Elite Deathaxe Skeleton"] = 2,
-    ["Elite Orc"] = 3,
-    ["Elite Rogue Skeleton"] = 4,
-    ["EliteZombie"] = 9,
-    ["Golem"] = 4,
-    ["MinerZombie"] = 9,
-    ["Mini Demonic Spider"] = 4,
-    ["Prismarine Spider"] = 3,
-    ["Reaper"] = 3,
-    ["Skeleton Pirate"] = 10,
-    ["Skeleton Rogue"] = 7,
-    ["Slime"] = 9,
-    ["Yeti"] = 3,
-    ["Zombie"] = 9,
-    ["Zombie3"] = 9,
-}
+    local DefaultEnemyPriority = {
+        ["Axe Skeleton"] = 6,
+        ["Blazing Slime"] = 1,
+        ["Blight Pyromancer"] = 2,
+        ["Bomber"] = 8,
+        ["Brute Zombie"] = 9,
+        ["Chuthlu"] = 10,
+        ["Common Orc"] = 5,
+        ["Crystal Golem"] = 2,
+        ["Crystal Spider"] = 3,
+        ["Deathaxe Skeleton"] = 5,
+        ["Delver Zombie"] = 9,
+        ["Demonic Queen Spider"] = 1,
+        ["Demonic Spider"] = 2,
+        ["Diamond Spider"] = 3,
+        ["Elite Deathaxe Skeleton"] = 2,
+        ["Elite Orc"] = 3,
+        ["Elite Rogue Skeleton"] = 4,
+        ["EliteZombie"] = 9,
+        ["Golem"] = 4,
+        ["MinerZombie"] = 9,
+        ["Mini Demonic Spider"] = 4,
+        ["Prismarine Spider"] = 3,
+        ["Reaper"] = 3,
+        ["Skeleton Pirate"] = 10,
+        ["Skeleton Rogue"] = 7,
+        ["Slime"] = 9,
+        ["Yeti"] = 3,
+        ["Zombie"] = 9,
+        ["Zombie3"] = 9,
+        ["Mountain Ape"] = 5,
+        ["Savage Ape"] = 6,
+        ["Samurai Ape"] = 7,
+        ["Monk Panda"] = 5,
+        ["Brute Oni"] = 8,
+        ["Frostburn Oni"] = 8,
+        ["Warlord Oni"] = 9,
+        ["Hellflame Oni"] = 9,
+        ["Asura's Incarnate"] = 10,
+    }
 
     local OrePriority   = {}
     local EnemyPriority = {}
+
     for k, v in pairs(DefaultOrePriority) do OrePriority[k] = v end
     for k, v in pairs(DefaultEnemyPriority) do EnemyPriority[k] = v end
 
@@ -100,7 +151,7 @@ local DefaultEnemyPriority = {
         local payload = {
             Version = PRIORITY_CONFIG_VERSION,
             Ores    = DefaultOrePriority,
-            Enemies = DefaultEnemyPriority
+            Enemies = DefaultEnemyPriority,
         }
         pcall(function()
             writefile(PriorityConfigFile, HttpService:JSONEncode(payload))
@@ -139,13 +190,17 @@ local DefaultEnemyPriority = {
                         fileVersion = 0
                     end
                 end
+                
+                -- Version check to refresh structure
                 if fileVersion < PRIORITY_CONFIG_VERSION then
                     applyDefaultPriorities()
                     writeDefaultPriorityConfig()
                     notify("Priority config outdated (v" .. fileVersion
-                        .. " vs v" .. PRIORITY_CONFIG_VERSION .. "). Resetting.", 5)
+                        .. " vs v" .. PRIORITY_CONFIG_VERSION .. "). Resetting to include World 4.", 5)
                     return
                 end
+
+                -- Load Ores
                 if type(result.Ores) == "table" then
                     OrePriority = {}
                     for k, v in pairs(result.Ores) do
@@ -154,6 +209,8 @@ local DefaultEnemyPriority = {
                 else
                     for k, v in pairs(DefaultOrePriority) do OrePriority[k] = v end
                 end
+
+                -- Load Enemies
                 if type(result.Enemies) == "table" then
                     EnemyPriority = {}
                     for k, v in pairs(result.Enemies) do
@@ -162,6 +219,7 @@ local DefaultEnemyPriority = {
                 else
                     for k, v in pairs(DefaultEnemyPriority) do EnemyPriority[k] = v end
                 end
+
             else
                 applyDefaultPriorities()
                 writeDefaultPriorityConfig()
